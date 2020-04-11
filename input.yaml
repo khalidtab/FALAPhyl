@@ -1,0 +1,81 @@
+group: # The group column name in your mapping file
+     - ShortCond
+
+color: # The color column in your mapping file
+     - Colors
+
+adonis: # What independent terms do you want to test? "treatment+block" would test the input distance matrix partitions "treatment" and "block". The formula "treatment*block" would test "Treatment" as well as the interaction between the two terms. 
+# Nestedness is not possible with this implementation of adonis, i.e, formula "Patient/Pockets", as the block Patient needs to be included in the R formula itself as well "strata = Patient". This will be implemented via a different snakemake workflow with other analyses related to nested data analysis
+#     - Cond
+#     - ShortCond
+#     - ShortCond*Cond
+     - ShortCond+Cond
+
+distances:
+     - jaccard
+     - braycurtis
+#     - canberra_adkins
+#     - euclidean
+#     - sokalmichener
+#     - cosine
+#     - matching
+#     - kulsinski
+#     - sqeuclidean
+#     - cityblock
+#     - seuclidean
+#     - yule
+#     - canberra
+#     - dice
+#     - hamming
+#     - sokalsneath
+#     - correlation
+#     - rogerstanimoto
+#     - russellrao
+#     - aitchison
+#     - chebyshev
+
+alpha: #This list of alpha diversity metrics is shared by both Qiime2 and PhyloToast's implementation.
+     - ace
+     - berger_parker_d
+     - brillouin_d
+     - chao1
+     - dominance
+     - doubles
+     - enspie
+     - fisher_alpha
+     - gini_index
+     - goods_coverage
+     - heip_e
+     - kempton_taylor_q
+     - lladser_pe
+     - margalef
+     - mcintosh_d
+     - mcintosh_e
+     - menhinick
+     - michaelis_menten_fit
+     - observed_otus
+     - osd
+     - robbins
+     - shannon
+     - simpson
+     - simpson_e
+     - singles
+     - strong
+
+phylogenic:
+     - unifrac
+     - unifrac_g
+     - unifrac_g_full_tree
+     - unweighted_unifrac
+     - unweighted_unifrac_full_tree
+     - weighted_normalized_unifrac
+     - weighted_unifrac
+
+phylogenic:
+     - unifrac
+     - unifrac_g
+     - unifrac_g_full_tree
+     - unweighted_unifrac
+     - unweighted_unifrac_full_tree
+     - weighted_normalized_unifrac
+     - weighted_unifrac

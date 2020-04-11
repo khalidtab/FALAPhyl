@@ -1,0 +1,16 @@
+channels:
+    - bioconda
+    - conda-forge
+dependencies:
+    - numpy
+    - scipy
+    - matplotlib <= 1.5.3
+    - biopython >= 1.60
+    - scikit-bio <= 0.4.2
+    - scikit-learn
+    - pandas
+    - statsmodels
+    - palettable
+    - biom-format >= 2.1.5
+    - h5py
+    - phylotoast
