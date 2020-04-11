@@ -12,7 +12,7 @@ rule beta_div: #Opportunity for parallelization by writing all commands to a tex
       tsv=expand("data/distance/beta_div/{{sample}}+{dist}.tsv",dist=config["distances"]),
       tsv_pcoa=expand("data/distance/PCoA/PCoA_{{sample}}+{dist}.tsv",dist=config["distances"])
    shell: 
-      "mkdir -p data/distance/beta_div data/distance/PCoA &&"
+      "mkdir -p data/distance/beta_div data/distance/PCoA data/scripts &&"
       "echo 'for x in {params.dist}; do qiime diversity beta --i-table data/biom/{wildcards.sample}.qza --o-distance-matrix data/distance/beta_div/{wildcards.sample}+$x.qza --p-metric $x &&"
       "qiime diversity pcoa --i-distance-matrix data/distance/beta_div/{wildcards.sample}+$x.qza --o-pcoa data/distance/PCoA/PCoA_{wildcards.sample}+$x.qza &&"
       "qiime tools export --input-path data/distance/beta_div/{wildcards.sample}+$x.qza --output-path data/distance/beta_div/{wildcards.sample}+$x &&"
@@ -92,6 +92,7 @@ rule make_anosim_PDFs:
    params: 
       dist=expand("{dist}",dist=config["distances"])
    shell:
+      "mkdir -p data/logs data/scripts &&"
       "echo 'for x in {params.dist}; do weasyprint data/distance/ANOSIM/ANOSIM_{wildcards.sample}_$x/index.html data/distance/ANOSIM/ANOSIM_{wildcards.sample}_$x.pdf 2>> data/logs/PDF_{wildcards.sample}_ANOSIM.log && rm -rf data/distance/ANOSIM/ANOSIM_{wildcards.sample}_$x"
       "; done' > data/scripts/PDF_ANOSIM_{wildcards.sample}.sh |"
       "chmod +x data/scripts/PDF_ANOSIM_{wildcards.sample}.sh |"
@@ -109,6 +110,7 @@ rule make_permdisp_PDFs:
    params: 
       dist=expand("{dist}",dist=config["distances"])
    shell:
+      "mkdir -p data/logs data/scripts &&"
       "echo 'for x in {params.dist}; do weasyprint data/distance/PERMDISP/PERMDISP_{wildcards.sample}_$x/index.html data/distance/PERMDISP/PERMDISP_{wildcards.sample}_$x.pdf 2>> data/logs/PDF_{wildcards.sample}_PERMDISP.log && rm -rf data/distance/PERMDISP/PERMDISP_{wildcards.sample}_$x"
       "; done' > data/scripts/PDF_PERMDISP_{wildcards.sample}.sh |"
       "chmod +x data/scripts/PDF_PERMDISP_{wildcards.sample}.sh |"
@@ -127,6 +129,7 @@ rule make_adonis_PDFs:
       dist=expand("{dist}",dist=config["distances"]),
       formula=expand("{dist}",dist=config["adonis"])
    shell:
+      "mkdir -p data/logs data/scripts &&"
       "echo 'for x in {params.dist}; do for y in {params.formula}; do weasyprint data/distance/ADONIS/ADONIS_{wildcards.sample}_$y+$x/index.html data/distance/ADONIS/ADONIS_{wildcards.sample}_$y+$x.pdf 2>> data/logs/PDF_{wildcards.sample}_ADONIS.log && rm -rf data/distance/ADONIS/ADONIS_{wildcards.sample}_$y+$x"
       "; done ; done' > data/scripts/PDF_ADONIS_{wildcards.sample}.sh |"
       "chmod +x data/scripts/PDF_ADONIS_{wildcards.sample}.sh |"
@@ -147,6 +150,7 @@ rule pcoa_svg: #Opportunity for parallelization by writing all commands to a tex
    output:
       report(expand("data/plots/PCoA_{{sample}}+{dist}.svg",dist=config["distances"]))
    shell: 
+      "mkdir -p data/plots &&"
       "echo 'for x in {params.dist}; do PCoA.py -i data/distance/PCoA/PCoA_{wildcards.sample}+$x.tsv -m data/map/{wildcards.sample}.txt -g {params.group} -d 2 -c {params.color} -o data/plots/PCoA_{wildcards.sample}+$x.svg ; done'"
       "> data/scripts/SVG_PCoA_{wildcards.sample}.sh |"
       "chmod +x data/scripts/SVG_PCoA_{wildcards.sample}.sh |"

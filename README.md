@@ -1,11 +1,11 @@
-# Necessary folder structure in the snakemake folder:
+# Necessary folder structure
+
+Before execution, the snakemake folder needs the following folders inside of it where the biom files and mapping files reside in:
 
 - data/biom
-- data/distance
-- data/logs
 - data/map 
-- data/plots
-- data/scripts
-- data/tsv
-- workflow/envs
-- workflow/rules
+
+Each biom and mapping file needs to be named the same, and be stored in the correct folders. For example: 
+
+- data/biom/health_disease.biom
+- data/map/health_disease.txt

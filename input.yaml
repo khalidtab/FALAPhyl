@@ -1,7 +1,7 @@
-group: # The group column name in your mapping file
+group: # The group column name in your mapping file. Only one entry possible. Everything else will be ignored
      - ShortCond
 
-color: # The color column in your mapping file
+color: # The color column in your mapping file. Only one entry possible. Everything else will be ignored
      - Colors
 
 adonis: # What independent terms do you want to test? "treatment+block" would test the input distance matrix partitions "treatment" and "block". The formula "treatment*block" would test "Treatment" as well as the interaction between the two terms. 
@@ -36,31 +36,31 @@ distances:
 
 alpha: #This list of alpha diversity metrics is shared by both Qiime2 and PhyloToast's implementation.
      - ace
-     - berger_parker_d
-     - brillouin_d
+#     - berger_parker_d
+#     - brillouin_d
      - chao1
-     - dominance
-     - doubles
-     - enspie
-     - fisher_alpha
-     - gini_index
-     - goods_coverage
-     - heip_e
-     - kempton_taylor_q
-     - lladser_pe
-     - margalef
-     - mcintosh_d
-     - mcintosh_e
-     - menhinick
-     - michaelis_menten_fit
-     - observed_otus
-     - osd
-     - robbins
+#     - dominance
+#     - doubles
+#     - enspie
+#     - fisher_alpha
+#     - gini_index
+#     - goods_coverage
+#     - heip_e
+#     - kempton_taylor_q
+#     - lladser_pe
+#     - margalef
+#     - mcintosh_d
+#     - mcintosh_e
+#     - menhinick
+#     - michaelis_menten_fit
+#     - observed_otus
+#     - osd
+#     - robbins
      - shannon
-     - simpson
-     - simpson_e
-     - singles
-     - strong
+#     - simpson
+#     - simpson_e
+#     - singles
+#     - strong
 
 phylogenic:
      - unifrac
