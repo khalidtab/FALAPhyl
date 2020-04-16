@@ -25,6 +25,27 @@ rule beta_div: #Opportunity for parallelization by writing all commands to a tex
       "bash data/scripts/beta_div_PCoA_{wildcards.sample}.sh"
 
 
+rule nmds:
+   version: "1.0"
+   conda: "../../workflow/envs/NMDS.yaml"
+   input:
+      rules.beta_div.output.tsv
+   output: 
+      report(expand("data/plots/NMDS_{{sample}}+{dist}.svg",dist=config["distances"]))
+   params:
+      dist=expand("{dist}",dist=config["distances"]),
+      group=config["group"][0],
+      color=config["color"][0]
+   log:
+      expand("data/logs/NMDS_{{sample}}+{dist}.log", dist=config["distances"])
+   shell:
+      "echo 'for x in {params.dist}; do ./workflow/scripts/NMDS.R -i data/distance/beta_div/{wildcards.sample}+$x.tsv -o data/plots/NMDS_{wildcards.sample}+$x.svg -m data/map/{wildcards.sample}.txt -g {params.group} -c {params.color} > data/logs/NMDS_{wildcards.sample}+$x.log; done' > data/scripts/beta_div_NMDS_{wildcards.sample}.sh |"
+      "chmod +x data/scripts/beta_div_NMDS_{wildcards.sample}.sh |"
+      "bash data/scripts/beta_div_NMDS_{wildcards.sample}.sh"
+
+
+
+
 rule anosim: # Calculates whether the intra-group variances is sig different from intergroup variances
    version: "1.0"
    conda:
