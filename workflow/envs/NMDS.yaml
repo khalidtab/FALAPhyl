@@ -1,9 +1,21 @@
+name: NMDS
 channels:
-    - conda-forge
     - plotly
+    - conda-forge
 dependencies:
+    - xvfbwrapper
     - r-optparse = 1.6.4
     - r-vegan = 2.5_6
-    - plotly-orca
+    - plotly-orca = 1.3.1
     - r-plotly = 4.9.2.1
     - r-dplyr = 0.8.5
+
+# To get orca to work, follow these commands after the environment is created
+#apt-get update
+#apt-get install libgtk2.0-0
+#apt-get install libgconf-2-4
+#apt install chromium
+#apt-get install xvfb
+# Didn't use this # install orca.sh in your path using the following steps: https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#saving-environment-variables
+# I saved the file as the .bashrc, it works when i look at orca directly but not through orca in the environment
+

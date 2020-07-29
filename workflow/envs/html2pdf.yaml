@@ -1,3 +1,4 @@
+name: html2pdf
 channels:
     -  conda-forge
 dependencies:

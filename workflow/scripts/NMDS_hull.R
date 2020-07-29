@@ -22,11 +22,11 @@ suppressMessages(library("dplyr"))
 suppressMessages(library("plotly"))
 
 
-dissimilarity = opt$input #dissimilarity="/Users/khaled/Desktop/bioinfo_snakemake/data/distance/beta_div/CPds_GAPds_LAPds_HNS+braycurtis.tsv"
-output = opt$output #output="/Users/khaled/Desktop/bioinfo_snakemake/data/plots/svg.svg"  #
-category = opt$group #category = "ShortCond" # 
-mapping_file = opt$mapping #mapping_file = "/Users/khaled/Desktop/bioinfo_snakemake/data/map/CPds_GAPds_LAPds_HNS.txt" #
-color = opt$color #color = "Colors" #
+dissimilarity = opt$input #dissimilarity="/Users/khaled/Desktop/bioinfo_snakemake/data/distance/beta_div/kfp5s2_CPd_GAPd_HNS_LAPd+braycurtis.tsv"
+output = opt$output #output="/Users/khaled/Desktop/bioinfo_snakemake/data/plots/svg.svg"  
+category = opt$group #category = "ShortCond" 
+mapping_file = opt$mapping #mapping_file = "/Users/khaled/Desktop/bioinfo_snakemake/data/map/kfp5s2_CPd_GAPd_HNS_LAPd.txt" 
+color = opt$color #color = "Colors" 
 
 dist = read.csv(file=dissimilarity, skip=0, header=T, row.names=1, sep="\t") %>% as.dist(.)
 map = read.csv(mapping_file, skip=0, header=T, sep="\t")
@@ -58,18 +58,37 @@ f2 = list(family = "Arial, sans-serif", size = 15, color = "black")
 axis1 = list(title="NMDS 1", titlefont=f1, tickfont=f2, showgrid = T, zeroline = F, gridline = T, linewidth=1, linecolor="#000000")
 axis2 = list(title="NMDS 2", titlefont=f1, tickfont=f2, showgrid = T, zeroline = F, gridline = T, linewidth=1, linecolor="#000000")
 
-p = plot_ly(plotly_coords, x = ~NMDS1, y = ~NMDS2, 
+
+
+
+fig = plot_ly(plotly_coords, x = ~NMDS1, y = ~NMDS2, 
             type = 'scatter', mode = 'markers', 
             name = myCat, size=I(150),
             marker = list(color = myColor, line = list(color = '#000000', width = 1)),            
             alpha=0.75, xaxis=axis1, yaxis=axis2)
 
-fig = p %>% layout (title=paste("stress = ", stress), xaxis=axis1, yaxis = axis2)
+for(l in unique(myCat)) {
+  myhull = dplyr::filter(plotly_coords,PlotlyCategory == l)
+  NMDS1 = as.numeric(as.character(myhull$NMDS1))
+  NMDS2 = as.numeric(as.character(myhull$NMDS2))
+  hull = chull(x =NMDS1, y = NMDS2)
+  hull = c(hull, hull[1])
+  myhull = myhull[c(hull),]
+  NMDS1 = as.numeric(as.character(myhull$NMDS1))
+  NMDS2 = as.numeric(as.character(myhull$NMDS2))
+   fig <- fig %>% 
+    add_polygons(x=NMDS1,
+               y=NMDS2,
+               line=list(width=0.5,color="transparent"),
+               fillcolor=unique(myhull$Colors), opacity = 0.3, inherit = FALSE, showlegend = FALSE)
+}
+
+fig = fig %>% layout(title=paste("stress = ", stress), xaxis=axis1, yaxis = axis2)
+
 
 myjson = plotly_json(fig,FALSE)
 write(myjson,output)
-
-#server = orca_serve(more_args="--enable-webgl")
 #server$export(fig,file=output)
 #server$close()
+
 

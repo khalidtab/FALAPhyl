@@ -1,0 +1,8 @@
+name: philr
+channels:
+    - bioconda
+    - conda-forge
+dependencies:
+    - bioconductor-philr = 1.12.0
+    - bioconductor-phyloseq = 1.30.0
+    - r-optparse

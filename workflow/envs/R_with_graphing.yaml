@@ -1,0 +1,10 @@
+channels:
+- bioconda
+- conda-forge
+dependencies:
+- bioconductor-phyloseq
+- bioconductor-philr 
+- r-optparse
+- r-tidyverse
+- r-igraph
+- r-reshape2
