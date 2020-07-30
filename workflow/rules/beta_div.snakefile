@@ -20,9 +20,9 @@ rule beta_div:
       "cp data/distance/beta_div/{wildcards.sample}+$x/distance-matrix.tsv data/distance/beta_div/{wildcards.sample}+$x.tsv &&"
       "cp data/distance/PCoA/PCoA_{wildcards.sample}+$x/ordination.txt data/distance/PCoA/PCoA_{wildcards.sample}+$x.tsv && "
       "rm -rf data/distance/PCoA/PCoA_{wildcards.sample}+$x/ && rm -rf data/distance/beta_div/{wildcards.sample}+$x/"
-      "; done' > temp/beta_div_PCoA_{wildcards.sample}.sh &&"
-      "chmod +x temp/beta_div_PCoA_{wildcards.sample}.sh &&"
-      "bash temp/beta_div_PCoA_{wildcards.sample}.sh"
+      "; done' > tmp/beta_div_PCoA_{wildcards.sample}.sh &&"
+      "chmod +x tmp/beta_div_PCoA_{wildcards.sample}.sh &&"
+      "bash tmp/beta_div_PCoA_{wildcards.sample}.sh"
 
 
 rule nmds:
@@ -41,9 +41,9 @@ rule nmds:
       expand("data/logs/NMDS_{{sample}}+{dist}.log", dist=config["distances"])
    shell:
       "echo 'for x in {params.dist}; do Rscript --vanilla ./workflow/scripts/NMDS.R -i data/distance/beta_div/{wildcards.sample}+$x.tsv -o data/plots/NMDS_{wildcards.sample}+$x.json -m data/map/{wildcards.sample}.txt -g {params.group} -c {params.color} > data/logs/NMDS_{wildcards.sample}+$x.log && "
-      "xvfb-run --auto-servernum orca graph data/plots/NMDS_{wildcards.sample}+$x.json -o data/plots/NMDS_{wildcards.sample}+$x.svg -f svg 2>> data/logs/NMDS_{wildcards.sample}+$x.log || true; done' > temp/beta_div_NMDS_{wildcards.sample}.sh &&"
-      "chmod +x temp/beta_div_NMDS_{wildcards.sample}.sh &&"
-      "bash temp/beta_div_NMDS_{wildcards.sample}.sh"
+      "xvfb-run --auto-servernum orca graph data/plots/NMDS_{wildcards.sample}+$x.json -o data/plots/NMDS_{wildcards.sample}+$x.svg -f svg 2>> data/logs/NMDS_{wildcards.sample}+$x.log || true; done' > tmp/beta_div_NMDS_{wildcards.sample}.sh &&"
+      "chmod +x tmp/beta_div_NMDS_{wildcards.sample}.sh &&"
+      "bash tmp/beta_div_NMDS_{wildcards.sample}.sh"
 
 rule nmds_hull:
    version: "1.0"
@@ -60,9 +60,9 @@ rule nmds_hull:
    log:
       expand("data/logs/NMDS_hull_{{sample}}+{dist}.log", dist=config["distances"])
    shell:
-      "echo 'for x in {params.dist}; do Rscript --vanilla ./workflow/scripts/NMDS_hull.R -i data/distance/beta_div/{wildcards.sample}+$x.tsv -o data/plots/NMDS_hull_{wildcards.sample}+$x.json -m data/map/{wildcards.sample}.txt -g {params.group} -c {params.color} > data/logs/NMDS_hull_{wildcards.sample}+$x.log && xvfb-run --auto-servernum orca graph data/plots/NMDS_hull_{wildcards.sample}+$x.json -o data/plots/NMDS_hull_{wildcards.sample}+$x.svg -f svg 2>> data/logs/NMDS_hull_{wildcards.sample}+$x.log || true; done' > temp/beta_div_NMDS_hull_{wildcards.sample}.sh &&"
-      "chmod +x temp/beta_div_NMDS_hull_{wildcards.sample}.sh &&"
-      "bash temp/beta_div_NMDS_hull_{wildcards.sample}.sh"
+      "echo 'for x in {params.dist}; do Rscript --vanilla ./workflow/scripts/NMDS_hull.R -i data/distance/beta_div/{wildcards.sample}+$x.tsv -o data/plots/NMDS_hull_{wildcards.sample}+$x.json -m data/map/{wildcards.sample}.txt -g {params.group} -c {params.color} > data/logs/NMDS_hull_{wildcards.sample}+$x.log && xvfb-run --auto-servernum orca graph data/plots/NMDS_hull_{wildcards.sample}+$x.json -o data/plots/NMDS_hull_{wildcards.sample}+$x.svg -f svg 2>> data/logs/NMDS_hull_{wildcards.sample}+$x.log || true; done' > tmp/beta_div_NMDS_hull_{wildcards.sample}.sh &&"
+      "chmod +x tmp/beta_div_NMDS_hull_{wildcards.sample}.sh &&"
+      "bash tmp/beta_div_NMDS_hull_{wildcards.sample}.sh"
 
 rule get_colors:
    version: "1.0"
@@ -92,6 +92,6 @@ rule pcoa_svg:
    shell: 
       "mkdir -p data/plots &&"
       "echo 'for x in {params.dist}; do xvfb-run --auto-servernum PCoA.py -i data/distance/PCoA/PCoA_{wildcards.sample}+$x.tsv -m data/map/{wildcards.sample}.txt -b {params.group} -d 2 -c {input.color} -o data/plots/PCoA_{wildcards.sample}+$x.svg ; done'"
-      "> temp/SVG_PCoA_{wildcards.sample}.sh &&"
-      "chmod +x temp/SVG_PCoA_{wildcards.sample}.sh &&"
-      "bash temp/SVG_PCoA_{wildcards.sample}.sh "
+      "> tmp/SVG_PCoA_{wildcards.sample}.sh &&"
+      "chmod +x tmp/SVG_PCoA_{wildcards.sample}.sh &&"
+      "bash tmp/SVG_PCoA_{wildcards.sample}.sh "

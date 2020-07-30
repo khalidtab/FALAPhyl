@@ -16,6 +16,3 @@ dependencies:
 #apt-get install libgconf-2-4
 #apt install chromium
 #apt-get install xvfb
-# Didn't use this # install orca.sh in your path using the following steps: https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#saving-environment-variables
-# I saved the file as the .bashrc, it works when i look at orca directly but not through orca in the environment
-

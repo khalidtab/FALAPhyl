@@ -45,9 +45,9 @@ rule fastspar_on_core:
       "mkdir -p {output.sparcc} {output.cov} &&"
       "echo 'for i in $(cat {input.mycat}); do "
       "fastspar -c {input.coreFolder}core+$i.tsv -r {output.sparcc}corr+$i.tsv -a {output.cov}cov+$i.tsv -e {params.corr}"
-      "; done' > temp/fastspar_on_core_{wildcards.sample}.sh && "
-      "chmod +x temp/fastspar_on_core_{wildcards.sample}.sh &&"
-      "bash temp/fastspar_on_core_{wildcards.sample}.sh >/dev/null"
+      "; done' > tmp/fastspar_on_core_{wildcards.sample}.sh && "
+      "chmod +x tmp/fastspar_on_core_{wildcards.sample}.sh &&"
+      "bash tmp/fastspar_on_core_{wildcards.sample}.sh >/dev/null"
 
 rule bootstrap:
    version: "1.0"
@@ -58,16 +58,16 @@ rule bootstrap:
       mycat="data/network/{sample}_categories.txt",
       sparcc=rules.fastspar_on_core.output.sparcc
    output:
-      bootstrapDone=temporary(touch("temp/bootstrap_{sample}.done"))
+      bootstrapDone=temporary(touch("tmp/bootstrap_{sample}.done"))
    params:
       bootstrap=config["sparcc_bootstrap"][0]
    shell:
       "echo 'for i in $(cat {input.mycat}); do  "
       "mkdir -p data/network/{wildcards.sample}/bootstrap+$i/fake_data/ && "
       "fastspar_bootstrap --otu_table {input.coreFolder}core+$i.tsv --number {params.bootstrap} --prefix data/network/{wildcards.sample}/bootstrap+$i/fake_data/"
-      "; done' > temp/bootstrap_{wildcards.sample}.sh && "
-      "chmod +x temp/bootstrap_{wildcards.sample}.sh &&"
-      "bash temp/bootstrap_{wildcards.sample}.sh >/dev/null"
+      "; done' > tmp/bootstrap_{wildcards.sample}.sh && "
+      "chmod +x tmp/bootstrap_{wildcards.sample}.sh &&"
+      "bash tmp/bootstrap_{wildcards.sample}.sh >/dev/null"
   
 
 rule bootstrap_fastspar:
@@ -78,7 +78,7 @@ rule bootstrap_fastspar:
       coreFolder=rules.bootstrap.output.bootstrapDone,
       mycat="data/network/{sample}_categories.txt"
    output:
-      fastspar=temporary(touch("temp/fastspar_{sample}.done"))
+      fastspar=temporary(touch("tmp/fastspar_{sample}.done"))
    params:
       bootstrap=config["sparcc_bootstrap"][0]
    shell:
@@ -86,9 +86,9 @@ rule bootstrap_fastspar:
       "mkdir -p data/network/{wildcards.sample}/bootstrap+$i && "
       "for y in {{0..{params.bootstrap}}}; do "
       "if [ $y -lt {params.bootstrap} ]; then fastspar --otu_table data/network/{wildcards.sample}/bootstrap+$i/fake_data/_$y.tsv -i 5 --correlation data/network/{wildcards.sample}/bootstrap+$i/fake_data_corr_$y.tsv --covariance data/network/{wildcards.sample}/bootstrap+$i/fake_data_cov_$y.tsv"
-      "; fi ; done; done' > temp/fastspar_bootstrap_{wildcards.sample}.sh && "
-      "chmod +x temp/fastspar_bootstrap_{wildcards.sample}.sh && "
-      "bash temp/fastspar_bootstrap_{wildcards.sample}.sh >/dev/null"
+      "; fi ; done; done' > tmp/fastspar_bootstrap_{wildcards.sample}.sh && "
+      "chmod +x tmp/fastspar_bootstrap_{wildcards.sample}.sh && "
+      "bash tmp/fastspar_bootstrap_{wildcards.sample}.sh >/dev/null"
   
 
 
@@ -101,15 +101,15 @@ rule pvalues:
       mycat="data/network/{sample}_categories.txt",
       folder=rules.makeCore.output.network
    output:
-      fastspar=temporary(touch("temp/pvalues_{sample}.done"))
+      fastspar=temporary(touch("tmp/pvalues_{sample}.done"))
    params:
       bootstrap=config["sparcc_bootstrap"][0]
    shell:
       "echo 'for i in $(cat {input.mycat}); do "
       "fastspar_pvalues --otu_table data/network/{wildcards.sample}/core+$i.tsv --correlation data/network/{wildcards.sample}_corr/corr+$i.tsv --prefix data/network/{wildcards.sample}/bootstrap+$i/fake_data_corr_ --permutations {params.bootstrap} --outfile data/network/{wildcards.sample}_corr/pvalue+$i.tsv "
-      "; done' > temp/fastspar_{wildcards.sample}.sh && "
-      "chmod +x temp/fastspar_{wildcards.sample}.sh && "
-      "bash temp/fastspar_{wildcards.sample}.sh >/dev/null"
+      "; done' > tmp/fastspar_{wildcards.sample}.sh && "
+      "chmod +x tmp/fastspar_{wildcards.sample}.sh && "
+      "bash tmp/fastspar_{wildcards.sample}.sh >/dev/null"
 
 rule nodes_and_edges:
    version: "1.0"
@@ -119,16 +119,16 @@ rule nodes_and_edges:
       pvalues=rules.pvalues.output,
       mycat="data/network/{sample}_categories.txt"
    output:
-      temporary(touch("temp/table_{sample}.done"))
+      temporary(touch("tmp/table_{sample}.done"))
    params:
       pvalue=config["sparcc_pvalue"][0],
       threshold=config["threshold"][0]
    shell:
       "mkdir -p data/network/{wildcards.sample} && echo 'for i in $(cat {input.mycat}); do "
       "Rscript --vanilla ./workflow/scripts/gephi_zipi.R -i data/network/{wildcards.sample}_corr/corr+$i.tsv -p data/network/{wildcards.sample}_corr/pvalue+$i.tsv -n data/network/{wildcards.sample}/nodes+$i.tsv -e data/network/{wildcards.sample}/edges+$i.tsv -a {params.threshold} -b {params.pvalue}"
-      "; done' > temp/network_{wildcards.sample}.sh && "
-      "chmod +x temp/network_{wildcards.sample}.sh && "
-      "bash temp/network_{wildcards.sample}.sh"
+      "; done' > tmp/network_{wildcards.sample}.sh && "
+      "chmod +x tmp/network_{wildcards.sample}.sh && "
+      "bash tmp/network_{wildcards.sample}.sh"
 
 
 rule run_fastspar:
@@ -139,14 +139,14 @@ rule run_fastspar:
       pvalues=rules.nodes_and_edges.output,
       mycat="data/network/{sample}_categories.txt"
    output:
-      temporary(touch("temp/zipiGraph_{sample}.done"))
+      temporary(touch("tmp/zipiGraph_{sample}.done"))
    shell:
       "mkdir -p data/logs data/plots && echo 'for i in $(cat {input.mycat}); do "
       "Rscript --vanilla ./workflow/scripts/zipi_graph.R -i data/network/{wildcards.sample}/nodes+$i.tsv -o data/plots/{wildcards.sample}_zipi+$i.json &&"
       "xvfb-run --auto-servernum orca graph data/plots/{wildcards.sample}_zipi+$i.json -o data/plots/zipi_{wildcards.sample}+$i.svg -f svg 2>> data/logs/zipi_{wildcards.sample}+$x.log || true &&"
       "rm data/plots/{wildcards.sample}_zipi+$i.json &&"
       "rm -rf data/network/{wildcards.sample}_corr"
-      "; done' > temp/zipi_{wildcards.sample}.sh &&"
-      "chmod +x temp/zipi_{wildcards.sample}.sh && "
-      "bash temp/zipi_{wildcards.sample}.sh"
+      "; done' > tmp/zipi_{wildcards.sample}.sh &&"
+      "chmod +x tmp/zipi_{wildcards.sample}.sh && "
+      "bash tmp/zipi_{wildcards.sample}.sh"
 

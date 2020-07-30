@@ -79,3 +79,15 @@ data/scripts/PERMDISP_LAPs_LAPd.sh
 data/scripts/SVG_PCoA_CPds_GAPds_LAPds_HNS.sh
 data/scripts/SVG_PCoA_GAPs_GAPd.sh
 data/scripts/SVG_PCoA_LAPs_LAPd.sh
+data/biom/Func_GAPd_LAPd_CPd_HNS_subsystem.biom
+data/biom/Func_GAPd_LAPd_CPd_subsystem.biom
+data/biom/kfp5s2_CPd_GAPd_LAPd.biom
+data/biom/kfp5s2_CPd_GAPd_LAPd_HNS.biom
+.Rprofile
+data/map/Func_GAPd_LAPd_CPd_HNS_subsystem.txt
+data/map/Func_GAPd_LAPd_CPd_subsystem.txt
+data/map/kfp5s2_CPd_GAPd_LAPd.txt
+data/map/kfp5s2_CPd_GAPd_LAPd_HNS.txt
+renv/activate.R
+renv/settings.dcf
+workflow/scripts/.Rhistory
