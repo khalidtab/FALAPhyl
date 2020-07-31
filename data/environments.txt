@@ -1,7 +1,7 @@
 fastspar	.snakemake/conda/e781b50c
 html2pdf	.snakemake/conda/4ac107fb
-NMDS	.snakemake/conda/a795ba44
-R_with_graphing	
-qiime2	
-csvkit	.snakemake/conda/35185566
+NMDS	.snakemake/conda/fde72e8a
+R_with_graphing	.snakemake/conda/022fb37d
+qiime2	.snakemake/conda/3f715ae5
+csvkit	 .snakemake/conda/35185566
 phylotoast	.snakemake/conda/85da5eec
