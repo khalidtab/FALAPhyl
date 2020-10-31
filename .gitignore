@@ -91,3 +91,102 @@ data/map/kfp5s2_CPd_GAPd_LAPd_HNS.txt
 renv/activate.R
 renv/settings.dcf
 workflow/scripts/.Rhistory
+data/all_files/all_samples+philr.qza
+data/all_files/all_samples/all_samples_originals/all_samples+philr.qza
+data/all_files/all_samples/all_samples_originals/all_samples.tsv
+data/all_files/all_samples/all_samples_originals/all_samples_caseUnchanged.tsv
+data/all_files/all_samples_case_Unchanged.txt
+data/all_files/all_samples_caseUnchanged+philr.qza
+data/all_files/all_samples_caseUnchanged.txt
+data/all_files/alpha/ace.tsv
+data/all_files/alpha/chao1.tsv
+data/all_files/alpha/shannon.tsv
+data/all_files/biom/SHIP.biom
+data/all_files/distance/SHIP+philr.tsv
+data/all_files/NoCaseChange/ace_combo_nonparametric/ace_combo_nonparametric.qzv
+data/all_files/NoCaseChange/ace_combo_parametric/ace_combo_parametric.qzv
+data/all_files/NoCaseChange/chao1_combo_nonparametric/chao1_combo_nonparametric.qzv
+data/all_files/NoCaseChange/chao1_combo_parametric/chao1_combo_parametric.qzv
+data/all_files/NoCaseChange/nocasechange_samples+philr.qza
+data/all_files/NoCaseChange/nocasechange_samples.tsv
+data/all_files/NoCaseChange/shannon_combo_nonparametric/shannon_combo_nonparametric.qzv
+data/all_files/NoCaseChange/shannon_combo_parametric/shannon_combo_parametric.qzv
+data/all_files/NoCaseChange_allObese/nocasechange/nocasechange_samples+philr.qza
+data/all_files/NoCaseChange_allObese/nocasechange/nocasechange_samples_original.txt
+data/all_files/NoCaseChange_allObese/nocasechange/nocasechange_shannon_combo_parametric/visualization.qzv
+data/all_files/NoCaseChange_allObese/nocasechange_samples_trimmed+philr.qza
+data/all_files/NoCaseChange_allObese/nocasechange_samples_trimmed.tsv
+data/all_files/NoCaseChange_allObese/noncasechange_samples_trimmed_pairwise-distances.qzv
+data/all_files/NoCaseChange_allObese/noncasechange_samples_trimmed_pairwise-distances_nonparametric.qzv
+data/all_files/NoCaseChange_allObese/shannon_combo_nonparametric/visualization.qzv
+data/all_files/NoCaseChange_allObese/shannon_combo_parametric/visualization.qzv
+data/all_files/originals/SHIP.tre
+data/all_files/originals/SHIP.tsv
+data/all_files/originals/SHIP_hdf5.biom
+data/all_files/originals/SHIP_json.biom
+data/all_files/originals/SHIP_tsv.tsv
+data/all_files/PerSite__progressingsites_vs_nonprogressing/nonprogressing_patients/nonparameteric_nonprogressing_ace.qzv
+data/all_files/PerSite__progressingsites_vs_nonprogressing/nonprogressing_patients/nonparameteric_nonprogressing_chao1.qzv
+data/all_files/PerSite__progressingsites_vs_nonprogressing/nonprogressing_patients/nonparameteric_nonprogressing_shannon.qzv
+data/all_files/PerSite__progressingsites_vs_nonprogressing/nonprogressing_patients/parametric_nonprogressing_ace.qzv
+data/all_files/PerSite__progressingsites_vs_nonprogressing/nonprogressing_patients/parametric_nonprogressing_chao1.qzv
+data/all_files/PerSite__progressingsites_vs_nonprogressing/nonprogressing_patients/parametric_nonprogressing_shannon.qzv
+data/all_files/PerSite__progressingsites_vs_nonprogressing/not_progressing.tsv
+data/all_files/PerSite__progressingsites_vs_nonprogressing/not_progressing_pairwise-distances.qzv
+data/all_files/PerSite__progressingsites_vs_nonprogressing/not_progressing_philr.qza
+data/all_files/PerSite__progressingsites_vs_nonprogressing/progressing_patients/ace_non-parametric_visualization.qzv
+data/all_files/PerSite__progressingsites_vs_nonprogressing/progressing_patients/ace_progressing_parametric.qzv
+data/all_files/PerSite__progressingsites_vs_nonprogressing/progressing_patients/chao1_progressing_nonparametric.qzv
+data/all_files/PerSite__progressingsites_vs_nonprogressing/progressing_patients/chao1_progressing_parametric.qzv
+data/all_files/PerSite__progressingsites_vs_nonprogressing/progressing_patients/files/progressing+philr.qza
+data/all_files/PerSite__progressingsites_vs_nonprogressing/progressing_patients/files/progressing.tsv
+data/all_files/PerSite__progressingsites_vs_nonprogressing/progressing_patients/pairwise-distances.qzv
+data/all_files/PerSite__progressingsites_vs_nonprogressing/progressing_patients/shannon_progressing_nonparametric.qzv
+data/all_files/PerSite__progressingsites_vs_nonprogressing/progressing_patients/shannon_progressing_parametric.qzv
+data/all_files/SHIP/all_samples+philr.qza
+data/all_files/SHIP/mappingFile_final.tsv
+data/all_files/SHIP/SHIP+philr.qza
+data/all_files/SHIP/SHIP.qza
+data/all_files/SHIP/SHIP.tre
+data/all_files/SHIP/SHIP.tsv
+data/biom/BothPerio.biom
+data/biom/BothPerio.qza
+data/biom/BothPerio_temp.biom
+data/biom/casediag_HGHRv3.biom
+data/biom/casediag_HGHRv3.qza
+data/biom/casediag_HGHRv3_temp.biom
+data/biom/SHIP_distance.txt
+data/biom/SHIP_hdf5.biom
+data/biom/SHIP_json.biom
+data/samples.txt
+data/Philr_pairwise.jrp
+data/philr.R
+data/mappingfile.xlsx
+data/mappingfile 2.xlsx
+data/map/SHIP_canonicalv3.tsv
+data/map/casediag_HGHRv3.txt
+data/map/BothPerio.txt
+data/tree/SHIP.tre
+workflow works/scripts/.Rhistory
+workflow works/scripts/zipi_graph.R
+workflow works/scripts/philr.R
+workflow works/scripts/NMDS_hull.R
+workflow works/scripts/NMDS.R
+workflow works/scripts/make_core.R
+workflow works/scripts/gephi_zipi.R
+workflow works/rules/philr.snakefile
+workflow works/rules/make_qza.snakefile
+workflow works/rules/fastspar.snakefile
+workflow works/rules/beta_sig.snakefile
+workflow works/rules/beta_div.snakefile
+workflow works/rules/alpha_div.snakefile
+workflow works/envs/R_with_graphing.yaml
+workflow works/envs/qiime2.yaml
+workflow works/envs/phylotoast.yaml
+workflow works/envs/philr.yaml
+workflow works/envs/NMDS.yaml
+workflow works/envs/html2pdf.yaml
+workflow works/envs/fastspar.yaml
+workflow works/envs/csvkit.yaml
+workflow works/envs/biom.yaml
+definition.txt
