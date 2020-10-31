@@ -1,21 +1,16 @@
 # The group column name in your mapping file. Only one entry possible. Everything else will be ignored
 # What was it used for? Bcz ADONIS has multiple groups
 group: 
-     - ShortCond
-
-# The color column in your mapping file. Only one entry possible. Everything else will be ignored
-color: 
-     - Colors
-
-
-# What independent terms do you want to test? "treatment+block" would test the input distance matrix partitions "treatment" and "block". The formula "treatment*block" would test "Treatment" as well as the interaction between the two terms. 
-# Nestedness is not possible with this implementation of adonis, i.e, formula "Patient/Pockets", as the block Patient needs to be included in the R formula itself as well "strata = Patient". This will be implemented via a different snakemake workflow with other analyses related to nested data analysis
-adonis: 
 #     - Cond
-     - ShortCond
-#     - ShortCond*Cond
-#     - ShortCond+Cond
+     - delta_smoking
+     - delta_diabetes
+     - delta_BMI
 
+# The suffix to the color column in your mapping file. Only one entry possible. Every column in your "group" variable below will have to have a corresponding column ending with the suffix you have written here, otherwise, you will get an error if you are trying to create plots with them
+color: 
+     - _color
+
+# Beta diversity metrics
 distances:
      - jaccard
      - braycurtis
@@ -33,19 +28,27 @@ distances:
 #     - dice
 #     - hamming
 #     - sokalsneath
-     - correlation
+#     - correlation
 #     - rogerstanimoto
 #     - russellrao
 #     - aitchison
 #     - chebyshev
 
+# More complex adonis formulations: what independent terms do you want to test? "treatment+block" would test the input distance matrix partitions "treatment" and "block". The formula "treatment*block" would test "Treatment" as well as the interaction between the two terms. 
+# Nestedness is not possible with this implementation of adonis, i.e, formula "Patient/Pockets", as the block Patient needs to be included in the R formula itself as well "strata = Patient". This will be implemented via a different snakemake workflow with other analyses related to nested data analysis
+adonis: 
+#     - ShortCond*Cond
+#     - ShortCond+Cond
+
+
+
 
 #This list of alpha diversity metrics is shared by both Qiime2 and PhyloToast's implementation.
 alpha: 
-     - ace
+#     - ace
 #     - berger_parker_d
 #     - brillouin_d
-     - chao1
+#     - chao1
 #     - dominance
 #     - doubles
 #     - enspie
@@ -64,8 +67,8 @@ alpha:
 #     - osd
 #     - robbins
      - shannon
-     - simpson
-     - simpson_e
+#     - simpson
+#     - simpson_e
 #     - singles
 #     - strong
 

@@ -1,20 +1,20 @@
-# The group column name in your mapping file. Only one entry possible. Everything else will be ignored.
-# Used for what????
-group:
-     - ShortCond
+# The group column name in your mapping file. Only one entry possible. Everything else will be ignored
+# What was it used for? Bcz ADONIS has multiple groups
+group: 
+     - statusInGeneral
 
 # The color column in your mapping file. Only one entry possible. Everything else will be ignored
 color: 
-     - Colors
+     - statusInGeneral_color
+
 
 # What independent terms do you want to test? "treatment+block" would test the input distance matrix partitions "treatment" and "block". The formula "treatment*block" would test "Treatment" as well as the interaction between the two terms. 
 # Nestedness is not possible with this implementation of adonis, i.e, formula "Patient/Pockets", as the block Patient needs to be included in the R formula itself as well "strata = Patient". This will be implemented via a different snakemake workflow with other analyses related to nested data analysis
-
 adonis: 
 #     - Cond
-     - ShortCond
-     - ShortCond*Cond
-     - ShortCond+Cond
+     - statusInGeneral
+#     - ShortCond*Cond
+#     - ShortCond+Cond
 
 distances:
      - jaccard
@@ -33,14 +33,15 @@ distances:
 #     - dice
 #     - hamming
 #     - sokalsneath
-#     - correlation
+     - correlation
 #     - rogerstanimoto
 #     - russellrao
 #     - aitchison
 #     - chebyshev
 
- #This list of alpha diversity metrics is shared by both Qiime2 and PhyloToast's implementation.
-alpha:
+
+#This list of alpha diversity metrics is shared by both Qiime2 and PhyloToast's implementation.
+alpha: 
      - ace
 #     - berger_parker_d
 #     - brillouin_d
@@ -63,8 +64,8 @@ alpha:
 #     - osd
 #     - robbins
      - shannon
-#     - simpson
-#     - simpson_e
+     - simpson
+     - simpson_e
 #     - singles
 #     - strong
 
@@ -76,6 +77,15 @@ phylogenic:
      - unweighted_unifrac_full_tree
      - weighted_normalized_unifrac
      - weighted_unifrac
+     
+sparcc_corr:
+     - 0.6
+     
+sparcc_pvalue:
+     - 0.05
+
+sparcc_bootstrap: # Number of bootstrapping iterations to perform
+     - 100
 
 threshold: # Level to filter the core by represented in a fraction. EG: 0.8 means that only features present in 80% of the group will be kept
      - 0.8

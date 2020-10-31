@@ -1,18 +1,59 @@
-#!/usr/bin/env Rscript --vanilla
+#!/usr/local/bin/Rscript --vanilla
 
-library(optparse)
-library(philr)
-library(phyloseq)
-library(ape)
+set.seed(1234)
+
+suppressWarnings(suppressMessages(library(phyloseq)))	
+suppressWarnings(suppressMessages(library(dplyr)))
+suppressWarnings(suppressMessages(library(philr)))	
+suppressWarnings(suppressMessages(require(ape)))
+suppressWarnings(suppressMessages(library(optparse)))	
+
+# Main function
+main = function(phylot,myLevels,fileName){
+  #phylot=phylo
+  #myLevels=condName
+  #fileName=output
+  
+  #====== The functions =======
+  prunePhylo = function(phylot,myLevels){
+    samNames = as.data.frame(sample_data(phylot))
+    myNames = subset(samNames, myLevels %in% myLevels) %>% .$X.SampleID %>% as.character(.)
+    mySubset = prune_samples(myNames,phylot)
+    mySubset = prune_taxa(taxa_sums(mySubset) != 0, mySubset)  # Remove zero taxa
+  }
+  psuedoCount = function(phylot){
+
+    data.no0 = transform_sample_counts(phylot, function(x) x+1)
+    phylot = merge_phyloseq(data.no0,phylot@phy_tree,phylot@sam_data,phylot@tax_table) # make your new GP phyloseq object based on the newly created matrix
+    
+    return(phylot)
+  }
+
+    
+  #===== The Steps ======
+  
+  # Prune your phyloseq object to only those with the requested input characteristics, and remove the taxa with zero values in all samples
+  mySubset = prunePhylo(phylo,myLevels)
+
+  # Add 1 to avoid fractions on a zero denominator
+  myMatrix = psuedoCount(mySubset)
+  myMatrix = myMatrix@otu_table@.Data %>% t(.)
+  tree = phy_tree(phylot)
+  
+  gp.philr = philr(myMatrix, tree, part.weights='enorm.x.gm.counts', ilr.weights='blw.sqrt')
+  gp.dist = dist(gp.philr, method="euclidean") # Make it into phyloseq compatible object
+  
+  #Write our the distribution between the different samples
+  write.table(as.matrix(gp.dist), sep = "\t", file = paste0(fileName), na = "\t")
+
+}
 
 option_list = list(
-  make_option(c("-i", "--input"), type="character", default=NULL, help="biom file", metavar="Input biom file"),
-  make_option(c("-t", "--tree"), type="character", default=NULL, help="The tree file", metavar="Input tree file"),
-  make_option(c("-o", "--output"), type="character", default=NULL, help="Name of the output dissimilarity matrix", metavar="Output dissimilarity matrix"),
-  make_option(c("-v", "--viz"), type="character", default=NULL, help="Name of the output PCA in SVG format", metavar="Output SVG file"),
-  make_option(c("-m", "--mapping"), type="character", default=NULL, help="The mapping file", metavar="Mapping file"),
-  make_option(c("-g", "--group"), type="character", default=NULL, help="The category in the mapping file", metavar="Group name"),
-  make_option(c("-c", "--color"), type="character", default=NULL, help="The color column in the mapping file", metavar="Color name")
+  make_option(c("-i", "--input"), type="character", default=NULL, help="Biom file", metavar="Features input file formatted as biom"),
+  make_option(c("-t", "--tree"), type="character", default=NULL, help="Phylogenic Tree file. With or without lineage distances", metavar="Phylogenic tree file"),
+  make_option(c("-m", "--mapping"), type="character", default=NULL, help="Mapping file", metavar="Input mapping file"),
+  make_option(c("-g", "--groups"), type="character", default=NULL, help="Column name in the mapping file that indicates which grouping the samples belong to", metavar="Group indication column"),
+  make_option(c("-o", "--output"), type="character", default=NULL, help="output file name", metavar="Output file name")
 );
 
 opt_parser = OptionParser(option_list=option_list);
@@ -20,44 +61,35 @@ opt = parse_args(opt_parser);
 
 if (is.null(opt$input)){
   print_help(opt_parser)
-  stop("At least one argument must be supplied (input file)", call.=FALSE)
+  stop("At least one argument must be supplied (input file).n", call.=FALSE)
 }
 
+# Load files
 
-biom = opt$input # biom = "/Users/khaled/Desktop/bioinfo_snakemake/data/biom/Func_GAPd_LAPd_CPd_HNS_subsystem.biom"
-tree = opt$tree # tree = "/Users/khaled/Desktop/bioinfo_snakemake/data/tree/Func_GAPd_LAPd_CPd_HNS_subsystem.tre"
-output = opt$output # output = "/Users/khaled/Desktop/bioinfo_snakemake/data/distances/Philr_Func_GAPd_LAPd_CPd_HNS_subsystem.txt"
-viz = opt$viz # viz = "/Users/khaled/Desktop/bioinfo_snakemake/data/plots/Philr_Func_GAPd_LAPd_CPd_HNS_subsystem.svg"
-map = opt$mapping # map = "/Users/khaled/Desktop/bioinfo_snakemake/data/map/Func_GAPd_LAPd_CPd_HNS_subsystem.txt"
-category = opt$group #category = "ShortCond"
-color = opt$color #color = "Colors"
-
-
+biom = opt$input
 biom = import_biom(biom)
-tree = read_tree(tree)
+
+map = opt$mapping 
 map = import_qiime_sample_data(map)
+
+tree = opt$tree 
+tree = read_tree(tree)
+
+condition = opt$groups
+output = opt$output 
+
 phylo = merge_phyloseq(biom,tree,map)
-  
-# make your new phyloseq object with taxa as columns
-data = phylo@otu_table@.Data
-data = t(data)
-data = otu_table(data, taxa_are_rows = FALSE)
-phylo = merge_phyloseq(data,phylo@phy_tree,phylo@sam_data,phylo@tax_table) 
-  
-# Add pseudocount of 0.5 to all counts so we're not dividing by zero
-phylo = transform_sample_counts(phylo, function(x) x+0.5)
-otu.table = (otu_table(phylo))
-tree = phy_tree(phylo)
-  
-## Transform Data using PhILR
-##Calculate the distances and (optionally) weight the resulting PhILR space using phylogenetic distance.
-gp.philr = philr(otu.table, tree, part.weights='enorm.x.gm.counts', ilr.weights='blw.sqrt')
-gp.dist = dist(gp.philr, method="euclidean") # Make it into phyloseq compatible object
-  
-#Write our the distribution between the different samples
-test = as.data.frame(as.matrix(gp.dist))
-test = cbind(rownames(test),test)
-colnames(test)[1] = ""
-write_tsv(test, path = output)
 
+rm(biom,tree,map)
 
+# Check if the tree is rooted and is binary (that is, divides only as a binary). If not, use the multi2di function from ape package to replace the multichotomies with a series of dichotomies with a branch length of zero.
+if(!ape::is.rooted(phy_tree(phylo))){stop("Tree needs to be rooted.",call.=FALSE)} #if not rooted
+if(!ape::is.binary.tree(phy_tree(phylo))){phy_tree(phylo) = multi2di(phylo@phy_tree)} #if not binary tree
+
+# There is an issue with the names of the nodes in the tree, that is, some of the names are repeated even though they are from different branches in the tree. So, will need to change the names of the nodes to those that are unique
+phy_tree(phylo) = ape::makeNodeLabel(phy_tree(phylo), method="number", prefix= 'n')
+
+condNum = which(colnames(phylo@sam_data)==condition)
+condName = phylo@sam_data[,condNum][[1]] %>% unique(.) %>% as.character(.)
+
+nonZeroPhylo = suppressMessages(main(phylo,condName,output))	

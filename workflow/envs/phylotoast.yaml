@@ -10,4 +10,5 @@ dependencies:
     - matplotlib
     - brewer2mpl
     - statsmodels
+    - h5py
     - phylotoast

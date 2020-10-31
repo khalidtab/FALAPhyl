@@ -5,11 +5,12 @@ rule biom_to_qza: # Since qiime requires a specific biom format (either V100/jso
    input:
         "data/biom/{sample}.biom"
    output:
-        qza=temporary("data/biom/{sample}.qza"),
-        tsv=temporary("data/tsv/{sample}.tsv"),
-        temp_biom=temporary("data/biom/{sample}_temp.biom")
+        qza=("data/biom/{sample}.qza"),
+        tsv=("data/tsv/{sample}.tsv"),
+        temp_biom=("data/biom/{sample}_temp.biom")
+   message: "Generating temporary files for {wildcards.sample}"
    shell:
         "mkdir -p data/tsv &&"
         "biom convert -i {input} -o {output.tsv} --to-tsv --header-key taxonomy &&"
         'biom convert -i {output.tsv} -o {output.temp_biom} --to-json --table-type="OTU table" --process-obs-metadata taxonomy &&'
-        "qiime tools import --input-path {output.temp_biom} --output-path {output.qza} --type FeatureTable[Frequency] --input-format BIOMV100Format"
+        "qiime tools import --input-path {output.temp_biom} --output-path {output.qza} --type FeatureTable[Frequency] --input-format BIOMV100Format >/dev/null"

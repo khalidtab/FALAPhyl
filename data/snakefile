@@ -15,11 +15,11 @@ rule results:
    conda: "workflow/envs/qiime2.yaml"
    input:
 #      rules.network.output,
-      rules.make_anosim_PDFs.output,
+#      rules.make_anosim_PDFs.output,
 #      rules.make_permdisp_PDFs.output,
-#      rules.make_adonis_PDFs.output
+#      rules.make_adonis_PDFs.output,
 #      rules.pcoa_svg.output,
-#      rules.alpha_div.output,
+      rules.alpha_div.output,
 #      rules.nmds.output,
 #      rules.nmds_hull.output
 #      rules.philr_nmds.output
