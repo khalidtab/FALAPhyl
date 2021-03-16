@@ -1,14 +1,15 @@
 # matrix to pairwise
 library("optparse")
 #library(reshape2)
-suppressMessages(library(tidyverse))
-suppressMessages(library(igraph))
+suppressWarnings(suppressMessages(library(tidyverse)))
+suppressWarnings(suppressMessages(library(igraph)))
 
 option_list = list(
-  make_option(c("-i", "--input"), type="character", default=NULL, help="dissimilarity matrix", metavar="Input dissimilarity matrix"),
+  make_option(c("-i", "--input"), type="character", default=NULL, help="correlation matrix", metavar="Input correlation matrix"),
   make_option(c("-p", "--pvalue"), type="character", default=NULL, help="p-value matrix", metavar="pvalue file"),
   make_option(c("-n", "--nodes"), type="character", default=NULL, help="Name of the output nodes table", metavar="output nodes table file name"),
   make_option(c("-e", "--edges"), type="character", default=NULL, help="Name of the output edges table", metavar="output edges table file name"),
+  make_option(c("-z", "--zipi"), type="character", default=NULL, help="Name of the ZiPi plot file name in SVG format.", metavar="output ZiPi plot file name"),
   make_option(c("-a", "--threshold"), type="character", default=NULL, help="Correlation cut off threshold below which correlations will be discarded", metavar="Correlation threshold"),  
   make_option(c("-b", "--pvaluethreshold"), type="character", default=NULL, help="P-value cut off threshold below which pvalues will be discarded", metavar="P-value threshold")
 );
@@ -21,15 +22,16 @@ if (is.null(opt$input)){
   stop("At least one argument must be supplied (input file)", call.=FALSE)
 }
 
-input = opt$input #"/Users/khaled/Desktop/bioinfo_snakemake/data/network/kfp5s2_CPd_GAPd_LAPd_corr/corr+CPd.tsv"
-pvalue = opt$pvalue #"/Users/khaled/Desktop/bioinfo_snakemake/data/network/kfp5s2_CPd_GAPd_LAPd_corr/pvalue+CPd.tsv"
-threshold = opt$threshold #"0.6"
+input = opt$input
+pvalue = opt$pvalue
+threshold = opt$threshold
 threshold = as.numeric(threshold)
-pvaluethreshold = opt$pvaluethreshold #"0.1"
+pvaluethreshold = opt$pvaluethreshold
 pvaluethreshold = as.numeric(pvaluethreshold)
 
-nodesOutput = opt$nodes #"/Users/khaled/Desktop/bioinfo_snakemake/data/network/kfp5s2_CPd_GAPd_LAPd_corr/nodes+CPd.tsv"
-edgesOutput = opt$edges #"/Users/khaled/Desktop/bioinfo_snakemake/data/network/kfp5s2_CPd_GAPd_LAPd_corr/edges+CPd.tsv"
+nodesOutput = opt$nodes
+edgesOutput = opt$edges
+zipiOutput = opt$zipi 
 
 # Unpack/Melt the correlation matrix table
 myInput = suppressMessages(read_tsv(input))
@@ -58,17 +60,21 @@ Type = rep("Undirected", length(rownames(myTable)))
 myTable = cbind(myTable,Type)
 
 myTable = cbind(myTable, abs(myTable$corrWeight))
-myTable = subset(myTable, abs(myTable$corrWeight) >= threshold)
+myTable = subset(myTable, abs(myTable$corrWeight) >= threshold) # Subset to only correlations that fit the criteria
 myTable$`abs(myTable$corrWeight)` = NULL
+
+myTable = subset(myTable, abs(myTable$pvalue) < pvaluethreshold) # Subset to only pvalues less than the pvalue threshold
 
 weight = myTable$corrWeight
 myTable = cbind(myTable,weight)
 
 myTable$weight[myTable$weight < 0] = 0 # This way, the louvain modularity function below will not consider negative correlations between two edges as a positive correlation and be influenced to place them in the same cluster
-
 row.names(myTable) = NULL # At this point, you have a pairwise table that was filtered to the level specified
 
-myigraph = graph.data.frame(myTable, directed = FALSE)
+tableForModularity = myTable
+tableForModularity = subset(tableForModularity, tableForModularity$weight != 0) # Subset to only correlations that fit the criteria
+
+myigraph = graph.data.frame(tableForModularity, directed = FALSE)
 myModularity = cluster_louvain(myigraph) #Same method as Gephi
 
 nodesList = cbind(myModularity$names,myModularity$membership)
@@ -99,12 +105,12 @@ colnames(myTable2) = c("Target","Source","Weight","pvalue",
 myTable = myTable2
 # Before Zi-Pi plot calculations, a little variable clean up
 rm(myTable2,Source, Target, newTable,myigraph,
-   threshold, pvaluethreshold,Type,mypvalue,myInput,weight,input,pvalue)
+   Type,mypvalue,myInput,weight,input,pvalue)
 
 # Create Zi-Pi table
-final_table = matrix(NA, ncol = 3, nrow = length(nodesList$Id)) %>% as.data.frame(.,stringsAsFactors=FALSE)
-colnames(final_table) = c("Id","Zi","Pi")
-final_table$Id = nodesList$Id
+zipiTable = matrix(NA, ncol = 3, nrow = length(nodesList$Id)) %>% as.data.frame(.,stringsAsFactors=FALSE)
+colnames(zipiTable) = c("Id","Zi","Pi")
+zipiTable$Id = nodesList$Id
 
 
 myCommunities = unique(myTable$SourceCommunity) %>% as.character(.)
@@ -112,31 +118,47 @@ myCommunities = unique(myTable$SourceCommunity) %>% as.character(.)
 #Zi calculations
 for (x in (1:length(myCommunities))){
 
-## Leave only edges coming nodes from the same community
+## Leave only edges coming from nodes in the same community
 myComm = myCommunities[x] %>% as.character(.)
 currentComm = subset(myTable, SourceCommunity==myComm)
 currentComm = subset(currentComm, TargetCommunity==myComm)
 
-if (dim(currentComm)[1] == 0){next} #Break out if the current Community has only negative edges to other nodes, or if the node doesn't have any edges to nodes within the same community
+if (dim(currentComm)[1] == 0){next} #Break out if the current Community has only negative edges to other nodes, or if the node doesn't have any edges to nodes within the same community. These communities don't get reported through this method.
 
-uniq_comm_ids = unique(currentComm$Source)
-comm_zi = matrix(NA, ncol = 5, nrow = length(uniq_comm_ids)) %>% as.data.frame(.,stringsAsFactors=FALSE)
-colnames(comm_zi) = c("Id","NumOfConnections","average","STDev","Zi")
+
+uniq_comm_ids = c(unique(currentComm$Source),unique(currentComm$Target))
+comm_zi = matrix(NA, ncol = 7, nrow = length(uniq_comm_ids)) %>% as.data.frame(.,stringsAsFactors=FALSE)
+colnames(comm_zi) = c("Id","NumOfSourceConnections","NumOfTargetConnections","NumOfConnections","average","STDev","Zi")
 comm_zi$Id = uniq_comm_ids
 
-for (xx in uniq_comm_ids){
+for (xx in uniq_comm_ids){ # For source
 
   myNum = subset(currentComm, Source==xx) 
   myNum = dim(myNum)
   myNum = myNum[1]
-  comm_zi = within(comm_zi, NumOfConnections[Id == xx] <- myNum)
+  comm_zi = within(comm_zi, NumOfSourceConnections[Id == xx] <- myNum)
 }
+
+for (xx in uniq_comm_ids){ # For target
+  
+  myNum = subset(currentComm, Target==xx) 
+  myNum = dim(myNum)
+  myNum = myNum[1]
+  comm_zi = within(comm_zi, NumOfTargetConnections[Id == xx] <- myNum)
+}
+
+comm_zi$NumOfConnections = comm_zi$NumOfSourceConnections + comm_zi$NumOfTargetConnections
+comm_zi$NumOfSourceConnections = NULL
+comm_zi$NumOfTargetConnections = NULL
 
 comm_zi_STDEV = sd(comm_zi$NumOfConnections)
 
-if (comm_zi_STDEV == 0){
-  comm_zi$Zi = NA
-} else {
+
+if (is.na(comm_zi_STDEV) == TRUE){
+  comm_zi$Zi = 0 # Divide by zero is not allowed, therefore we are assigning it as zero instead.
+  } else if(comm_zi_STDEV == 0) {
+    comm_zi$Zi = 0 # Divide by zero is not allowed, therefore we are assigning it as zero instead.
+  } else {
   comm_zi$STDev = comm_zi_STDEV
   comm_zi$average = ave(comm_zi$NumOfConnections)
   comm_zi$Zi = (comm_zi$NumOfConnections - comm_zi$average)/comm_zi$STDev
@@ -146,19 +168,27 @@ comm_zi$NumOfConnections = NULL
 comm_zi$average = NULL
 comm_zi$STDev = NULL
 
-final_table = merge(final_table,comm_zi, by="Id", all.x = TRUE, all.y = TRUE)
-myValues = coalesce(as.double(final_table$Zi.y),as.double(final_table$Zi.x))
-final_table$Zi.x = NULL
-colnames(final_table) = c("Id","Pi","Zi")
-final_table$Zi = myValues
+zipiTable = merge(zipiTable,comm_zi, by="Id", all.x = TRUE, all.y = TRUE)
+myValues = coalesce(as.double(zipiTable$Zi.y),as.double(zipiTable$Zi.x))
+zipiTable$Zi.x = NULL
+colnames(zipiTable) = c("Id","Pi","Zi")
+zipiTable$Zi = myValues
 }
 
 #Clean up after Zi calculations
 rm(comm_zi,comm_zi_STDEV,currentComm,myComm,myCommunities,myNum,myValues,uniq_comm_ids,x,xx)
 
+zipiTable = unique(zipiTable) # There are some duplicate measurements of the table, so only keep unique ones
+
 #Pi calculations
 for (x in nodesList$Id){
-  piTotalTable = subset(myTable, Source==x)
+  # x = nodesList$Id[2]
+  piTotalTableSource = subset(myTable, Source==x)
+  piTotalTableTarget = subset(myTable, Target==x)
+  colnames(piTotalTableTarget) = c("Source","Target","Weight","pvalue","Type","TargetCommunity","SourceCommunity") # Change the target to a source, including the community
+  
+  piTotalTable = rbind(piTotalTableSource,piTotalTableTarget)
+  
   total = dim(piTotalTable)[1]
   sigma = 0
   
@@ -169,15 +199,16 @@ for (x in nodesList$Id){
   }
   
   featurePiScore = 1-sigma
-  final_table = within(final_table, Pi[Id == x] <- featurePiScore)
+  zipiTable = within(zipiTable, Pi[Id == x] <- featurePiScore)
 } 
 
-final_table = merge(final_table,nodesList)
-
-# final_table is nodes table, myTable is edges table
+zipiTable = merge(zipiTable,nodesList)
+# zipiTable2 = dplyr::full_join(zipiTable,nodesList)
+# zipiTable is nodes table, myTable is edges table
 
 rm(x,y,total,sigma,piTotalTable,myModularity,fraction,featurePiScore,nodesList,commConnections)
 
-write.table(final_table, file = nodesOutput,sep = "\t", row.names = FALSE)
+write.table(zipiTable, file = nodesOutput,sep = "\t", row.names = FALSE)
 write.table(myTable, file = edgesOutput,sep = "\t", row.names = FALSE)
+
 

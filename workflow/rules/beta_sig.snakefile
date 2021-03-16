@@ -12,7 +12,7 @@ rule anosim: # Calculates whether the intra-group variances is sig different fro
    message: "Calculating ANOSIM for {wildcards.sample}"
    shell:
       "mkdir -p data/distance/ANOSIM &&"
-      "echo 'for x in {params.dist}; do for y in {params.group}; do qiime diversity beta-group-significance --i-distance-matrix data/distance/beta_div/{wildcards.sample}+$x.qza --m-metadata-file data/map/{wildcards.sample}.txt --m-metadata-column $y --p-method anosim --o-visualization data/distance/ANOSIM/ANOSIM_{wildcards.sample}+$y+$x.qzv >/dev/null && "
+      "echo 'for x in {params.dist}; do for y in {params.group}; do qiime diversity beta-group-significance --p-pairwise --i-distance-matrix data/distance/beta_div/{wildcards.sample}+$x.qza --m-metadata-file data/map/{wildcards.sample}.txt --m-metadata-column $y --p-method anosim --o-visualization data/distance/ANOSIM/ANOSIM_{wildcards.sample}+$y+$x.qzv >/dev/null && "
       "qiime tools export --input-path data/distance/ANOSIM/ANOSIM_{wildcards.sample}+$y+$x.qzv --output-path data/distance/ANOSIM/ANOSIM_{wildcards.sample}+$y+$x >/dev/null"
       "; done ; done' > tmp/ANOSIM_{wildcards.sample}.sh &&"
       "chmod +x tmp/ANOSIM_{wildcards.sample}.sh &&"
@@ -35,7 +35,7 @@ rule permdisp: # Calculates whether the two groups have similar dispersions (var
    message: "Calculating PERMDISP for {wildcards.sample}"
    shell:
       "mkdir -p data/distance/PERMDISP &&"
-      "echo 'for x in {params.dist}; do for y in {params.group}; do qiime diversity beta-group-significance --i-distance-matrix data/distance/beta_div/{wildcards.sample}+$x.qza --m-metadata-file data/map/{wildcards.sample}.txt --m-metadata-column $y --p-method permdisp --o-visualization data/distance/PERMDISP/PERMDISP_{wildcards.sample}+$y+$x.qzv >/dev/null && "
+      "echo 'for x in {params.dist}; do for y in {params.group}; do qiime diversity beta-group-significance --p-pairwise --i-distance-matrix data/distance/beta_div/{wildcards.sample}+$x.qza --m-metadata-file data/map/{wildcards.sample}.txt --m-metadata-column $y --p-method permdisp --o-visualization data/distance/PERMDISP/PERMDISP_{wildcards.sample}+$y+$x.qzv >/dev/null && "
       "qiime tools export --input-path data/distance/PERMDISP/PERMDISP_{wildcards.sample}+$y+$x.qzv --output-path data/distance/PERMDISP/PERMDISP_{wildcards.sample}+$y+$x >/dev/null"
       "; done ; done' > tmp/PERMDISP_{wildcards.sample}.sh &&"
       "chmod +x tmp/PERMDISP_{wildcards.sample}.sh &&"
@@ -64,7 +64,7 @@ rule adonis: # Calculates whether the two groups have different centroids, susce
       "bash tmp/ADONIS_{wildcards.sample}.sh"
 
 
-rule make_anosim_PDFs:
+rule make_anosim_PDFs: # Creates PDFs out of the HTML file for easier handling
    version: "1.0"
    conda: "../../workflow/envs/html2pdf.yaml"
    input:
@@ -84,7 +84,7 @@ rule make_anosim_PDFs:
       "bash tmp/PDF_ANOSIM_{wildcards.sample}.sh "
 
 
-rule make_permdisp_PDFs:
+rule make_permdisp_PDFs: # Creates PDFs out of the HTML file for easier handling
    version: "1.0"
    conda: "../../workflow/envs/html2pdf.yaml"
    input:
@@ -104,7 +104,7 @@ rule make_permdisp_PDFs:
       "bash tmp/PDF_PERMDISP_{wildcards.sample}.sh "
 
 
-rule make_adonis_PDFs:
+rule make_adonis_PDFs: # Creates PDFs out of the HTML file for easier handling
    version: "1.0"
    conda: "../../workflow/envs/html2pdf.yaml"
    input:

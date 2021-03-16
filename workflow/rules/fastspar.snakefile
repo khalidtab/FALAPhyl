@@ -1,19 +1,23 @@
-rule get_categories:
+rule get_categories: # Prepares the chosen categories
    version: "1.0"
    conda:
       "../../workflow/envs/csvkit.yaml"
    input:
       "data/map/{sample}.txt"
    params:
-      group=config["group"][0]
+      group=expand("{group}",group=config["group"])
    output:
       temporary("data/network/{sample}_categories.txt")
    message: "Extracting catergories from the mapping file for {wildcards.sample}"
    shell:
       "mkdir -p data/network/ &&"
-      "csvcut {input} -t -c {params.group} | sort -u | head -n -1 > {output}"
+      "echo 'for x in {params.group}; do "
+      "csvcut {input} -t -c $x | tail -n +2 | sort -u | csvformat -T >> data/network/{wildcards.sample}_categories.txt; done ' > tmp/getCategories_{wildcards.sample}.sh &&"
+      "chmod +x tmp/getCategories_{wildcards.sample}.sh &&"
+      "bash tmp/getCategories_{wildcards.sample}.sh"
 
-rule makeCore:
+
+rule makeCore: # SparCC works better when the feature table has less zeros. Therefore, this script will filter the feature tables to the desired level of "coreness" based on the input file values
    version: "1.0"
    conda:
       "../../workflow/envs/R_with_graphing.yaml"
@@ -22,15 +26,19 @@ rule makeCore:
       map="data/map/{sample}.txt"
    params:
       threshold=config["threshold"][0],
-      group=config["group"][0]
+      group=config["group"]
    output:
-      network=temporary(directory("data/network/{sample}/"))
+      network=directory("data/network/{sample}/")
    message: "Making core files for {wildcards.sample}"
    shell:
-      "mkdir -p {output} &&"
-      "Rscript --vanilla ./workflow/scripts/make_core.R -i {input.biom} -m {input.map} -c {params.group} -t {params.threshold} -o {output}  >/dev/null"
+      "mkdir -p {output} data/logs &&"
+      "echo 'for x in {params.group}; do "
+      "Rscript --vanilla ./workflow/scripts/make_core.R -i {input.biom} -m {input.map} -c $x -t {params.threshold} -o {output} ; done ' > tmp/makeCores_{wildcards.sample}.sh &&"
+      "chmod +x tmp/makeCores_{wildcards.sample}.sh &&"
+      "bash tmp/makeCores_{wildcards.sample}.sh"
 
-rule fastspar_on_core:
+
+rule fastspar_on_core: # SparCC (through the fastpar algorithm) will be done on the core feature table
    version: "1.0"
    conda:
       "../../workflow/envs/fastspar.yaml"
@@ -46,12 +54,12 @@ rule fastspar_on_core:
    shell:
       "mkdir -p {output.sparcc} {output.cov} &&"
       "echo 'for i in $(cat {input.mycat}); do "
-      "fastspar -c {input.coreFolder}core+$i.tsv -r {output.sparcc}corr+$i.tsv -a {output.cov}cov+$i.tsv -e {params.corr} >/dev/null"
+      "fastspar -c {input.coreFolder}_core+$i.tsv -r {output.sparcc}/corr+$i.tsv -a {output.cov}/cov+$i.tsv -e {params.corr} >/dev/null"
       "; done' > tmp/fastspar_on_core_{wildcards.sample}.sh && "
       "chmod +x tmp/fastspar_on_core_{wildcards.sample}.sh &&"
       "bash tmp/fastspar_on_core_{wildcards.sample}.sh"
 
-rule bootstrap:
+rule bootstrap: # To calculate P-values, bootstraps need to be done from the core feature table. This script accomplishes this.
    version: "1.0"
    conda:
       "../../workflow/envs/fastspar.yaml"
@@ -67,13 +75,13 @@ rule bootstrap:
    shell:
       "echo 'for i in $(cat {input.mycat}); do  "
       "mkdir -p data/network/{wildcards.sample}/bootstrap+$i/fake_data/ && "
-      "fastspar_bootstrap --otu_table {input.coreFolder}core+$i.tsv --number {params.bootstrap} --prefix data/network/{wildcards.sample}/bootstrap+$i/fake_data/  >/dev/null"
+      "fastspar_bootstrap --otu_table {input.coreFolder}_core+$i.tsv --number {params.bootstrap} --prefix data/network/{wildcards.sample}/bootstrap+$i/fake_data/  >/dev/null"
       "; done' > tmp/bootstrap_{wildcards.sample}.sh && "
       "chmod +x tmp/bootstrap_{wildcards.sample}.sh &&"
       "bash tmp/bootstrap_{wildcards.sample}.sh"
   
 
-rule bootstrap_fastspar:
+rule bootstrap_fastspar: # TO calculate p-values, correlations on the bootstraps need to be done. This script accomplishes this.
    version: "1.0"
    conda:
       "../../workflow/envs/fastspar.yaml"
@@ -94,7 +102,7 @@ rule bootstrap_fastspar:
       "chmod +x tmp/fastspar_bootstrap_{wildcards.sample}.sh && "
       "bash tmp/fastspar_bootstrap_{wildcards.sample}.sh"
 
-rule pvalues:
+rule pvalues: # Calculates p-values by using the correlations from the core feature table, and the boostraps
    version: "1.0"
    conda:
       "../../workflow/envs/fastspar.yaml"
@@ -106,15 +114,15 @@ rule pvalues:
       fastspar=temporary(touch("tmp/pvalues_{sample}.done"))
    params:
       bootstrap=config["sparcc_bootstrap"][0]
-   message: "pvalues calculation for the features of {wildcards.sample}"
+   message: "pvalues calculation for the features in networks of {wildcards.sample}"
    shell:
       "echo 'for i in $(cat {input.mycat}); do "
-      "fastspar_pvalues --otu_table data/network/{wildcards.sample}/core+$i.tsv --correlation data/network/{wildcards.sample}_corr/corr+$i.tsv --prefix data/network/{wildcards.sample}/bootstrap+$i/fake_data_corr_ --permutations {params.bootstrap} --outfile data/network/{wildcards.sample}_corr/pvalue+$i.tsv  >/dev/null"
+      "fastspar_pvalues --otu_table data/network/{wildcards.sample}_core+$i.tsv --correlation data/network/{wildcards.sample}_corr/corr+$i.tsv --prefix data/network/{wildcards.sample}/bootstrap+$i/fake_data_corr_ --permutations {params.bootstrap} --outfile data/network/{wildcards.sample}_corr/pvalue+$i.tsv  >/dev/null"
       "; done' > tmp/fastspar_{wildcards.sample}.sh && "
       "chmod +x tmp/fastspar_{wildcards.sample}.sh && "
       "bash tmp/fastspar_{wildcards.sample}.sh"
 
-rule nodes_and_edges:
+rule nodes_and_edges: #This script returns nodes and edges that pass the desired level of correlation and pvalue. It also calculates modularity, and the Zi-Pi calculations
    version: "1.0"
    conda:
       "../../workflow/envs/R_with_graphing.yaml"
@@ -125,31 +133,46 @@ rule nodes_and_edges:
       temporary(touch("tmp/table_{sample}.done"))
    params:
       pvalue=config["sparcc_pvalue"][0],
-      threshold=config["threshold"][0]
+      threshold=config["sparcc_corr"][0]
    message: "Creating nodes and edges for the calculated SparCC for {wildcards.sample}"
    shell:
       "mkdir -p data/network/{wildcards.sample} && echo 'for i in $(cat {input.mycat}); do "
-      "Rscript --vanilla ./workflow/scripts/gephi_zipi.R -i data/network/{wildcards.sample}_corr/corr+$i.tsv -p data/network/{wildcards.sample}_corr/pvalue+$i.tsv -n data/network/{wildcards.sample}/nodes+$i.tsv -e data/network/{wildcards.sample}/edges+$i.tsv -a {params.threshold} -b {params.pvalue} >/dev/null"
+      "Rscript --vanilla ./workflow/scripts/nodes_edges.R -i data/network/{wildcards.sample}_corr/corr+$i.tsv -p data/network/{wildcards.sample}_corr/pvalue+$i.tsv -n data/network/{wildcards.sample}/nodes+$i.tsv -e data/network/{wildcards.sample}/edges+$i.tsv -a {params.threshold} -b {params.pvalue} >/dev/null"
       "; done' > tmp/network_{wildcards.sample}.sh && "
       "chmod +x tmp/network_{wildcards.sample}.sh && "
       "bash tmp/network_{wildcards.sample}.sh"
 
-rule network:
+rule zipi: # This script plots the Zi-Pi plots from the nodes_and_edges output
    version: "1.0"
    conda:
-      "../../workflow/envs/NMDS.yaml"
+      "../../workflow/envs/R_with_graphing.yaml"
    input:
       pvalues=rules.nodes_and_edges.output,
       mycat="data/network/{sample}_categories.txt"
    output:
       temporary(touch("tmp/zipiGraph_{sample}.done"))
+   params:
+      pvalue=config["sparcc_pvalue"][0],
+      corr=config["sparcc_corr"][0],
+      core=config["threshold"][0]
    message: "Generating Zi-Pi plots for {wildcards.sample}"
    shell:
       "mkdir -p data/logs data/plots && echo 'for i in $(cat {input.mycat}); do "
-      "Rscript --vanilla ./workflow/scripts/zipi_graph.R -i data/network/{wildcards.sample}/nodes+$i.tsv -o data/plots/{wildcards.sample}_zipi+$i.json  >/dev/null &&"
-      "xvfb-run --auto-servernum orca graph data/plots/{wildcards.sample}_zipi+$i.json -o data/plots/zipi_{wildcards.sample}+$i.svg -f svg 2>> data/logs/zipi_{wildcards.sample}+$x.log || true &&"
-      "rm data/plots/{wildcards.sample}_zipi+$i.json &&"
-      "rm -rf data/network/{wildcards.sample}_corr"
+      "Rscript --vanilla ./workflow/scripts/zipi_graph.R -i data/network/{wildcards.sample}/nodes+$i.tsv -o data/plots/ZiPi_{wildcards.sample}+$i.svg -t {params.corr} -c {params.core} -p {params.pvalue}  >/dev/null"
       "; done' > tmp/zipi_{wildcards.sample}.sh &&"
       "chmod +x tmp/zipi_{wildcards.sample}.sh && "
       "bash tmp/zipi_{wildcards.sample}.sh >/dev/null"
+
+rule network: # Cleans up the temporary files from the network calculations
+   version: "1.0"
+   conda:
+      "../../workflow/envs/R_with_graphing.yaml"
+   input:
+      zipi=rules.zipi.output,
+      nodes=rules.nodes_and_edges.output
+   output:
+      temporary(touch("tmp/network_{sample}.done"))
+   message: "Cleaning up after networks of {wildcards.sample}"
+   shell:
+      "rm -rf data/network/{wildcards.sample}_corr &&"
+      "rm -rf data/network/{wildcards.sample}/bootstrap*"

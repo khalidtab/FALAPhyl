@@ -1,9 +1,9 @@
-csvkit	/.snakemake/conda/35185566
-fastspar	/.snakemake/conda/e781b50c
-phylotoast	/.snakemake/conda/4e450c1d
-R_with_graphing	/.snakemake/conda/e4be4437
-philr	/.snakemake/conda/784fe26c
-qiime2	/.snakemake/conda/3f715ae5
-html2pdf	/.snakemake/conda/4ac107fb
-NMDS	/.snakemake/conda/fde72e8a
-
+csvkit	.snakemake/conda/35185566
+fastspar	.snakemake/conda/d08c87fd
+phylotoast	.snakemake/conda/d0d5aaa5
+R_with_graphing	.snakemake/conda/8c63ed64
+philr	.snakemake/conda/784fe26c
+qiime2	.snakemake/conda/3f715ae5
+html2pdf	.snakemake/conda/4ac107fb
+NMDS_plotly	 .snakemake/conda/5c903649
+betapart .snakemake/conda/6b20f14b

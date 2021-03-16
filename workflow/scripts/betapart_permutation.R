@@ -1,0 +1,51 @@
+#!/usr/local/bin/Rscript --vanilla
+
+
+
+set.seed(1234)
+suppressWarnings(suppressMessages(library(optparse)))	
+suppressWarnings(suppressMessages(library(betapart)))	
+suppressWarnings(suppressMessages(require(tidyverse)))	
+suppressWarnings(suppressMessages(require(vegan)))	
+suppressWarnings(suppressMessages(library(dplyr)))
+suppressWarnings(suppressMessages(library(phyloseq)))
+
+option_list = list(
+  make_option(c("-i", "--input"), type="character", default=NULL, help="tsv file", metavar="Features input file formatted as tsv from a biom file"),
+  make_option(c("-r", "--reps"), type="character", default=10, help="number of samples per each permutation", metavar="Samples per permutation"),
+  make_option(c("-p", "--perm"), type="character", default=1000, help="number of permutations to run", metavar="Number of permutations"),
+  make_option(c("-o", "--output"), type="character", default=NULL, help="output folder to save the files", metavar="Output folder")
+);
+
+opt_parser = OptionParser(option_list=option_list);
+opt = parse_args(opt_parser);
+
+if (is.null(opt$input)){
+  print_help(opt_parser)
+  stop("At least one argument must be supplied (input file).n", call.=FALSE)
+}
+
+subsetTable = opt$input 
+output = opt$output
+numOfSamplesPerTrial = opt$reps
+NumOfPermutations = opt$perm 
+
+myBasename = basename(subsetTable)
+subsetTable = read.delim(subsetTable, row.names = 1)
+phylo.popu = beta.sample.abund(subsetTable, index.family = "bray", sites= as.numeric(numOfSamplesPerTrial), samples=as.numeric(NumOfPermutations))
+
+populationTable = phylo.popu$sampled.values
+
+sink(paste0(output,"/betapart_permu_",myBasename,"_mean_sd.txt"))
+
+print(paste0(myBasename,": Permutation-based mean values for balanced, gradient, and full Bray Curtis"))
+print(paste(phylo.popu$mean.values))
+print(paste(myBasename,": Permutation-based SD values for balanced, gradient, and full Bray Curtis"))
+print(paste(phylo.popu$sd.values))
+
+
+sink()
+
+write.table(populationTable,paste0(output,"/permutations/betapart_permutations_",myBasename),sep="\t",row.names = FALSE)
+
+

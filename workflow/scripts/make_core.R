@@ -1,6 +1,6 @@
 library(optparse)
-library(phyloseq)
-suppressMessages(library(tidyverse))
+suppressWarnings(suppressMessages(library(phyloseq)))
+suppressWarnings(suppressMessages(library(tidyverse)))
 
 option_list = list(
   make_option(c("-i", "--input"), type="character", default=NULL, help="input biom file", metavar="Input biom file"),
@@ -19,12 +19,12 @@ if (is.null(opt$input)){
   stop("At least one argument must be supplied (input file)", call.=FALSE)
 }
 
-input = opt$input # input ="/Users/khaled/Desktop/bioinfo_snakemake/data/network/kfp5s2_CPd_GAPd_LAPd_corr/corr+CPd.tsv"
-map   = opt$map # map = "/Users/khaled/Desktop/bioinfo_snakemake/data/map/kfp5s2_CPd_GAPd_HNS_LAPd.txt"
-threshold = opt$threshold # threshold = "0.8"
+input = opt$input 
+map   = opt$map #
+threshold = opt$threshold 
 threshold = as.numeric(threshold)
-categories = opt$categories # categories = "ShortCond"
-output = opt$output # output = "/Users/khaled/Desktop/bioinfo_snakemake/data/network/Func_GAPd_LAPd_CPd_HNS_subsystem/"
+categories = opt$categories
+output = opt$output 
 
 # Read the files
 myOTU = import_biom(input)
@@ -50,8 +50,7 @@ for(currentCat in myCat){ # This is what will loop on all categories of your map
   myCurrentOTU = cbind(ID,myCurrentOTU)
   zeroCounts = myCurrentOTU%>%
     gather(var, val, -ID) %>% #Transforming the data from wide to long format
-    group_by(val, ID) %>% #Grouping 
-    summarise(count = n()) %>% #Performing the count
+    group_by(val, ID) %>% summarise(count = n())  %>% #Performing the count
     reshape2::dcast(ID~val, value.var = "count", fill = 0) #Reshaping the data
   
   colnames(zeroCounts)[colnames(zeroCounts) == "0"] <- "My0"
@@ -66,6 +65,6 @@ for(currentCat in myCat){ # This is what will loop on all categories of your map
   colnames(myTable)[colnames(myTable) == "ID"] <- "#OTU ID" #Change name of column before saving the file to the standard in biom files
   
   
-  myOutput = paste0(output,"core+",currentCat,".tsv")
+  myOutput = paste0(output,"_core+",currentCat,".tsv")
   write_tsv(myTable,myOutput,col_names = TRUE)
 }

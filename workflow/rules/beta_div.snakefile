@@ -1,4 +1,4 @@
-rule get_colors:
+rule get_colors: # Gets colors associated with the categories in the chosen group to be used in graphing beta diversity
    version: "1.0"
    conda:
       "../../workflow/envs/csvkit.yaml"
@@ -17,7 +17,9 @@ rule get_colors:
       "chmod +x tmp/getColors_{wildcards.sample}.sh &&"
       "bash tmp/getColors_{wildcards.sample}.sh"
 
-rule beta_div:
+
+
+rule beta_div: # Calculate distances between samples based on the chosen beta diversity choices in the input file
    version: "1.0"
    conda:
       "../../workflow/envs/qiime2.yaml"
@@ -45,9 +47,9 @@ rule beta_div:
       "bash tmp/beta_div_PCoA_{wildcards.sample}.sh"
 
 
-rule nmds:
+rule nmds: # Plots the beta diversity distances using the Non-Metric Dimensional Scaling (NMDS) algorithm
    version: "1.0"
-   conda: "../../workflow/envs/NMDS.yaml"
+   conda: "../../workflow/envs/NMDS_plotly.yaml"
    input:
       rules.beta_div.output.tsv
    output: 
@@ -68,9 +70,9 @@ rule nmds:
       "chmod +x tmp/beta_div_NMDS_{wildcards.sample}.sh &&"
       "bash tmp/beta_div_NMDS_{wildcards.sample}.sh"
 
-rule nmds_hull:
+rule nmds_hull: # Plots the beta diversity distances using the Non-Metric Dimensional Scaling (NMDS) algorithm, with an added hull around the points
    version: "1.0"
-   conda: "../../workflow/envs/NMDS.yaml"
+   conda: "../../workflow/envs/NMDS_plotly.yaml"
    input:
       rules.beta_div.output.tsv
    output: 
@@ -92,7 +94,7 @@ rule nmds_hull:
       "bash tmp/beta_div_NMDS_HULL_{wildcards.sample}.sh"
 
 
-rule pcoa_svg:
+rule pcoa: # Plots the beta diversity distances using the Principal Coordinates Analysis (PCoA) algorithm
    version: "1.0"
    conda:
       "../../workflow/envs/phylotoast.yaml"

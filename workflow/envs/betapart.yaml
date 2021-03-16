@@ -1,0 +1,12 @@
+name: betapart
+channels:
+    - bioconda
+    - conda-forge
+dependencies:
+    - r-optparse
+    - r-tidyverse 
+    - r-vegan = 2.5_6
+    - r-dplyr = 1.0.2
+    - bioconductor-phyloseq = 1.30.0
+
+# After the environment is created, install betapart in R

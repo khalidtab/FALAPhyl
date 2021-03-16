@@ -1,10 +1,8 @@
 # The group column name in your mapping file. Only one entry possible. Everything else will be ignored
 # What was it used for? Bcz ADONIS has multiple groups
 group: 
-#     - Cond
-     - delta_smoking
-     - delta_diabetes
-     - delta_BMI
+     - HMPbodysubsite
+     - sex
 
 # The suffix to the color column in your mapping file. Only one entry possible. Every column in your "group" variable below will have to have a corresponding column ending with the suffix you have written here, otherwise, you will get an error if you are trying to create plots with them
 color: 
@@ -36,19 +34,16 @@ distances:
 
 # More complex adonis formulations: what independent terms do you want to test? "treatment+block" would test the input distance matrix partitions "treatment" and "block". The formula "treatment*block" would test "Treatment" as well as the interaction between the two terms. 
 # Nestedness is not possible with this implementation of adonis, i.e, formula "Patient/Pockets", as the block Patient needs to be included in the R formula itself as well "strata = Patient". This will be implemented via a different snakemake workflow with other analyses related to nested data analysis
-adonis: 
+multivariate_adonis: 
 #     - ShortCond*Cond
 #     - ShortCond+Cond
-
-
-
 
 #This list of alpha diversity metrics is shared by both Qiime2 and PhyloToast's implementation.
 alpha: 
 #     - ace
 #     - berger_parker_d
 #     - brillouin_d
-#     - chao1
+     - chao1
 #     - dominance
 #     - doubles
 #     - enspie
@@ -80,9 +75,12 @@ phylogenic:
      - unweighted_unifrac_full_tree
      - weighted_normalized_unifrac
      - weighted_unifrac
+
+threshold: # Level to filter the core by represented in a fraction. EG: 0.8 means that only features present in 80% of the group will be kept. This is a pre-filtereing step for SparCC
+     - 0.1
      
 sparcc_corr:
-     - 0.6
+     - 0.5
      
 sparcc_pvalue:
      - 0.05
@@ -90,5 +88,11 @@ sparcc_pvalue:
 sparcc_bootstrap: # Number of bootstrapping iterations to perform
      - 100
 
-threshold: # Level to filter the core by represented in a fraction. EG: 0.8 means that only features present in 80% of the group will be kept
-     - 0.8
+
+     
+
+betapart_samples: # How many samples to use per permutation?
+     - 10
+     
+betapart_permutations: # How many permutations to create?
+     - 1000

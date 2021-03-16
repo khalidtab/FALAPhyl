@@ -1,10 +1,14 @@
 library("optparse")
-suppressMessages(library("dplyr"))
-suppressMessages(library("plotly"))
+suppressWarnings(suppressMessages(library("dplyr")))
+suppressWarnings(suppressMessages(library(tidyverse)))
+suppressWarnings(suppressMessages(library(ggrepel)))
 
 option_list = list(
   make_option(c("-i", "--input"), type="character", default=NULL, help="Nodes list with Zi-Pi coordinates", metavar="Zi-Pi input"),
-  make_option(c("-o", "--output"), type="character", default=NULL, help="Name of the output plotly json file", metavar="Plotly json output")
+  make_option(c("-t", "--threshold"), type="character", default=NULL, help="Correlation thershold", metavar="Correlation threshold"),
+  make_option(c("-p", "--pvalue"), type="character", default=NULL, help="P-value", metavar="P-value"),
+  make_option(c("-c", "--core"), type="character", default=NULL, help="The percentage (presented as a fraction of one, eg: 80% is 0.8) by which the feature needs to be present in a group to be considered as part of the core.", metavar="Core"),
+  make_option(c("-o", "--output"), type="character", default=NULL, help="Path to output svg graph", metavar="Path of Output SVG")
   );
 
 opt_parser = OptionParser(option_list=option_list);
@@ -15,54 +19,51 @@ if (is.null(opt$input)){
   stop("At least one argument must be supplied (input file)", call.=FALSE)
 }
 
-plotly_coords = read.csv(opt$input, skip=0, header=T, sep="\t")
-plotly_coords = plotly_coords %>% mutate(names=case_when(Zi >= 2.5 | Pi >= 0.62 ~ Id))
+zipiTable = opt$input 
+zipiTable = read.csv(zipiTable, skip=0, header=T, sep="\t")
 
-f1 = list(family = "Arial, sans-serif",size = 15,color = "black")
-f2 = list(family = "Arial, sans-serif", size = 15, color = "black")
+threshold = opt$threshold # threshold = "0.1"
+pvalue = opt$pvalue # pvalue = "0.05"
+core = opt$core # core = "0.8"
+core = as.numeric(core)
 
-axis1 = list(title="Among modules connectivity (Pi)", titlefont=f1, tickfont=f2, showgrid = T, zeroline = F, gridline = T, linewidth=1, linecolor="#000000", range = c(-0.1, 0.8))
-axis2 = list(title="Within module connectivity (Zi)", titlefont=f1, tickfont=f2, showgrid = T, zeroline = F, gridline = T, linewidth=1, linecolor="#000000", range = c(-2,4))
+output = opt$output
 
-fig = plot_ly(plotly_coords, x = ~Pi, y = ~Zi, 
-            type = 'scatter', mode = 'markers+text', 
-             size=I(10),text=~names)#,
-        #    marker = list(color = "#000000", line = list(color = '#000000', width = 1)),            
-         #   alpha=0.75, xaxis=axis1, yaxis=axis2)
+#Create table that will have labels only on interesting points
+zipiTableLabels = cbind(zipiTable,zipiTable$Id)
+colnames(zipiTableLabels) = c("Id","Pi","Zi","Community","Label")
 
+PiLabels = filter(zipiTableLabels,Pi>=0.62)
+ZiLabels = filter(zipiTableLabels,Zi>=2.5)
+labeledPoints = rbind(PiLabels,ZiLabels)
+unlabeledPoints = subset(zipiTableLabels, !(Id %in% labeledPoints$Id))
+unlabeledPoints$Label = ""
 
-fig = fig %>% layout (xaxis=axis1, yaxis = axis2)
+zipiTableLabels = rbind(unlabeledPoints,labeledPoints)
 
-fig = fig %>% add_trace(x = 0.62, showlegend = FALSE, mode = 'lines', size=I(2)) 
-fig = fig %>% add_trace(y = 2.5, showlegend = FALSE, mode = 'lines', size=I(2)) 
+#Draw scatterplot
+# Write the labels of each quadrant
+annotations <- data.frame(
+  xpos = c(-Inf,-Inf,Inf,Inf),
+  ypos =  c(-Inf, Inf,-Inf,Inf),
+  annotateText = c("Peripherals","Module hubs"
+                   ,"Connectors","Network hubs"),
+  hjustvar = c(0,0,1,1) ,
+  vjustvar = c(0,1,0,1)) #<- adjust
 
-fig = fig %>% layout (annotations = 
-         list(x = 0, y = 0, text = "Peripherals", 
-              showarrow = F, xref='paper', yref='paper', 
-              xanchor='auto', yanchor='auto', xshift=0, yshift=0,
-              font=list(size=12, color="black")))
-
-fig = fig %>% layout (annotations = 
-                        list(x = 0, y = 0.85, text = "Module hubs", 
-                             showarrow = F, xref='paper', yref='paper', 
-                             xanchor='auto', yanchor='auto', xshift=0, yshift=0,
-                             font=list(size=12, color="red")))
-
-fig = fig %>% layout (annotations = 
-                        list(x = 1.01, y = 0, text = "Connectors", 
-                             showarrow = F, xref='paper', yref='paper', 
-                             xanchor='auto', yanchor='auto', xshift=0, yshift=0,
-                             font=list(size=12, color="blue")))
-
-fig = fig %>% layout (annotations = 
-                        list(x = 1.01, y = 0.85, text = "Network hubs", 
-                             showarrow = F, xref='paper', yref='paper', 
-                             xanchor='auto', yanchor='auto', xshift=0, yshift=0,
-                             font=list(size=12, color="green")))
-
-myjson = plotly_json(fig,FALSE)
-write(myjson,opt$output)
+zipiPlot =  ggplot(zipiTableLabels, aes(x = Pi, y = Zi, label = Label)) +
+  geom_point(color = "dark blue", position = "jitter") + geom_hline(yintercept = 2.5, color = "dark green", size = 1) + 
+  geom_vline(xintercept = 0.62, color = "orange", size = 1) + 
+  labs(x = "Among modules connectivity (Pi)", y = "Within module connectivity (Zi") +
+  geom_text(data=annotations,aes(x=xpos,y=ypos,hjust=hjustvar,vjust=vjustvar,label=annotateText)) +
+  geom_label_repel(max.overlaps = 50) +
+  labs(title = paste0("ZiPi plot. # of nodes = ", length(zipiTable$Id),", Core = " ,(core*100),"%, Threshold = ",threshold, ", p-value < ",pvalue)) +
+  theme(plot.title = element_text(hjust = 0.5))
 
 
-#plotly::orca(fig,file="~/Desktop/zi-pi/GAP_zi_pi.svg")
+gt = ggplot_gtable(ggplot_build(zipiPlot))
+gt$layout$clip[gt$layout$name == "panel"] <- "off"
 
+svg(output)
+grid::grid.draw(gt)
+dev.off()

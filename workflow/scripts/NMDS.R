@@ -22,11 +22,11 @@ suppressMessages(library("dplyr"))
 suppressMessages(library("plotly"))
 
 
-dissimilarity = opt$input #dissimilarity="/Users/khaled/Desktop/bioinfo_snakemake/data/distance/beta_div/CPds_GAPds_LAPds_HNS+braycurtis.tsv"
-output = opt$output #output="/Users/khaled/Desktop/bioinfo_snakemake/data/plots/svg.svg"  #
-category = opt$group #category = "ShortCond" # 
-mapping_file = opt$mapping #mapping_file = "/Users/khaled/Desktop/bioinfo_snakemake/data/map/CPds_GAPds_LAPds_HNS.txt" #
-color = opt$color #color = "Colors" #
+dissimilarity = opt$input
+output = opt$output
+category = opt$group
+mapping_file = opt$mapping 
+color = opt$color
 
 dist = read.csv(file=dissimilarity, skip=0, header=T, row.names=1, sep="\t") %>% as.dist(.)
 map = read.csv(mapping_file, skip=0, header=T, sep="\t")
@@ -68,8 +68,4 @@ fig = p %>% layout (title=paste("stress = ", stress), xaxis=axis1, yaxis = axis2
 
 myjson = plotly_json(fig,FALSE)
 write(myjson,output)
-
-#server = orca_serve(more_args="--enable-webgl")
-#server$export(fig,file=output)
-#server$close()
 
