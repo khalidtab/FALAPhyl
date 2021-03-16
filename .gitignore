@@ -192,3 +192,14 @@ definition.txt
 input.yaml
 input.yaml
 input.yaml
+data/biom/SHIP_canonicalv3.biom
+data/biom/SHIP_canonicalv3_for_tree.biom
+data/biom/v35_oral_condensed.tsv
+data/map/SHIP_canonicalv3.txt
+data/map/v35_oral.txt
+data/samples.txt
+data/tree/v35_oral.tre
+data/samples.txt
+data/samples.txt
+data/.Rhistory
+data/samples.txt
