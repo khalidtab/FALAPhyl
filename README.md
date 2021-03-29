@@ -7,7 +7,7 @@ You need a features table in a biom file format, and a mapping file. If composit
 
 FALAPhyl is provided either as a docker environment that is ready for deployment, or it can be installed through this github repository. Github deployment requires manual package installation of some R packages (additional requirements are presented in the yaml files).
 
-# How do you run it?
+## How do you run it?
 If you are using the docker image, you will need to mount the OS's folder as a volume:
 
 > docker run -ti -v ~/MyLocalFolder/:/data/ khalidtab/falaphyl:latest bash
