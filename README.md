@@ -1,19 +1,25 @@
-# What does this snakemake workflow do?
-Automatic exploratory analysis of microbiome data.
+# Forays into Automating Laborious Analysis of Phylogeny (FALAPhyl)
+This is a pipeline that fully automates some bioinformatic analysis using well-recognised packages such as Qiime2, PhyloToast, PhyloSeq, and others. It is built on top of snakemake.
+
+The rationale for this is to perform exploratory analysis of your feature data, and produce publication quality plots for beta diversity (Principal Coordinates Analysis - PCoA, Non-metric Multidimensional Scaling - NMDS), alpha diversity, the network connectivity Zi-Pi plot (Zi within-module connectivity, Pi among-module connectivity).
+
+You need a features table in a biom file format, and a mapping file. If compositional beta diversity is specified (PhILR), a rooted tree is optional. If no tree is provided, then one is automatically generated using Ward Hierarchical clustering.
+
+FALAPhyl is provided either as a docker environment that is ready for deployment, or it can be installed through this github repository. Github deployment requires manual package installation of some R packages (additional requirements are presented in the yaml files).
 
 # How do you run it?
-For the workflow to run, snakemake expects the names of the output files it is supposed to generate. This workflow has been made with the idea that each file name (without its original extension) is to be passed to snakemake with the extension of ".final". For example, "smokers_nonsmokers.final". Of course you don't have to pass these values interactively to snakemake and the values can be saved to a text file then fed to snakemake
+If you are using the docker image, you will need to mount the OS's folder as a volume:
 
-> samples=$(cat samples.txt) &&  snakemake $samples --cores all --use-conda
+> docker run -ti -v ~/MyLocalFolder/:/data/ khalidtab/falaphyl:latest bash
 
-# Necessary folder structure
+The volume mounted above should include the following files and folders:
 
-Before execution, the snakemake folder needs the following folders inside of it where the biom files and mapping files reside in:
+> /biom/ # Folder with the biom files to be processed. Files must be in [filename].biom extension, where [filename] is the file name that is exactly the same as the other input files (biom, mapping file, and optional tree file)
+> /map/ # Folder with the mapping files to be processed. Files must be in [filename].txt extension
+> /tree/ # Optional folder with the tree file. Files must be in [filename].tre extension
+> input.yaml # The file with the input parameters. This can be downloaded from this github repo, and it is also packaged in the docker image. If you are using the file in the docker image, it must be copied to the volume, and modified before usage. Any parameter that is not wanted should be commented with a #
 
-- data/biom
-- data/map 
+To run the pipeline. Run the following command
+> snakemake [filename].final --cores all --use-conda
 
-Each biom and mapping file needs to be named the same, and be stored in the correct folders. For example: 
-
-- data/biom/health_disease.biom
-- data/map/health_disease.txt
+[filename] must be the exact same name as the biom and the mapping files, with the .final at the end
