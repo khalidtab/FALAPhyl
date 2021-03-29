@@ -14,10 +14,19 @@ If you are using the docker image, you will need to mount the OS's folder as a v
 
 The volume mounted above should include the following files and folders:
 
-> /biom/ # Folder with the biom files to be processed. Files must be in [filename].biom extension, where [filename] is the file name that is exactly the same as the other input files (biom, mapping file, and optional tree file)
-> /map/ # Folder with the mapping files to be processed. Files must be in [filename].txt extension
-> /tree/ # Optional folder with the tree file. Files must be in [filename].tre extension
-> input.yaml # The file with the input parameters. This can be downloaded from this github repo, and it is also packaged in the docker image. If you are using the file in the docker image, it must be copied to the volume, and modified before usage. Any parameter that is not wanted should be commented with a #
+> /biom/ 
+
+This is the folder with the biom files to be processed. Files must be in [filename].biom extension, where [filename] is the file name that is exactly the same as the other input files (biom, mapping file, and optional tree file)
+> /map/ 
+ 
+This is the folder with the mapping files to be processed. Files must be in [filename].txt extension
+> /tree/ 
+
+Optional folder with the tree file. Files must be in [filename].tre extension
+
+> input.yaml
+
+The file with the input parameters. This can be downloaded from this github repo, and it is also packaged in the docker image. If you are using the file in the docker image, it must be copied to the volume, and modified before usage. Any parameter that is not wanted should be commented with a #
 
 To run the pipeline. Run the following command
 > snakemake [filename].final --cores all --use-conda
