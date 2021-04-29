@@ -13,7 +13,6 @@ rule all:
 
 rule results:
    version: "1.0"
-   conda: "workflow/envs/qiime2.yaml"
    input:
       rules.network.output,
       rules.make_anosim_PDFs.output,

@@ -94,7 +94,7 @@ rule nmds_hull: # Plots the beta diversity distances using the Non-Metric Dimens
       "bash tmp/beta_div_NMDS_HULL_{wildcards.sample}.sh"
 
 
-rule pcoa: # Plots the beta diversity distances using the Principal Coordinates Analysis (PCoA) algorithm
+rule pcoa: # Plots the beta diversity distances using the Principal Coordinates Analysis (PCoAf) algorithm
    version: "1.0"
    conda:
       "../../workflow/envs/phylotoast.yaml"
@@ -110,7 +110,7 @@ rule pcoa: # Plots the beta diversity distances using the Principal Coordinates 
    shell: 
       "mkdir -p data/plots &&"
       "echo 'for x in {params.dist}; do for y in {params.group};" 
-      "do xvfb-run --auto-servernum PCoA.py -i data/distance/PCoA/PCoA_{wildcards.sample}+$x.tsv -m data/map/{wildcards.sample}.txt -b $y -d 2 -c data/map/color_{wildcards.sample}+$y.txt -o data/plots/PCoA_{wildcards.sample}+$x+$y.svg ; done ; done'"
+      "do xvfb-run --auto-servernum python2 workflow/scripts/PCoA.py -i data/distance/PCoA/PCoA_{wildcards.sample}+$x.tsv -m data/map/{wildcards.sample}.txt -b $y -d 2 -c data/map/color_{wildcards.sample}+$y.txt -o data/plots/PCoA_{wildcards.sample}+$x+$y.svg ; done ; done'"
       "> tmp/SVG_PCoA_{wildcards.sample}.sh &&"
       "chmod +x tmp/SVG_PCoA_{wildcards.sample}.sh &&"
       "bash tmp/SVG_PCoA_{wildcards.sample}.sh "

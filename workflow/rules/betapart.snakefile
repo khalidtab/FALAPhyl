@@ -5,11 +5,31 @@ rule betapart_matrix: # Create betapart matrices for all samples
       "data/biom/{sample}.biom"
    output:
       repl="data/distance/beta_div/{sample}+BrayRepl.tsv",
-      norepl="data/distance/beta_div/{sample}+BrayNoRepl.tsv"
+      norepl="data/distance/beta_div/{sample}+BrayNoRepl.tsv",
+      bray=temporary("data/distance/beta_div/{sample}+BrayCurtis_2.tsv")
+   message: "Creating the matrices for the Bray Curtis breakdown for {wildcards.sample}"
    shell:
-      "mkdir -p data/distance/beta_div/{wildcards.sample} && Rscript --vanilla workflow/scripts/betapart_matrix.R -i {input} -r {output.repl} -n {output.norepl}"
+      "mkdir -p data/distance/beta_div/{wildcards.sample} && Rscript --vanilla workflow/scripts/betapart_matrix.R -i {input} -r {output.repl} -n {output.norepl} -b {output.bray}"
 
-
+rule betapart_pairwise: # Create pairwise distance breakdown between each two entities in the categories to show whether the distance is mostly due to turn-over or nestedness
+   conda:
+      "../../workflow/envs/R_with_graphing.yaml"
+   input:
+      repl="data/distance/beta_div/{sample}+BrayRepl.tsv",
+      norepl="data/distance/beta_div/{sample}+BrayNoRepl.tsv",
+      bray="data/distance/beta_div/{sample}+BrayCurtis_2.tsv"
+   params:
+      group=expand("{group}", group=config["group"])
+   output:
+      temporary(touch("data/distance/beta_div/{sample}_braycurtis_breakdown_pairwise.done"))
+   message: "Graphing breakdown of pairwise distances of Bray-Curtis for {wildcards.sample}"
+   shell:
+      "mkdir -p data/distance/beta_div/{wildcards.sample} &&"
+      "echo 'for y in {params.group}; do "
+      " Rscript --vanilla workflow/scripts/betapart_pairwise.R -i {input.bray} -r {input.repl} -n {input.repl} -m data/map/{wildcards.sample}.txt -c $y -o data/plots/betapart_pairwise_{wildcards.sample}_"
+      " ; done' > tmp/Betapart_pairwise_{wildcards.sample}.sh &&"
+      " chmod +x tmp/Betapart_pairwise_{wildcards.sample}.sh &&"
+      " bash tmp/Betapart_pairwise_{wildcards.sample}.sh"
 
 rule anosim_betapart: # Calculates whether the intra-group variances is sig different from intergroup variances
    version: "1.0"
@@ -135,6 +155,7 @@ rule betapart_plot_permutation: # Plots permutations from betapart_permutations 
       temporary(touch("data/betapart/{sample}/plots_done.txt"))
    params:
       color=expand("{color}",color=config["color"])
+   message: "Creating the permutations for the Bray Curtis breakdown of {wildcards.sample}"
    log: "data/logs/PDF_{sample}+ANOSIM+Betapart.log"
    shell:
       "mkdir -p data/plots/ && Rscript --vanilla workflow/scripts/betapart_plot_permutation.R -i data/betapart/{wildcards.sample}/perm/permutations/ -o data/plots/ -m data/map/{wildcards.sample}.txt -b {wildcards.sample} -c {params.color}"
@@ -147,8 +168,11 @@ rule betapart: # Last step from betapart. Cleans up temporary files.
     input:
         mean_std=ids_ingroup_var,
         perm=rules.betapart_plot_permutation.output,
-        PDFs=rules.make_anosim_betapart_PDFs.output.anosim_repl
+        PDFs=rules.make_anosim_betapart_PDFs.output.anosim_repl,
+        pairwise=rules.betapart_pairwise.output
     output:
-        temporary(touch("data/.done_ingroupdiff_{sample}.txt"))
+        temporary(touch("data/.done_betapart_{sample}.txt"))
     shell:
         "echo Cleaning up after Betapart. && rm -rf data/betapart/{wildcards.sample}/perm/permutations data/betapart/{wildcards.sample}/tsv data/distance/beta_div/{wildcards.sample}"
+
+

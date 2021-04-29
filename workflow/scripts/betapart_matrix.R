@@ -10,6 +10,7 @@ suppressWarnings(suppressMessages(library(phyloseq)))
 
 option_list = list(
   make_option(c("-i", "--input"), type="character", default=NULL, help="Biom file", metavar="Features input file formatted as biom"),
+  make_option(c("-b", "--bray"), type="character", default=NULL, help="output file to save the Bray-Curtis tsv matrix", metavar="Output Bray-Curtis"),
   make_option(c("-r", "--replace"), type="character", default=NULL, help="output file to save the turnover/replacement tsv matrix", metavar="Output replacement"),
   make_option(c("-n", "--noreplace"), type="character", default=NULL, help="output file to save the netedness/no replacement tsv matrix", metavar="Output no replacement")
 );
@@ -25,6 +26,7 @@ if (is.null(opt$input)){
 biomFile = opt$input
 replace = opt$replace
 noreplace = opt$noreplace
+bray = opt$bray
 
 ####### Functions #######
 brayBreakdown = function(biomMatrix){
@@ -48,5 +50,6 @@ biom = suppressWarnings(suppressMessages(import_biom(biomFile)))
 # Write the Bray Curtis dissimilarity, balanced and gradients matrices
 myBrays = brayBreakdown(biom@otu_table@.Data) 
 
+write.table(x=myBrays[[1]],file=paste0(bray), quote = FALSE, sep = "\t",col.names = NA)
 write.table(x=myBrays[[2]],file=paste0(replace), quote = FALSE, sep = "\t",col.names = NA)
 write.table(x=myBrays[[3]],file=paste0(noreplace), quote = FALSE, sep = "\t",col.names = NA)

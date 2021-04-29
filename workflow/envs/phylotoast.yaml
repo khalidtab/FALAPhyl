@@ -12,5 +12,6 @@ dependencies:
     - statsmodels
     - h5py
     - phylotoast
+    - xvfbwrapper
 
 # Install xvfbwrapper wrapper

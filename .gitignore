@@ -203,3 +203,21 @@ data/samples.txt
 data/samples.txt
 data/.Rhistory
 data/samples.txt
+*.qza
+data/biom/original files/v35_condensed.tsv
+data/biom/v35_oral.biom
+data/biom/v35_oral_gs.biom
+data/biom/v35_oral_gs_temp.biom
+data/biom/v35_oral.biom
+data/filter_biom.py
+data/map/v35_oral_gs.txt
+data/PCoA.py
+data/samples.txt
+data/tree/v35_oral_gs.tre
+data/biom/v35_oral.biom
+data/biom/v35_oral.biom
+data/biom/v35_oral.biom
+data/command.txt
+data/environments.txt
+data/environments.txt
+data/biom/v35_oral.biom

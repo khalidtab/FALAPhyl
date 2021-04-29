@@ -38,7 +38,7 @@ tree = read_tree(tree)
 
 output = opt$output
 
-phylo = merge_phyloseq(biom,tree,map)
+phylo = suppressMessages(merge_phyloseq(biom,tree,map))
 
 rm(biom,tree,map)
 

@@ -31,6 +31,8 @@ rule philr_distance: # Calculates PhILR distances between different samples, wit
    output: "data/distance/beta_div/{sample}+philr.tsv"
    message: "Creating PhILR distances for {wildcards.sample}"
    log: "data/logs/philr_{sample}.log"
+   resources:
+      mem_mb=10000
    shell:
       "mkdir -p data/distance/beta_div/ data/logs &&"
       "Rscript --vanilla ./workflow/scripts/philr.R -i {input.biom} -t {input.tree} -m {input.map} -o {output} 2>> data/logs/philr_{wildcards.sample}.log"
@@ -70,7 +72,7 @@ rule philr_pcoa: # Plots the PhILR PCoA coordinates using the Principal Coordina
    shell: 
       "mkdir -p data/plots &&"
       "echo 'for y in {params.group};" 
-      "do xvfb-run --auto-servernum PCoA.py -i data/distance/PCoA/PCoA_{wildcards.sample}+philr.tsv -m data/map/{wildcards.sample}.txt -b $y -d 2 -c data/map/color_{wildcards.sample}+$y.txt -o data/plots/PCoA_{wildcards.sample}+philr+$y.svg;  done'"
+      "do xvfb-run --auto-servernum python2 workflow/scripts/PCoA.py -i data/distance/PCoA/PCoA_{wildcards.sample}+philr.tsv -m data/map/{wildcards.sample}.txt -b $y -d 2 -c data/map/color_{wildcards.sample}+$y.txt -o data/plots/PCoA_{wildcards.sample}+philr+$y.svg;  done'"
       "> tmp/SVG_PCoA_philr_{wildcards.sample}.sh &&"
       "chmod +x tmp/SVG_PCoA_philr_{wildcards.sample}.sh &&"
       "bash tmp/SVG_PCoA_philr_{wildcards.sample}.sh "

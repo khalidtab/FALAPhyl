@@ -2,7 +2,6 @@
 # What was it used for? Bcz ADONIS has multiple groups
 group: 
      - HMPbodysubsite
-     - sex
 
 # The suffix to the color column in your mapping file. Only one entry possible. Every column in your "group" variable below will have to have a corresponding column ending with the suffix you have written here, otherwise, you will get an error if you are trying to create plots with them
 color: 
@@ -77,7 +76,7 @@ phylogenic:
      - weighted_unifrac
 
 threshold: # Level to filter the core by represented in a fraction. EG: 0.8 means that only features present in 80% of the group will be kept. This is a pre-filtereing step for SparCC
-     - 0.1
+     - 0.6
      
 sparcc_corr:
      - 0.5

@@ -9,6 +9,7 @@ dependencies:
 - r-reshape2 = 1.4.4
 - r-ggrepel
 - xvfbwrapper
+- r-ggpubr
 
 # If the graphing doesn't work through xvfbwrapper, do this after the environment is created
 #apt-get update

@@ -17,7 +17,7 @@ rule alpha_div_plot: # Calculates alpha diversity in each group, and outputs a P
       "echo 'for x in {params.alpha}; do for y in {params.group}; do "
       " w=$(printf \"%s{params.color}\" $y) && "
       "mkdir -p data/plots/alpha_div_{wildcards.sample}+$y+$x && "
-      "xvfb-run --auto-servernum ./workflow/scripts/diversity_modified.py -i {input.biom} -m {input.map} -c $y -d $x --o data/plots/alpha_div_{wildcards.sample}+$y+$x --image_type svg --color_by $w && "
+      "xvfb-run --auto-servernum python2 ./workflow/scripts/diversity_modified.py -i {input.biom} -m {input.map} -c $y -d $x --o data/plots/alpha_div_{wildcards.sample}+$y+$x --image_type svg --color_by $w && "
       "mv data/plots/alpha_div_{wildcards.sample}+$y+$x/d.svg data/plots/alpha_div_{wildcards.sample}+$y+$x.svg || true"
       "; done ; done' > tmp/alpha_div_plot_{wildcards.sample}.sh && "
       "chmod +x tmp/alpha_div_plot_{wildcards.sample}.sh && "

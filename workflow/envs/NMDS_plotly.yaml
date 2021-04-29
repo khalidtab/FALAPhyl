@@ -17,3 +17,7 @@ dependencies:
 #apt-get install libgconf-2-4
 #apt install chromium
 #apt-get install xvfb
+#apt-get install libxss1
+
+
+# apt-get install libgtk2.0-0 libgconf-2-4 chromium xvfb libxss1
