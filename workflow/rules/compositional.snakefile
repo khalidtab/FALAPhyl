@@ -9,8 +9,8 @@ rule make_tree: #If a tree is not provided, a tree is generated from the feature
    message: "Tree for {wildcards.sample} does not exist. Generating one based on Ward hierarchical clustering."
    shell:
       "   mkdir -p data/tsv &&"
-      "   biom convert -i {input} -o data/tsv/{wildcards.sample}_for_tree.tsv --to-tsv --header-key taxonomy &&"
-      '   biom convert -i data/tsv/{wildcards.sample}_for_tree.tsv -o data/biom/{wildcards.sample}_for_tree.biom --to-json --table-type="OTU table" --process-obs-metadata taxonomy &&'
+      "   biom convert -i {input} -o data/tsv/{wildcards.sample}_for_tree.tsv --to-tsv &&"
+      '   biom convert -i data/tsv/{wildcards.sample}_for_tree.tsv -o data/biom/{wildcards.sample}_for_tree.biom --to-json --table-type="OTU table" &&'
       "   qiime tools import --input-path data/biom/{wildcards.sample}_for_tree.biom --output-path data/biom/{wildcards.sample}_for_tree.qza --type FeatureTable[Frequency] --input-format BIOMV100Format >/dev/null &&"
       "   qiime gneiss correlation-clustering --i-table data/biom/{wildcards.sample}_for_tree.qza --o-clustering data/tree/{wildcards.sample}.qza &&"
       "   qiime tools export --input-path data/tree/{wildcards.sample}.qza --output-path data/tree/tree_{wildcards.sample}  >/dev/null &&"

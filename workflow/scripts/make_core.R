@@ -45,7 +45,7 @@ for(currentCat in myCat){ # This is what will loop on all categories of your map
   currentthreshold = length(currentSamples) - (threshold * length(currentSamples))
   
   #There is prune_taxa
-  myCurrentOTU = currentOTU@otu_table %>% as.data.frame(.)
+  myCurrentOTU = currentOTU@.Data %>% as.data.frame(.)
   ID = rownames(myCurrentOTU)
   myCurrentOTU = cbind(ID,myCurrentOTU)
   zeroCounts = myCurrentOTU%>%

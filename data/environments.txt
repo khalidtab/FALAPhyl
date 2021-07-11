@@ -1,9 +1,24 @@
-csvkit	.snakemake/conda/35185566
-fastspar	.snakemake/conda/d08c87fd
-phylotoast	.snakemake/conda/d0d5aaa5
-R_with_graphing	.snakemake/conda/8c63ed64
-philr	.snakemake/conda/784fe26c
-qiime2	.snakemake/conda/3f715ae5
-html2pdf	.snakemake/conda/4ac107fb
-NMDS_plotly	 .snakemake/conda/5c903649
-betapart .snakemake/conda/6b20f14b
+fastspar	.snakemake/conda/d08c87fd64e6321d083c45284165f318
+qiime2	.snakemake/conda/3f715ae5bd37609cb8497ffdaef239ab
+philr	.snakemake/conda/784fe26c16d6e4cb5239217bec082eae
+R_with_graphing	/.snakemake/conda/fe7352531b5aea06f6d84cec207e72c5
+NMDS_plotly	.snakemake/conda/d2f9b9739837725d2653a786dbd2c1e3
+betapart	.snakemake/conda/6b20f14bdce7cbf7de8c906d9892a402
+csvkit	.snakemake/conda/35185566385168d86baf686557eb91a2
+phylotoast	.snakemake/conda/272edd90b74192062942038c7c9af570
+html2pdf	.snakemake/conda/4ac107fbb3983d857645c864d1148490
+
+
+
+
+
+
+
+                         /.snakemake/conda/56c536fcf0ff97105483a631ea5a7da9
+
+
+
+
+
+
+                         /.snakemake/conda/fe7352531b5aea06f6d84cec207e72c5

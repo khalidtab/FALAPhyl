@@ -10,6 +10,7 @@ option_list = list(
   make_option(c("-m", "--mapping"), type="character", default=NULL, help="Mapping file", metavar="Mapping file"),
   make_option(c("-c", "--color"), type="character", default=NULL, help="the suffix that is used for colors of the column", metavar="Color column suffix"),
   make_option(c("-b", "--basename"), type="character", default=NULL, help="Basename of the biom file", metavar="Basename of the biom file"),
+  make_option(c("-d", "--distance"), type="character", default=NULL, help="Type of distance matrix. Either the string 'bray' or 'jaccard'.", metavar="Distance matrix"),
   make_option(c("-o", "--output"), type="character", default=NULL, help="output folder to save the files", metavar="Output folder")
 );
 
@@ -20,9 +21,10 @@ if (is.null(opt$input)){
   print_help(opt_parser)
   stop("At least one argument must be supplied (input file).n", call.=FALSE)
 }
+distance = opt$distance
 
 myFolder = opt$input 
-myFiles = list.files(path = myFolder, pattern = "^betapart_permutations_")
+myFiles = list.files(path = myFolder, pattern = paste0("^betapart_permutations_",distance,"_"))
 
 output = opt$output
 color = opt$color 
@@ -34,8 +36,9 @@ myGroups = c()
 
 basename = opt$basename
 
+
 for(myfile in myFiles){
-  s1 = unlist(strsplit(myfile, split='betapart_permutations_', fixed=TRUE))[2]
+  s1 = unlist(strsplit(myfile, split=paste0('betapart_permutations_',distance,"_"), fixed=TRUE))[2]
   myGroups = c(myGroups, unlist(strsplit(s1, split='+', fixed=TRUE))[1])  
 }
 

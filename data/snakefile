@@ -4,7 +4,8 @@ include: "workflow/rules/make_qza.snakefile"
 include: "workflow/rules/beta_div.snakefile"
 include: "workflow/rules/alpha_div.snakefile"
 include: "workflow/rules/beta_sig.snakefile"
-include: "workflow/rules/betapart.snakefile"
+include: "workflow/rules/bray_betapart.snakefile"
+include: "workflow/rules/jaccard_betapart.snakefile"
 include: "workflow/rules/compositional.snakefile"
 
 rule all:
@@ -22,7 +23,8 @@ rule results:
       rules.alpha_div.output,
       rules.nmds.output,
       rules.nmds_hull.output,
-      rules.betapart.output,
+      rules.bray_betapart.output,
+      rules.jaccard_betapart.output,
       rules.compositional_betadiv.output
    message: "Cleaning up…"
    output:
