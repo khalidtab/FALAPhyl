@@ -1,11 +1,9 @@
 # FALAPhyl: *F*orays into *A*utomating *L*aborious *A*nalysis of *Phyl*ogeny 
-This is a pipeline that fully automates some bioinformatic analysis using well-recognised packages such as Qiime2, PhyloToast, PhyloSeq, and others. It is built on top of snakemake.
+This is a pipeline that fully automates some bioinformatic analysis using well-recognised packages such as Qiime2, PhyloSeq, ggplot and others. It is built on top of snakemake.
 
 The rationale for this is to perform exploratory analysis of your feature data, and produce publication quality plots for beta diversity (Principal Coordinates Analysis - PCoA, Non-metric Multidimensional Scaling - NMDS), alpha diversity, the network connectivity Zi-Pi plot (Zi within-module connectivity, Pi among-module connectivity).
 
 You need a features table in a biom file format, and a mapping file. If compositional beta diversity is specified (PhILR), a rooted tree is optional. If no tree is provided, then one is automatically generated using Ward Hierarchical clustering.
-
-FALAPhyl is provided either as a docker environment that is ready for deployment, or it can be installed through this github repository. Github deployment requires manual package installation of some R packages (additional requirements are presented in the yaml files).
 
 ## How do you run it?
 If you are using the docker image, you will need to mount the OS's folder as a volume:
