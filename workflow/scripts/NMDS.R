@@ -1,5 +1,10 @@
 #install.packages("workflow/scripts/vegan_2.5-6.tar", repos = NULL, type="source", INSTALL_opts = '--no-lock')
 library("optparse")
+suppressMessages(library("vegan"))
+suppressMessages(library("dplyr"))
+suppressMessages(library("ggplot2"))
+suppressMessages(library("ggrepel"))
+suppressMessages(library("cowplot"))
 
 option_list = list(
   make_option(c("-i", "--input"), type="character", default=NULL, help="dissimilarity matrix", metavar="Input dissimilarity matrix"),
@@ -17,19 +22,14 @@ if (is.null(opt$input)){
   stop("At least one argument must be supplied (input file)", call.=FALSE)
 }
 
-suppressMessages(library("vegan"))
-suppressMessages(library("dplyr"))
-suppressMessages(library("plotly"))
-
-
 dissimilarity = opt$input
 output = opt$output
 category = opt$group
 mapping_file = opt$mapping 
 color = opt$color
 
-dist = read.csv(file=dissimilarity, skip=0, header=T, row.names=1, sep="\t") %>% as.dist(.)
-map = read.csv(mapping_file, skip=0, header=T, sep="\t")
+dist = suppressMessages(read.csv(file=dissimilarity, skip=0, header=T, row.names=1, sep="\t")) %>% as.dist(.)
+map = suppressMessages(read.csv(mapping_file, skip=0, header=T, sep="\t"))
 
 # Get NMDS coordinates
 NMDS = metaMDS(dist)
@@ -42,30 +42,69 @@ firstcol=as.matrix(rownames(coords))
 coords=cbind(firstcol,coords)
 rownames(coords) = NULL
 colnames(coords) = list("SampleID","NMDS1","NMDS2")
-plotly_coords=merge(coords,map, by.x = "SampleID", by.y = "X.SampleID")
-catNum = which(colnames(plotly_coords) == category)
-colnames(plotly_coords)[catNum] = "PlotlyCategory"
-plotly_coords = plotly_coords %>% dplyr::arrange(PlotlyCategory) # This makes sure that the colors are correctly mapped since the legend is in alphabetical order, and it assumes the entries are in alphabetical order too
+NMDS_table=merge(coords,map, by.x = "SampleID", by.y = "X.SampleID")
+catNum = which(colnames(NMDS_table) == category)
+colnames(NMDS_table)[catNum] = "Category"
+NMDS_table = NMDS_table %>% dplyr::arrange(Category) # This makes sure that the colors are correctly mapped since the legend is in alphabetical order, and it assumes the entries are in alphabetical order too
 
-myCat = as.vector(t(plotly_coords[catNum]))
+myCat = as.vector(t(NMDS_table[catNum]))
 
-colorNum = which(colnames(plotly_coords) == color)
-myColor = as.vector(t(plotly_coords[colorNum]))
+colorNum = which(colnames(NMDS_table) == color)
+myColor = unique(as.vector(t(NMDS_table[colorNum])))
 
-f1 = list(family = "Arial, sans-serif",size = 15,color = "black")
-f2 = list(family = "Arial, sans-serif", size = 15, color = "black")
 
-axis1 = list(title="NMDS 1", titlefont=f1, tickfont=f2, showgrid = T, zeroline = F, gridline = T, linewidth=1, linecolor="#000000")
-axis2 = list(title="NMDS 2", titlefont=f1, tickfont=f2, showgrid = T, zeroline = F, gridline = T, linewidth=1, linecolor="#000000")
+NMDS_table$NMDS1 = as.numeric(as.character(NMDS_table$NMDS1))
+NMDS_table$NMDS2 = as.numeric(as.character(NMDS_table$NMDS2))
 
-p = plot_ly(plotly_coords, x = ~NMDS1, y = ~NMDS2, 
-            type = 'scatter', mode = 'markers', 
-            name = myCat, size=I(150),
-            marker = list(color = myColor, line = list(color = '#000000', width = 1)),            
-            alpha=0.75, xaxis=axis1, yaxis=axis2)
+# Graph with no names
+myplot = ggplot(NMDS_table, aes(x = NMDS1, y = NMDS2)) + geom_point(aes(color = Category, size=1)) + 
+  labs(title = paste("Non-metric Multidimensional Scaling (NMDS), stress = ", stress)) + theme_bw() + 
+  scale_color_manual(values=myColor) + 
+  theme(axis.text.x = element_blank(),axis.text.y = element_blank(),axis.ticks = element_blank()) +
+  theme(axis.line = element_line(color='black'),
+        plot.background = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank()) # these last 3 lines remove the grid lines
+ggsave(filename=output,plot=myplot)
 
-fig = p %>% layout (title=paste("stress = ", stress), xaxis=axis1, yaxis = axis2)
+# Graph with no names  but with density plots
+xdens = axis_canvas(myplot, axis = "x")+ geom_density(data = NMDS_table, aes(x = NMDS1,fill=Category), alpha = 0.5, size = 0.1)+scale_fill_manual(values=unique(as.vector(t(NMDS_table[colorNum]))))
 
-myjson = plotly_json(fig,FALSE)
-write(myjson,output)
+ydens = axis_canvas(myplot, axis = "y", coord_flip = TRUE)+
+  geom_density(data = NMDS_table, aes(x = NMDS2, fill=Category),
+               alpha = 0.5, size = 0.1)+coord_flip()+scale_fill_manual(values=unique(as.vector(t(NMDS_table[colorNum]))))
+
+p1 = insert_xaxis_grob(myplot, xdens, grid::unit(.1, "null"), position = "top")
+p2 = insert_yaxis_grob(p1, ydens, grid::unit(.1, "null"), position = "right")
+
+ggsave(filename=paste0(output,"noNameswithProbDF.svg"),plot=p2)
+
+
+
+# Graph with names
+myplot = ggplot(NMDS_table, aes(x = NMDS1, y = NMDS2)) + geom_point(aes(color = Category, size=1)) + 
+  labs(title = paste("Non-metric Multidimensional Scaling (NMDS), stress = ", stress)) + theme_bw() + 
+  scale_color_manual(values=myColor) + 
+  geom_text_repel(max.overlaps = 50, label=NMDS_table$SampleID,size=2) +
+  theme(axis.text.x = element_blank(),axis.text.y = element_blank(),axis.ticks = element_blank()) +
+  theme(axis.line = element_line(color='black'),
+        plot.background = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank()) # these last 3 lines remove the grid lines
+ggsave(filename=paste0(output,"withnames.svg"),plot=myplot)
+
+
+
+xdens = axis_canvas(myplot, axis = "x")+ geom_density(data = NMDS_table, aes(x = NMDS1,fill=Category), alpha = 0.5, size = 0.1)+scale_fill_manual(values=unique(as.vector(t(NMDS_table[colorNum]))))
+
+ydens = axis_canvas(myplot, axis = "y", coord_flip = TRUE)+
+  geom_density(data = NMDS_table, aes(x = NMDS2, fill=Category),
+               alpha = 0.5, size = 0.1)+coord_flip()+scale_fill_manual(values=unique(as.vector(t(NMDS_table[colorNum]))))
+
+p1 = insert_xaxis_grob(myplot, xdens, grid::unit(.1, "null"), position = "top")
+p2 = insert_yaxis_grob(p1, ydens, grid::unit(.1, "null"), position = "right")
+
+ggsave(filename=paste0(output,"withnamesProbDF.svg"),plot=p2)
+
+
 

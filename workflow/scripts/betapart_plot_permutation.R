@@ -31,7 +31,7 @@ color = opt$color
 
 mapping = opt$mapping
 
-mapping = read.delim(mapping)
+mapping = suppressMessages(read.delim(mapping))
 myGroups = c()
 
 basename = opt$basename
@@ -95,9 +95,7 @@ myPlot =  ggplot2::ggplot(concatLongTable,aes(x=Value,color=Category, linetype=T
      scale_linetype_manual(values=c("twodash","solid", "dotted"))
 
 
-svg(filename=paste0(output,"betapart_",basename,"+",thisGroup,".svg")) 
-print(myPlot)
-dev.off()
+ggsave(filename=paste0(output,"betapart_",basename,"+",thisGroup,".svg"),plot=myPlot)
    
    }
  

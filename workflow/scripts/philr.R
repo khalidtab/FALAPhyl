@@ -25,9 +25,11 @@ if (is.null(opt$input)){
 
 # Load files
 
-biom = opt$input 
-biom = import_biom(biom)
+biom = suppressMessages(read.delim(opt$input,skip=1,sep="\t")) %>% as.data.frame(.)
+rownames(biom) = biom[,1]
+biom[,1] = NULL
 
+biom = otu_table(biom, taxa_are_rows = TRUE)
 
 map = opt$mapping
 map = import_qiime_sample_data(map)

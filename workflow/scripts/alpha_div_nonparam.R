@@ -33,9 +33,6 @@ colnames(alpha) = myNames
 merged = merge(map,alpha) %>% .[, c(myNames, group)]
 colnames(merged)[3] = "group"
 
-
-#merged = filter(merged, group == c("normal","overweight"))
-
 if (length(unique(merged$group)) > 2){
   test = kruskal.test(merged$alpha ~ merged$group, data = merged)
   posthoc = pairwise.wilcox.test(merged$alpha, merged$group, p.adjust.method = "fdr")

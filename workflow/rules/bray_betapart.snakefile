@@ -2,7 +2,7 @@ rule bray_betapart_matrix: # Create betapart matrices for all samples
    conda:
       "../../workflow/envs/betapart.yaml"
    input:
-      "data/biom/{sample}.biom"
+      "data/tsv/{sample}.tsv"
    output:
       repl="data/distance/beta_div/{sample}+BrayRepl.tsv",
       norepl="data/distance/beta_div/{sample}+BrayNoRepl.tsv",
@@ -11,9 +11,9 @@ rule bray_betapart_matrix: # Create betapart matrices for all samples
    shell:
       "mkdir -p data/distance/beta_div/{wildcards.sample} && Rscript --vanilla workflow/scripts/betapart_matrix.R -i {input} -r {output.repl} -n {output.norepl} -f {output.bray} -d bray"
 
-rule bray_betapart_pairwise: # Create pairwise distance breakdown between each two entities in the categories to show whether the distance is mostly due to turn-over or nestedness
+rule bray_betapart_pairwise: # Create pairwise distance breakdown between each two entities in the categories to show whether the distance is mostly due to balanced variation in abundance or and balanced gradients
    conda:
-      "../../workflow/envs/R_with_graphing.yaml"
+      "../../workflow/envs/ggpubr.yaml"
    input:
       repl="data/distance/beta_div/{sample}+BrayRepl.tsv",
       norepl="data/distance/beta_div/{sample}+BrayNoRepl.tsv",
@@ -88,7 +88,7 @@ checkpoint bray_group_and_category: # Will export multiple biom files tagged by 
    conda:
       "../../workflow/envs/betapart.yaml"
    input:
-      "data/biom/{sample}.biom"
+      "data/tsv/{sample}.tsv"
    params:
       group=expand("{group}",group=config["group"])
    output:
@@ -97,7 +97,7 @@ checkpoint bray_group_and_category: # Will export multiple biom files tagged by 
    shell:
       "mkdir -p data/betapart_bray/{wildcards.sample}/tsv data/logs && "
       "echo 'for x in {params.group}; do "
-      "Rscript --vanilla workflow/scripts/separate_bioms.R -i data/biom/{wildcards.sample}.biom -o data/betapart_bray/{wildcards.sample}/tsv -m data/map/{wildcards.sample}.txt -g $x ; done ' > tmp/getbiomsPerCategoryBray_{wildcards.sample}.sh &&"
+      "Rscript --vanilla workflow/scripts/separate_bioms.R -i data/tsv/{wildcards.sample}.tsv -o data/betapart_bray/{wildcards.sample}/tsv -m data/map/{wildcards.sample}.txt -g $x ; done ' > tmp/getbiomsPerCategoryBray_{wildcards.sample}.sh &&"
       "chmod +x tmp/getbiomsPerCategoryBray_{wildcards.sample}.sh &&"
       "bash tmp/getbiomsPerCategoryBray_{wildcards.sample}.sh"
 
@@ -148,7 +148,7 @@ def ids_bray_betapart_permutations(wildcards):
 
 rule bray_betapart_plot_permutation: # Plots permutations from betapart_permutations step
    conda:
-      "../../workflow/envs/betapart.yaml"
+      "../../workflow/envs/ggpubr.yaml"
    input:
       perm=ids_bray_betapart_permutations
    output:

@@ -15,17 +15,15 @@ rule make_tree: #If a tree is not provided, a tree is generated from the feature
       "   qiime gneiss correlation-clustering --i-table data/biom/{wildcards.sample}_for_tree.qza --o-clustering data/tree/{wildcards.sample}.qza &&"
       "   qiime tools export --input-path data/tree/{wildcards.sample}.qza --output-path data/tree/tree_{wildcards.sample}  >/dev/null &&"
       "   mv data/tree/tree_{wildcards.sample}/tree.nwk {output} &&"
-      "   rm data/tree/{wildcards.sample}.qza data/biom/{wildcards.sample}_for_tree.qza data/tsv/{wildcards.sample}_for_tree.tsv &&"
-      "   rm -rf data/tree/tree_{wildcards.sample}"
-
-
+      "   rm data/tree/{wildcards.sample}.qza data/biom/{wildcards.sample}_for_tree.qza data/tsv/{wildcards.sample}_for_tree.tsv data/biom/{wildcards.sample}_for_tree.biom && "
+      " rm -rf data/tree/tree_{wildcards.sample}"
 
 rule philr_distance: # Calculates PhILR distances between different samples, without taking into account phylogenic distances (this can be changed by modifying the philr.R script)
    version: "1.0"
    conda:
       "../../workflow/envs/philr.yaml"
    input:
-      biom = "data/biom/{sample}.biom",
+      biom = "data/tsv/{sample}.tsv",
       tree = "data/tree/{sample}.tre",
       map = "data/map/{sample}.txt"
    output: "data/distance/beta_div/{sample}+philr.tsv"
@@ -60,19 +58,20 @@ rule philr_processing_in_qiime2: # Importing PhILR distances to qiime2 for calcu
 rule philr_pcoa: # Plots the PhILR PCoA coordinates using the Principal Coordinates Analysis (PCoA) algorithm
    version: "1.0"
    conda:
-      "../../workflow/envs/phylotoast.yaml"
+      "../../workflow/envs/ggrepel.yaml"
    input:
-      betaDiv=rules.philr_processing_in_qiime2.output.philr_pcoa_tsv,
-      color=rules.get_colors.output
+      betaDiv=rules.philr_processing_in_qiime2.output.philr_pcoa_tsv
    params: 
-      group=expand("{group}",group=config["group"])
+      group=expand("{group}",group=config["group"]),
+      color=config["color"][0]
    output:
       report(expand("data/plots/PCoA_{{sample}}+philr+{group}.svg",group=config["group"]))
    message: "Generating PhILR-PCoA plots for {wildcards.sample}"
    shell: 
       "mkdir -p data/plots &&"
-      "echo 'for y in {params.group};" 
-      "do xvfb-run --auto-servernum python2 workflow/scripts/PCoA.py -i data/distance/PCoA/PCoA_{wildcards.sample}+philr.tsv -m data/map/{wildcards.sample}.txt -b $y -d 2 -c data/map/color_{wildcards.sample}+$y.txt -o data/plots/PCoA_{wildcards.sample}+philr+$y.svg;  done'"
+      "echo 'for x in {params.group}; do " 
+      "y=$(printf \"%s{params.color}\" $x) && "      
+      "Rscript --vanilla ./workflow/scripts/PCoA.R -i data/distance/PCoA/PCoA_{wildcards.sample}+philr.tsv -m data/map/{wildcards.sample}.txt -g $x -c $y -o data/plots/PCoA_{wildcards.sample}+philr+$x.svg ; done'"
       "> tmp/SVG_PCoA_philr_{wildcards.sample}.sh &&"
       "chmod +x tmp/SVG_PCoA_philr_{wildcards.sample}.sh &&"
       "bash tmp/SVG_PCoA_philr_{wildcards.sample}.sh "
@@ -80,12 +79,11 @@ rule philr_pcoa: # Plots the PhILR PCoA coordinates using the Principal Coordina
       
 rule philr_nmds: # Plots the PhILR distances using the Non-Metric Dimensional Scaling (NMDS) algorithm
    version: "1.0"
-   conda: "../../workflow/envs/NMDS_plotly.yaml"
+   conda: "../../workflow/envs/ggrepel.yaml"
    input:
       rules.philr_distance.output
    output: 
-      json=temporary(expand("data/plots/NMDS_{{sample}}+philr+{group}.json",group=config["group"])),
-      svg=report(expand("data/plots/NMDS_{{sample}}+philr+{group}_1.svg",group=config["group"]))
+      svg=report(expand("data/plots/NMDS_{{sample}}+philr+{group}.svg",group=config["group"]))
    params:
       group=expand("{group}",group=config["group"]),
       color=config["color"][0]
@@ -95,34 +93,9 @@ rule philr_nmds: # Plots the PhILR distances using the Non-Metric Dimensional Sc
    shell:
       "echo 'for w in {params.group}; do "
       "y=$(printf \"%s{params.color}\" $w) && "
-      "Rscript --vanilla ./workflow/scripts/NMDS.R -i data/distance/beta_div/{wildcards.sample}+philr.tsv -o data/plots/NMDS_{wildcards.sample}+philr+$w.json -m data/map/{wildcards.sample}.txt -g $w -c $y > data/logs/NMDS_{wildcards.sample}+philr+$w.log 2>>/dev/null && "
-      "xvfb-run --auto-servernum orca graph data/plots/NMDS_{wildcards.sample}+philr+$w.json -o data/plots/NMDS_{wildcards.sample}+philr+$w.svg -f svg 2>> data/logs/NMDS_{wildcards.sample}+philr+$w.log || true; done' > tmp/beta_div_NMDS_philr_{wildcards.sample}.sh &&"
+      "Rscript --vanilla ./workflow/scripts/NMDS.R -i data/distance/beta_div/{wildcards.sample}+philr.tsv -o data/plots/NMDS_{wildcards.sample}+philr+$w.svg -m data/map/{wildcards.sample}.txt -g $w -c $y > data/logs/NMDS_{wildcards.sample}+philr+$w.log 2>>/dev/null ; done' > tmp/beta_div_NMDS_philr_{wildcards.sample}.sh &&"
       "chmod +x tmp/beta_div_NMDS_philr_{wildcards.sample}.sh &&"
       "bash tmp/beta_div_NMDS_philr_{wildcards.sample}.sh"
-
-rule philr_nmds_hull: # Plots the PhILR distances using the Non-Metric Dimensional Scaling (NMDS) algorithm, and adds a hull around the samples
-   version: "1.0"
-   conda: "../../workflow/envs/NMDS_plotly.yaml"
-   input:
-      rules.philr_distance.output
-   output: 
-      json=temporary(expand("data/plots/NMDS_HULL_{{sample}}+philr+{group}.json",group=config["group"])),
-      svg=report(expand("data/plots/NMDS_HULL_{{sample}}+philr+{group}_1.svg",group=config["group"]))
-   params:
-      group=expand("{group}",group=config["group"]),
-      color=config["color"][0]
-   log:
-      expand("data/logs/NMDS_HULL_{{sample}}+philr+{group}.log",group=config["group"])
-   message: "Generating PhILR NMDS hull plots for {wildcards.sample}"
-   shell:
-      "echo 'for w in {params.group}; do "
-      "y=$(printf \"%s{params.color}\" $w) && "
-      " Rscript --vanilla ./workflow/scripts/NMDS_hull.R -i data/distance/beta_div/{wildcards.sample}+philr.tsv -o data/plots/NMDS_HULL_{wildcards.sample}+philr+$w.json -m data/map/{wildcards.sample}.txt -g $w -c $y > data/logs/NMDS_HULL_{wildcards.sample}+philr+$w.log 2>>/dev/null && "
-      "xvfb-run --auto-servernum orca graph data/plots/NMDS_HULL_{wildcards.sample}+philr+$w.json -o data/plots/NMDS_HULL_{wildcards.sample}+philr+$w.svg -f svg 2>> data/logs/NMDS_HULL_{wildcards.sample}+philr+$w.log || true; done' > tmp/beta_div_NMDS_HULL_philr_{wildcards.sample}.sh &&"
-      "chmod +x tmp/beta_div_NMDS_HULL_philr_{wildcards.sample}.sh &&"
-      "bash tmp/beta_div_NMDS_HULL_philr_{wildcards.sample}.sh"
-
-
 
 
 rule philr_anosim: # Calculates whether the intra-group PhILR variances is sig different from intergroup variances
@@ -248,7 +221,6 @@ rule compositional_betadiv: # final step of compositional analysis
       permdisp=rules.make_philr_permdisp_PDFs.output,
       anosim=rules.make_philr_anosim_PDFs.output,
       nmds=rules.philr_nmds.output.svg,
-      nmdshull=rules.philr_nmds_hull.output.svg,
       pcoa=rules.philr_pcoa.output
    output: 
       touch(temporary("tmp/compositional_{sample}.final"))

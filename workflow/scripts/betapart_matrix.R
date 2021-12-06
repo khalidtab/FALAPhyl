@@ -1,8 +1,14 @@
 #!/usr/local/bin/Rscript --vanilla
 
 set.seed(1234)
+suppressWarnings(suppressMessages(library(devtools)))	
+suppressWarnings(suppressMessages(load_all(path = "workflow/scripts/betapart")))
+
+
+
+#install.packages("workflow/scripts/betapart_1.5.4.tar.gz", repos = NULL, type ="source")
+#library("betapart")
 suppressWarnings(suppressMessages(library(optparse)))	
-suppressWarnings(suppressMessages(library(betapart)))	
 suppressWarnings(suppressMessages(require(tidyverse)))	
 suppressWarnings(suppressMessages(require(vegan)))	
 suppressWarnings(suppressMessages(library(dplyr)))
@@ -23,6 +29,7 @@ if (is.null(opt$input)){
   print_help(opt_parser)
   stop("At least one argument must be supplied (input file).n", call.=FALSE)
 }
+
 
 biomFile = opt$input
 replace = opt$replace
@@ -57,10 +64,12 @@ breakdown = function(biomMatrix,distance){
 #########################
 
 # Make the phyloseq merged file
-biom = suppressWarnings(suppressMessages(import_biom(biomFile)))
+myTable = suppressMessages(read_tsv(biomFile, skip = 1)) %>% as.data.frame(.)
+rownames(myTable) = myTable[,1]
+myTable[,1] = NULL
 
-# Write the full dissimilarity, replacement and no replacement matrices
-myDists = breakdown(biom@.Data,distance) 
+# Write the full dissimilarity, replacement and no replacement matricesbiom
+myDists = breakdown(myTable,distance) 
 
 write.table(x=myDists[[1]],file=paste0(full), quote = FALSE, sep = "\t",col.names = NA)
 write.table(x=myDists[[2]],file=paste0(replace), quote = FALSE, sep = "\t",col.names = NA)

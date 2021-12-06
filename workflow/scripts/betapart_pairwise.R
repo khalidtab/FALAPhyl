@@ -107,13 +107,17 @@ for (myCond1 in uniqueCond1) {
   
   
   pd = data.frame(replacement = v1v2_tables$repl, noreplacement = v1v2_tables$noRepl)
-  colnames(pd) = c("Turn-over","Difference in richness")
- 
-  myGraph = ggpubr::ggpaired(pd, cond1 = "Turn-over", cond2 = "Difference in richness", fill = "condition", palette = "jco", line.size=0.01, title= (paste(dist_type, "breakdown between ",myCond1,"and",myCond2, "Pvalue <",formatC(pvalue, format = "e", digits = 2))))
-   
-  svg(paste0(output,dist_type,"_breakdown_",myCond1,"_",myCond2,".svg"))
- print(myGraph)
-  dev.off()
+  
+  if (dist_type == "bray"){
+  colnames(pd) = c("balanced variation in abundance","abundance gradients")
+  myGraph = ggpubr::ggpaired(pd, cond1 = "balanced variation in abundance", cond2 = "abundance gradients", fill = "condition", palette = "jco", line.size=0.01, title= (paste(dist_type, "breakdown between ",myCond1,"and",myCond2, "Pvalue <",formatC(pvalue, format = "e", digits = 2))))
+  } else {
+    colnames(pd) = c("Turn-over","Nestedness")
+    myGraph = ggpubr::ggpaired(pd, cond1 = "Turn-over", cond2 = "Nestedness", fill = "condition", palette = "jco", line.size=0.01, title= (paste(dist_type, "breakdown between ",myCond1,"and",myCond2, "Pvalue <",formatC(pvalue, format = "e", digits = 2))))  
+  } 
+  
+  
+  ggsave(filename=paste0(output,dist_type,"_breakdown_",myCond1,"_",myCond2,".svg"),plot=myGraph)
   }
 
   

@@ -1,5 +1,5 @@
 name: csvkit
 channels:
-    - conda-forge
+    - anaconda
 dependencies:
     - csvkit

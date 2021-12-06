@@ -3,8 +3,10 @@
 
 
 set.seed(1234)
+
+suppressWarnings(suppressMessages(library(devtools)))	
+suppressWarnings(suppressMessages(load_all(path = "workflow/scripts/betapart")))
 suppressWarnings(suppressMessages(library(optparse)))	
-suppressWarnings(suppressMessages(library(betapart)))	
 suppressWarnings(suppressMessages(require(tidyverse)))	
 suppressWarnings(suppressMessages(require(vegan)))	
 suppressWarnings(suppressMessages(library(dplyr)))
@@ -33,7 +35,7 @@ NumOfPermutations = opt$perm
 distance = opt$distance
 
 myBasename = basename(subsetTable)
-subsetTable = read.delim(subsetTable, row.names = 1) %>% t(.)
+subsetTable = suppressMessages(read.delim(subsetTable, row.names = 1)) %>% t(.)
 
 if (distance == "bray"){
 phylo.popu = beta.sample.abund(subsetTable, index.family = "bray", sites= as.numeric(numOfSamplesPerTrial), samples=as.numeric(NumOfPermutations))

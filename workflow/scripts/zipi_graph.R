@@ -20,7 +20,7 @@ if (is.null(opt$input)){
 }
 
 zipiTable = opt$input 
-zipiTable = read.csv(zipiTable, skip=0, header=T, sep="\t")
+zipiTable = suppressMessages(read.csv(zipiTable, skip=0, header=T, sep="\t"))
 
 threshold = opt$threshold # threshold = "0.1"
 pvalue = opt$pvalue # pvalue = "0.05"
@@ -64,6 +64,4 @@ zipiPlot =  ggplot(zipiTableLabels, aes(x = Pi, y = Zi, label = Label)) +
 gt = ggplot_gtable(ggplot_build(zipiPlot))
 gt$layout$clip[gt$layout$name == "panel"] <- "off"
 
-svg(output)
-grid::grid.draw(gt)
-dev.off()
+ggsave(filename=output,plot=grid::grid.draw(gt))

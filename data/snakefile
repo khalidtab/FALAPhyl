@@ -7,6 +7,7 @@ include: "workflow/rules/beta_sig.snakefile"
 include: "workflow/rules/bray_betapart.snakefile"
 include: "workflow/rules/jaccard_betapart.snakefile"
 include: "workflow/rules/compositional.snakefile"
+include: "workflow/rules/patient_level_analysis.snakefile"
 
 rule all:
    input: "{sample}.final"
@@ -22,9 +23,9 @@ rule results:
       rules.pcoa.output,
       rules.alpha_div.output,
       rules.nmds.output,
-      rules.nmds_hull.output,
       rules.bray_betapart.output,
       rules.jaccard_betapart.output,
+      rules.patient_level_analysis.output,
       rules.compositional_betadiv.output
    message: "Cleaning up…"
    output:

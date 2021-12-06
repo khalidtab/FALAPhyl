@@ -2,11 +2,22 @@ name: betapart
 channels:
     - bioconda
     - conda-forge
+    - r_test
+    - r
+    - skyblued
 dependencies:
+    - bioconductor-phyloseq 
     - r-optparse
     - r-tidyverse 
-    - r-vegan = 2.5_6
-    - r-dplyr = 1.0.2
-    - bioconductor-phyloseq = 1.30.0
-
-# After the environment is created, install betapart in R
+    - r-vegan
+    - r-dplyr
+    - r-ape
+    - r-rcdd
+    - r-snow
+    - r-foreach
+    - r-itertools
+    - r-geometry
+    - r-fastmatch
+    - r-picante
+    - r-doSNOW
+    - r-devtools

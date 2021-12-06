@@ -20,7 +20,7 @@ rule get_categories: # Prepares the chosen categories
 rule makeCore: # SparCC works better when the feature table has less zeros. Therefore, this script will filter the feature tables to the desired level of "coreness" based on the input file values
    version: "1.0"
    conda:
-      "../../workflow/envs/R_with_graphing.yaml"
+      "../../workflow/envs/phyloseq.yaml"
    input:
       biom="data/biom/{sample}_temp.biom",
       map="data/map/{sample}.txt"
@@ -125,7 +125,7 @@ rule pvalues: # Calculates p-values by using the correlations from the core feat
 rule nodes_and_edges: #This script returns nodes and edges that pass the desired level of correlation and pvalue. It also calculates modularity, and the Zi-Pi calculations
    version: "1.0"
    conda:
-      "../../workflow/envs/R_with_graphing.yaml"
+      "../../workflow/envs/phyloseq.yaml"
    input:
       pvalues=rules.pvalues.output,
       mycat="data/network/{sample}_categories.txt"
@@ -145,7 +145,7 @@ rule nodes_and_edges: #This script returns nodes and edges that pass the desired
 rule zipi: # This script plots the Zi-Pi plots from the nodes_and_edges output
    version: "1.0"
    conda:
-      "../../workflow/envs/R_with_graphing.yaml"
+      "../../workflow/envs/ggrepel.yaml"
    input:
       pvalues=rules.nodes_and_edges.output,
       mycat="data/network/{sample}_categories.txt"
@@ -165,8 +165,6 @@ rule zipi: # This script plots the Zi-Pi plots from the nodes_and_edges output
 
 rule network: # Cleans up the temporary files from the network calculations
    version: "1.0"
-   conda:
-      "../../workflow/envs/R_with_graphing.yaml"
    input:
       zipi=rules.zipi.output,
       nodes=rules.nodes_and_edges.output

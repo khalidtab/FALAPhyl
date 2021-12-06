@@ -1,29 +1,3 @@
-rule alpha_div_plot: # Calculates alpha diversity in each group, and outputs a PDF plot, and calculates the alpha diversity statistical analysis using nonparametric methods
-   version: "1.0"
-   conda:
-      "../../workflow/envs/phylotoast.yaml"
-   input:
-      biom="data/biom/{sample}.biom",
-      map="data/map/{sample}.txt"
-   output:
-      svg=report(expand("data/plots/alpha_div_{{sample}}+{group}+{alpha}.svg",alpha=config["alpha"],group=config["group"]))
-   params: 
-      alpha=expand("{alpha}",alpha=config["alpha"]),
-      group=expand("{group}",group=config["group"]),
-      color=config["color"][0]
-   message: "Plotting alpha diversity on {wildcards.sample}"
-   shell:
-      "mkdir -p tmp &&"
-      "echo 'for x in {params.alpha}; do for y in {params.group}; do "
-      " w=$(printf \"%s{params.color}\" $y) && "
-      "mkdir -p data/plots/alpha_div_{wildcards.sample}+$y+$x && "
-      "xvfb-run --auto-servernum python2 ./workflow/scripts/diversity_modified.py -i {input.biom} -m {input.map} -c $y -d $x --o data/plots/alpha_div_{wildcards.sample}+$y+$x --image_type svg --color_by $w && "
-      "mv data/plots/alpha_div_{wildcards.sample}+$y+$x/d.svg data/plots/alpha_div_{wildcards.sample}+$y+$x.svg || true"
-      "; done ; done' > tmp/alpha_div_plot_{wildcards.sample}.sh && "
-      "chmod +x tmp/alpha_div_plot_{wildcards.sample}.sh && "
-      "bash tmp/alpha_div_plot_{wildcards.sample}.sh"
-
-
 rule alpha_div_calc: # Provides per sample alpha calculation
    version: "1.0"
    conda:
@@ -46,10 +20,36 @@ rule alpha_div_calc: # Provides per sample alpha calculation
       "chmod +x tmp/alpha_div_{wildcards.sample}.sh && "
       "bash tmp/alpha_div_{wildcards.sample}.sh"
 
+rule alpha_div_plot: # Calculates alpha diversity in each group, and outputs a PDF plot, and calculates the alpha diversity statistical analysis using nonparametric methods
+   version: "1.0"
+   conda:
+      "../../workflow/envs/ggpubr.yaml"
+   input:
+      map="data/map/{sample}.txt",
+      alphadiv=rules.alpha_div_calc.output
+   output:
+      svg=report(expand("data/plots/alpha_div_{{sample}}+{group}+{alpha}.svg",alpha=config["alpha"],group=config["group"]))
+   params: 
+      alpha=expand("{alpha}",alpha=config["alpha"]),
+      group=expand("{group}",group=config["group"]),
+      color=config["color"][0]
+   message: "Plotting alpha diversity on {wildcards.sample}"
+   shell:
+      "mkdir -p tmp &&"
+      "echo 'for x in {params.alpha}; do for y in {params.group}; do "
+      " w=$(printf \"%s{params.color}\" $y) && "
+      "mkdir -p data/plots/alpha_div_{wildcards.sample}+$y+$x && "
+      "Rscript --vanilla ./workflow/scripts/alphaDiv.R -i data/alpha_div/calc_{wildcards.sample}+$x.txt -m {input.map} -c $w -g $y -o data/plots/alpha_div_{wildcards.sample}+$y+$x.svg "
+      "; done ; done' > tmp/alpha_div_plot_{wildcards.sample}.sh && "
+      "chmod +x tmp/alpha_div_plot_{wildcards.sample}.sh && "
+      "bash tmp/alpha_div_plot_{wildcards.sample}.sh"
+
+
+
 rule alpha_div_stats: # Provides per sample alpha calculation
    version: "1.0"
    conda:
-      "../../workflow/envs/R_with_graphing.yaml"
+      "../../workflow/envs/ggrepel.yaml"
    input:
       qza=rules.alpha_div_calc.output
    output:
@@ -71,8 +71,6 @@ rule alpha_div_stats: # Provides per sample alpha calculation
 
 rule alpha_div: # Final step in alpha diversity calculations, to clean up temporary files
    version: "1.0"
-   conda:
-      "../../workflow/envs/qiime2.yaml"
    input:
       svg=rules.alpha_div_plot.output.svg,
       stats=rules.alpha_div_stats.output.alphadiv

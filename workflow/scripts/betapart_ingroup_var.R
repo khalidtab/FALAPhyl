@@ -4,8 +4,10 @@
 
 set.seed(1234)
 suppressWarnings(suppressMessages(library(optparse)))	
-suppressWarnings(suppressMessages(library(betapart)))	
 suppressWarnings(suppressMessages(require(tidyverse)))	
+
+suppressWarnings(suppressMessages(library(devtools)))	
+suppressWarnings(suppressMessages(load_all(path = "workflow/scripts/betapart")))
 
 option_list = list(
   make_option(c("-i", "--input"), type="character", default=NULL, help="tsv file", metavar="Features input file formatted as tsv from a biom file"),
@@ -25,7 +27,7 @@ biomFile = opt$input
 output = opt$output 
 dist = opt$distance
 
-subsetTable = read.delim(biomFile, row.names = 1)
+subsetTable = suppressMessages(read.delim(biomFile, row.names = 1))
 
 sink(output)
 

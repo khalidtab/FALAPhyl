@@ -43,7 +43,13 @@ load_phylo = function(myPhyloseqObject){
 #########################
 
 # Make the phyloseq merged file
-biom = suppressWarnings(suppressMessages(import_biom(biomFile)))
+
+
+biom = suppressMessages(read_tsv(biomFile,skip=1)) %>% as.data.frame(.)
+rownames(biom) = biom[,1]
+biom[,1] = NULL
+
+biom = otu_table(biom, taxa_are_rows = TRUE)
 
 # Now do the required calculations on each group at a time
 ## First, find what the groups are

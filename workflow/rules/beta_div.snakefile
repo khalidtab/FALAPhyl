@@ -1,24 +1,3 @@
-rule get_colors: # Gets colors associated with the categories in the chosen group to be used in graphing beta diversity
-   version: "1.0"
-   conda:
-      "../../workflow/envs/csvkit.yaml"
-   input:
-      "data/map/{sample}.txt"
-   params:
-      group=expand("{group}",group=config["group"]),
-      color=config["color"][0]
-   output:
-      temporary(expand("data/map/color_{{sample}}+{group}.txt",group=config["group"]))
-   message: "Extracting colors from the mapping file for {wildcards.sample}"
-   shell:
-      "echo 'for x in {params.group}; do "
-      "y=$(printf \"%s{params.color}\" $x) &&" 
-      "csvcut {input} -t -c $x,$y | tail -n +2 | sort -u | csvformat -T | csvcut -t -c 2 > data/map/color_{wildcards.sample}+$x.txt; done ' > tmp/getColors_{wildcards.sample}.sh &&"
-      "chmod +x tmp/getColors_{wildcards.sample}.sh &&"
-      "bash tmp/getColors_{wildcards.sample}.sh"
-
-
-
 rule beta_div: # Calculate distances between samples based on the chosen beta diversity choices in the input file
    version: "1.0"
    conda:
@@ -49,12 +28,11 @@ rule beta_div: # Calculate distances between samples based on the chosen beta di
 
 rule nmds: # Plots the beta diversity distances using the Non-Metric Dimensional Scaling (NMDS) algorithm
    version: "1.0"
-   conda: "../../workflow/envs/NMDS_plotly.yaml"
+   conda: "../../workflow/envs/ggrepel.yaml"
    input:
       rules.beta_div.output.tsv
    output: 
-      temporary(expand("data/plots/NMDS_{{sample}}+{dist}+{group}.json",dist=config["distances"],group=config["group"])),
-      report(expand("data/plots/NMDS_{{sample}}+{dist}+{group}_1.svg",dist=config["distances"],group=config["group"]))
+      report(expand("data/plots/NMDS_{{sample}}+{dist}+{group}.svg",dist=config["distances"],group=config["group"]))
    params:
       dist=expand("{dist}",dist=config["distances"]),
       group=expand("{group}",group=config["group"]),
@@ -65,52 +43,29 @@ rule nmds: # Plots the beta diversity distances using the Non-Metric Dimensional
    shell:
       "echo 'for x in {params.dist}; do for w in {params.group}; do "
       "y=$(printf \"%s{params.color}\" $w) && "
-      " Rscript --vanilla ./workflow/scripts/NMDS.R -i data/distance/beta_div/{wildcards.sample}+$x.tsv -o data/plots/NMDS_{wildcards.sample}+$x+$w.json -m data/map/{wildcards.sample}.txt -g $w -c $y > data/logs/NMDS_{wildcards.sample}+$x+$w.log 2>>/dev/null && "
-      "xvfb-run --auto-servernum orca graph data/plots/NMDS_{wildcards.sample}+$x+$w.json -o data/plots/NMDS_{wildcards.sample}+$x+$w.svg -f svg 2>> data/logs/NMDS_{wildcards.sample}+$x+$w.log || true; done; done' > tmp/beta_div_NMDS_{wildcards.sample}.sh &&"
+      "Rscript --vanilla ./workflow/scripts/NMDS.R -i data/distance/beta_div/{wildcards.sample}+$x.tsv -o data/plots/NMDS_{wildcards.sample}+$x+$w.svg -m data/map/{wildcards.sample}.txt -g $w -c $y > data/logs/NMDS_{wildcards.sample}+$x+$w.log 2>>/dev/null; done; done' > tmp/beta_div_NMDS_{wildcards.sample}.sh &&"
       "chmod +x tmp/beta_div_NMDS_{wildcards.sample}.sh &&"
       "bash tmp/beta_div_NMDS_{wildcards.sample}.sh"
 
-rule nmds_hull: # Plots the beta diversity distances using the Non-Metric Dimensional Scaling (NMDS) algorithm, with an added hull around the points
+
+rule pcoa: # Plots the beta diversity distances using the Principal Coordinates Analysis (PCoA) algorithm
    version: "1.0"
-   conda: "../../workflow/envs/NMDS_plotly.yaml"
+   conda:
+      "../../workflow/envs/ggrepel.yaml"
    input:
-      rules.beta_div.output.tsv
-   output: 
-      temporary(expand("data/plots/NMDS_HULL_{{sample}}+{dist}+{group}.json",dist=config["distances"],group=config["group"])),
-      report(expand("data/plots/NMDS_HULL_{{sample}}+{dist}+{group}_1.svg",dist=config["distances"],group=config["group"]))
-   params:
+      betaDiv=rules.beta_div.output.tsv_pcoa
+   params: 
       dist=expand("{dist}",dist=config["distances"]),
       group=expand("{group}",group=config["group"]),
       color=config["color"][0]
-   log:
-      expand("data/logs/NMDS_HULL_{{sample}}+{dist}+{group}.log", dist=config["distances"],group=config["group"])
-   message: "Generating NMDS_HULL plots for {wildcards.sample}"
-   shell:
-      "echo 'for x in {params.dist}; do for w in {params.group}; do "
-      "y=$(printf \"%s{params.color}\" $w) && "
-      " Rscript --vanilla ./workflow/scripts/NMDS_hull.R -i data/distance/beta_div/{wildcards.sample}+$x.tsv -o data/plots/NMDS_HULL_{wildcards.sample}+$x+$w.json -m data/map/{wildcards.sample}.txt -g $w -c $y > data/logs/NMDS_HULL_{wildcards.sample}+$x+$w.log 2>>/dev/null && "
-      "xvfb-run --auto-servernum orca graph data/plots/NMDS_HULL_{wildcards.sample}+$x+$w.json -o data/plots/NMDS_HULL_{wildcards.sample}+$x+$w.svg -f svg 2>> data/logs/NMDS_HULL_{wildcards.sample}+$x+$w.log || true; done; done' > tmp/beta_div_NMDS_HULL_{wildcards.sample}.sh &&"
-      "chmod +x tmp/beta_div_NMDS_HULL_{wildcards.sample}.sh &&"
-      "bash tmp/beta_div_NMDS_HULL_{wildcards.sample}.sh"
-
-
-rule pcoa: # Plots the beta diversity distances using the Principal Coordinates Analysis (PCoAf) algorithm
-   version: "1.0"
-   conda:
-      "../../workflow/envs/phylotoast.yaml"
-   input:
-      betaDiv=rules.beta_div.output.tsv_pcoa,
-      color=rules.get_colors.output
-   params: 
-      dist=expand("{dist}",dist=config["distances"]),
-      group=expand("{group}",group=config["group"])
    output:
       report(expand("data/plots/PCoA_{{sample}}+{dist}+{group}.svg",dist=config["distances"],group=config["group"]))
    message: "Generating PCoA plots for {wildcards.sample}"
    shell: 
       "mkdir -p data/plots &&"
-      "echo 'for x in {params.dist}; do for y in {params.group};" 
-      "do xvfb-run --auto-servernum python2 workflow/scripts/PCoA.py -i data/distance/PCoA/PCoA_{wildcards.sample}+$x.tsv -m data/map/{wildcards.sample}.txt -b $y -d 2 -c data/map/color_{wildcards.sample}+$y.txt -o data/plots/PCoA_{wildcards.sample}+$x+$y.svg ; done ; done'"
+      "echo 'for x in {params.dist}; do for y in {params.group}; do "
+      "z=$(printf \"%s{params.color}\" $y) && " 
+      "Rscript --vanilla ./workflow/scripts/PCoA.R -i data/distance/PCoA/PCoA_{wildcards.sample}+$x.tsv -m data/map/{wildcards.sample}.txt -g $y -c $z -o data/plots/PCoA_{wildcards.sample}+$x+$y.svg ; done ; done'"
       "> tmp/SVG_PCoA_{wildcards.sample}.sh &&"
       "chmod +x tmp/SVG_PCoA_{wildcards.sample}.sh &&"
       "bash tmp/SVG_PCoA_{wildcards.sample}.sh "

@@ -2,7 +2,7 @@ rule jaccard_betapart_matrix: # Create betapart matrices for all samples
    conda:
       "../../workflow/envs/betapart.yaml"
    input:
-      "data/biom/{sample}.biom"
+      "data/tsv/{sample}.tsv"
    output:
       repl="data/distance/beta_div/{sample}+jaccardRepl.tsv",
       norepl="data/distance/beta_div/{sample}+jaccardNoRepl.tsv",
@@ -13,7 +13,7 @@ rule jaccard_betapart_matrix: # Create betapart matrices for all samples
 
 rule jaccard_betapart_pairwise: # Create pairwise distance breakdown between each two entities in the categories to show whether the distance is mostly due to turn-over or nestedness
    conda:
-      "../../workflow/envs/R_with_graphing.yaml"
+      "../../workflow/envs/ggpubr.yaml"
    input:
       repl="data/distance/beta_div/{sample}+jaccardRepl.tsv",
       norepl="data/distance/beta_div/{sample}+jaccardNoRepl.tsv",
@@ -88,7 +88,7 @@ checkpoint jaccard_group_and_category: # Will export multiple biom files tagged 
    conda:
       "../../workflow/envs/betapart.yaml"
    input:
-      "data/biom/{sample}.biom"
+      "data/tsv/{sample}.tsv"
    params:
       group=expand("{group}",group=config["group"])
    output:
@@ -97,7 +97,7 @@ checkpoint jaccard_group_and_category: # Will export multiple biom files tagged 
    shell:
       "mkdir -p data/betapart_jaccard/{wildcards.sample}/tsv data/logs && "
       "echo 'for x in {params.group}; do "
-      "Rscript --vanilla workflow/scripts/separate_bioms.R -i data/biom/{wildcards.sample}.biom -o data/betapart_jaccard/{wildcards.sample}/tsv -m data/map/{wildcards.sample}.txt -g $x ; done ' > tmp/getbiomsPerCategoryjaccard_{wildcards.sample}.sh &&"
+      "Rscript --vanilla workflow/scripts/separate_bioms.R -i data/tsv/{wildcards.sample}.tsv -o data/betapart_jaccard/{wildcards.sample}/tsv -m data/map/{wildcards.sample}.txt -g $x ; done ' > tmp/getbiomsPerCategoryjaccard_{wildcards.sample}.sh &&"
       "chmod +x tmp/getbiomsPerCategoryjaccard_{wildcards.sample}.sh &&"
       "bash tmp/getbiomsPerCategoryjaccard_{wildcards.sample}.sh"
 
@@ -148,7 +148,7 @@ def ids_jaccard_betapart_permutations(wildcards):
 
 rule jaccard_betapart_plot_permutation: # Plots permutations from betapart_permutations step
    conda:
-      "../../workflow/envs/betapart.yaml"
+      "../../workflow/envs/ggpubr.yaml"
    input:
       perm=ids_jaccard_betapart_permutations
    output:
