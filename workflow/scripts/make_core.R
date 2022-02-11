@@ -35,30 +35,32 @@ colnames(myMap)[colnames(myMap) == categories] <- "myCat"
 myCat = unique(as.vector(myMap$myCat))
 
 
+for(currentCat in myCat){
+currentSamples = dplyr::filter(myMap, myCat == currentCat) %>% .$X.SampleID %>% as.character(.)
+myCurrentOTU = myOTU[ , names(myOTU) %in% currentSamples] 
+myCurrentOTU[myCurrentOTU==0] = NA #Makes it easier to work on the samples
+myCurrentOTU = myCurrentOTU %>% filter(if_any(everything(), ~ !is.na(.))) # Rows with only NAs are removed
 
-myOTU[myOTU==0] = NA #Makes it easier to work on the samples
-myOTU = myOTU %>% filter(if_any(everything(), ~ !is.na(.))) # Rows with only NAs are removed
-retainedOTUs = myOTU[which(rowMeans(!is.na(myOTU)) > threshold), ] # Convert matrix to TRUE and FALSE. True is represented by 1 and false by 0. Get the mean of the row. If that row is more than the threshold then it is retained
 
+retainedOTUs = myCurrentOTU[which(rowMeans(!is.na(myCurrentOTU)) >= threshold), ] # Convert matrix to TRUE and FALSE. True is represented by 1 and false by 0. Get the mean of the row. If that row is more than the threshold then it is retained
 
 if(dim(retainedOTUs)[1] == 0){ # ie, no retained OTUs because of the threshold
   print(paste0("The level of core you have specified resulted in no retained features for",currentCat,". Adjust your level of core and rerun snakemake on a lower core level 'threshold' by adjusting the input.yaml file."))
 }
-excludedOTUs = subset(myOTU, !row.names(myOTU) %in% row.names(retainedOTUs))
-Others = colSums(excludedOTUs,na.rm = TRUE) %>% as.matrix(.) %>% t(.) # The sum of all OTUs that did not pass the filtering step. This is done to reduce zeros in the matrix, and to maintain the data as it is compositional in nature. After SparCC, it can be deleted due to to satisfy the subcompositional coherence
-row.names(Others) = "Others"
 
-retainedAndOthers = rbind(retainedOTUs,Others)
+excludedOTUs = subset(myCurrentOTU, !row.names(myCurrentOTU) %in% row.names(retainedOTUs)) # Give me myOTUs were row names of myOTUs is NOT (!) in row names of retainedOTUS
+excludedOTUs = colSums(excludedOTUs,na.rm = TRUE) %>% as.matrix(.) %>% t(.) # The sum of all OTUs that did not pass the filtering step. This is done to reduce zeros in the matrix, and to maintain the data as it is compositional in nature. After SparCC, it can be deleted due to to satisfy the subcompositional coherence
+row.names(excludedOTUs) = "Others"
+excludedOTUs = as.data.frame(excludedOTUs)
+myCurrentOTU_amalgamated = rbind(retainedOTUs,excludedOTUs)
 
-for(currentCat in myCat)
-  currentSamples = dplyr::filter(myMap, myCat == currentCat) %>% .$X.SampleID %>% as.character(.)
-myCurrentOTU = retainedAndOthers[ , names(retainedAndOthers) %in% currentSamples] 
 
-ID = rownames(myCurrentOTU)
-myCurrentOTU = cbind(ID,myCurrentOTU)
-colnames(myCurrentOTU)[colnames(myCurrentOTU) == "ID"] <- "#OTU ID" #Change name of column before saving the file to the standard in biom files
-retainedAndOthers[is.na(retainedAndOthers)] = 0
+
+ID = rownames(myCurrentOTU_amalgamated)
+myCurrentOTU_amalgamated = cbind(ID,myCurrentOTU_amalgamated)
+colnames(myCurrentOTU_amalgamated)[colnames(myCurrentOTU_amalgamated) == "ID"] <- "#OTU ID" #Change name of column before saving the file to the standard in biom files
+myCurrentOTU_amalgamated[is.na(myCurrentOTU_amalgamated)] = 0
 
 myOutput = paste0(output,"_core+",currentCat,".tsv")
-write_tsv(myTable,myOutput,col_names = TRUE)
+write_tsv(myCurrentOTU_amalgamated,myOutput,col_names = TRUE)
 }
