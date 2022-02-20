@@ -1,2 +1,6 @@
 
 .DS_Store
+data/biom/test.biom
+data/map/test.txt
+data/FALAPhyl/
+data/build.snakefile
