@@ -1,3 +1,4 @@
+🧆
 # FALAPhyl: *F*orays into *A*utomating *L*aborious *A*nalysis of *Phyl*ogeny 
 This is a pipeline that fully automates some bioinformatic analysis using well-recognised packages such as Qiime2, PhyloSeq, ggplot and others. It is built on top of snakemake.
 
