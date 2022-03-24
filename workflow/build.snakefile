@@ -80,22 +80,6 @@ rule phyloseq:
       temporary(touch("{sample}phyloseq"))
    shell:
       "touch {output}"
-
-<<<<<<< Updated upstream
-=======
-rule betapart:
-   conda:
-      "./workflow/envs/betapart.yaml"
-   message: "Creating betapart"
-   input:
-      "{sample}"
-   output:
-      temporary(touch("{sample}betapart"))
-   shell:
-      "touch {output}"
-
->>>>>>> Stashed changes
-
       
 rule results:
    version: "1.0"

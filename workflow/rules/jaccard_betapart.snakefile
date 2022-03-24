@@ -37,7 +37,6 @@ use rule bray_repl_anosim_betapart as jaccard_norepl_anosim_betapart:
    output:
       myresult="data/distance/ANOSIM/ANOSIM_jaccardNoRepl_{sample}.txt",
       mysh="tmp/ANOSIM_jacNorepl_{sample}.sh"
-
    message: "Calculating ANOSIM for Jaccard Nestedness (ie no replacement) of {wildcards.sample}"
 
 use rule bray_repl_anosim_betapart as jaccard_repl_anosim_betapart:
