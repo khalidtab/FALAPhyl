@@ -23,7 +23,7 @@ This is the folder with the mapping file to be processed. Mapping file must be i
 
 > input.yaml
 
-The file with the input parameters. This can be downloaded from this github repo, and it is also packaged in the docker image. If you are using the file in the docker image, it must be copied to the volume, and modified before usage. Any parameter that is not wanted should be commented with a #
+The file with the input parameters. This can be downloaded from this github repo, and it is also packaged in the docker image in the parent directory. If you are using the file in the docker image, it must be copied to the volume, and modified before usage. Any parameter that is not wanted should be commented with a #
 
 To run the pipeline. Run the following command
 > snakemake [filename].final --cores all --use-conda
