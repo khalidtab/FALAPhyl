@@ -31,55 +31,34 @@ rule bray_betapart_pairwise: # Create pairwise distance breakdown between each t
       " chmod +x tmp/Betapart_bray_pairwise_{wildcards.sample}.sh &&"
       " bash tmp/Betapart_bray_pairwise_{wildcards.sample}.sh"
 
-rule bray_anosim_betapart: # Calculates whether the intra-group variances is sig different from intergroup variances
+
+rule bray_repl_anosim_betapart:
    version: "1.0"
    conda:
-      "../../workflow/envs/qiime2.yaml"
+      "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
    input:
-      repl  =rules.bray_betapart_matrix.output.repl,
-      norepl=rules.bray_betapart_matrix.output.norepl
+      "data/distance/beta_div/{sample}+BrayRepl.tsv"
    output:
-      BrayReplDist=temporary("data/distance/beta_div/{{sample}}+BrayRepl.qza"),
-      BrayNoReplDist=temporary("data/distance/beta_div/{{sample}}+BrayNoRepl.qza"),
-      BrayRepl=temporary(expand("data/distance/ANOSIM/ANOSIM_{{sample}}+{group}+BrayRepl.qzv", group=config["group"])),
-      BrayNoRepl=temporary(expand("data/distance/ANOSIM/ANOSIM_{{sample}}+{group}+BrayNoRepl.qzv", group=config["group"]))
+      myresult="data/distance/ANOSIM/ANOSIM_BrayRepl_{sample}.txt",
+      mysh="tmp/ANOSIM_brayrepl_{sample}.sh"
    params: 
       group=expand("{group}",group=config["group"])
-   message: "Calculating ANOSIM for Bray-Curtis betapart of {wildcards.sample}"
+   message: "Calculating ANOSIM for Bray-Curtis balanced (ie replacement) of {wildcards.sample}"
    shell:
-      "mkdir -p data/distance/ANOSIM && mkdir -p data/distance/ANOSIM && "
-      "qiime tools import --input-path {input.repl} --output-path {output.BrayReplDist} --type DistanceMatrix &&"
-      "qiime tools import --input-path {input.norepl} --output-path {output.BrayNoReplDist} --type DistanceMatrix &&"
-      "echo 'for y in {params.group}; do "
-      "qiime diversity beta-group-significance --p-pairwise --i-distance-matrix {output.BrayReplDist} --m-metadata-file data/map/{wildcards.sample}.txt --m-metadata-column $y --p-method anosim --o-visualization data/distance/ANOSIM/ANOSIM_{wildcards.sample}+$y+BrayRepl.qzv >/dev/null && "
-      "qiime diversity beta-group-significance --p-pairwise --i-distance-matrix {output.BrayNoReplDist} --m-metadata-file data/map/{wildcards.sample}.txt --m-metadata-column $y --p-method anosim --o-visualization data/distance/ANOSIM/ANOSIM_{wildcards.sample}+$y+BrayNoRepl.qzv >/dev/null && "
-      "qiime tools export --input-path data/distance/ANOSIM/ANOSIM_{wildcards.sample}+$y+BrayRepl.qzv --output-path data/distance/ANOSIM/ANOSIM_{wildcards.sample}+$y+BrayRepl >/dev/null &&"
-      "qiime tools export --input-path data/distance/ANOSIM/ANOSIM_{wildcards.sample}+$y+BrayNoRepl.qzv --output-path data/distance/ANOSIM/ANOSIM_{wildcards.sample}+$y+BrayNoRepl >/dev/null"
-      "; done' > tmp/ANOSIM_Betapart_bray_{wildcards.sample}.sh &&"
-      "chmod +x tmp/ANOSIM_Betapart_bray_{wildcards.sample}.sh &&"
-      "bash tmp/ANOSIM_Betapart_bray_{wildcards.sample}.sh"
+      "mkdir -p data/distance/ANOSIM &&"
+      "echo 'for y in {params.group}; do"
+      "Rscript --vanilla ./workflow/scripts/adonis_anosim_betadisper.R -i {input} -o {output.myresult} -m data/map/{wildcards.sample}.txt -g $y -c {wildcards.color} -t anosim"
+      "; done ; done' > {output.mysh} &&"
+      "chmod +x {output.mysh} &&"
+      "bash {output.mysh}"
 
-
-rule bray_make_anosim_betapart_PDFs: # Create betapart matrices for all samples
-   version: "1.0"
-   conda: "../../workflow/envs/html2pdf.yaml"
+use rule bray_repl_anosim_betapart as bray_norepl_anosim_betapart:
    input:
-      BrayRepl=rules.bray_anosim_betapart.output.BrayRepl,
-      BrayNoRepl=rules.bray_anosim_betapart.output.BrayNoRepl
-   output: 
-      anosim_norepl=report(expand("data/distance/ANOSIM/ANOSIM_{{sample}}+{group}+BrayNoRepl.pdf", group=config["group"])),
-      anosim_repl=report(expand("data/distance/ANOSIM/ANOSIM_{{sample}}+{group}+BrayRepl.pdf", group=config["group"]))
-   log: "data/logs/PDF_{sample}+ANOSIM+Bray_Betapart.log"
-   params: 
-      group=expand("{group}",group=config["group"])
-   message: "Creating ANOSIM PDFs for Bray-Curtis betapart of {wildcards.sample}"
-   shell:
-      "mkdir -p data/logs &&"
-      "echo 'for y in {params.group}; do weasyprint data/distance/ANOSIM/ANOSIM_{wildcards.sample}+$y+BrayNoRepl/index.html data/distance/ANOSIM/ANOSIM_{wildcards.sample}+$y+BrayNoRepl.pdf 2>> data/logs/PDF_{wildcards.sample}+ANOSIM+Betapart.log && rm -rf data/distance/ANOSIM/ANOSIM_{wildcards.sample}+$y+BrayNoRepl && "
-      "weasyprint data/distance/ANOSIM/ANOSIM_{wildcards.sample}+$y+BrayRepl/index.html data/distance/ANOSIM/ANOSIM_{wildcards.sample}+$y+BrayRepl.pdf 2>> data/logs/PDF_{wildcards.sample}+ANOSIM+Betapart.log && rm -rf data/distance/ANOSIM/ANOSIM_{wildcards.sample}+$y+BrayRepl"
-      "; done' > tmp/PDF_ANOSIM_bray_betapart_{wildcards.sample}.sh &&"
-      "chmod +x tmp/PDF_ANOSIM_bray_betapart_{wildcards.sample}.sh &&"
-      "bash tmp/PDF_ANOSIM_bray_betapart_{wildcards.sample}.sh "
+      "data/distance/beta_div/{sample}+BrayNoRepl.tsv"
+   output:
+      myresult="data/distance/ANOSIM/ANOSIM_BrayNoRepl_{sample}.txt",
+      mysh="tmp/ANOSIM_brayNorepl_{sample}.sh"
+   message: "Calculating ANOSIM for Bray-Curtis gradient (ie no replacement) of {wildcards.sample}"
 
 # Split biom file for the upcoming betapart steps
 
@@ -168,7 +147,8 @@ rule bray_betapart: # Last step from betapart. Cleans up temporary files.
     input:
         mean_std=bray_ids_ingroup_var,
         perm=rules.bray_betapart_plot_permutation.output,
-        PDFs=rules.bray_make_anosim_betapart_PDFs.output.anosim_repl,
+        norepl=rules.bray_norepl_anosim_betapart.output,
+        repl=rules.bray_repl_anosim_betapart.output,
         pairwise=rules.bray_betapart_pairwise.output
     output:
         temporary(touch("data/.done_bray_betapart_{sample}.txt"))

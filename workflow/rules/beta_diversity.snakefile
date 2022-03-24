@@ -60,27 +60,6 @@ rule pcoa: # Plots the beta diversity distances using the Principal Coordinates 
       "chmod +x tmp/SVG_PCoA_{wildcards.sample}.sh &&"
       "bash tmp/SVG_PCoA_{wildcards.sample}.sh "
 
-rule permdisp: # Calculates whether the two groups have similar dispersions (variances) to their centroid
-   version: "1.0"
-   conda:
-      "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
-   input:
-      rules.beta_div.output
-   output:
-      permdisp_results=expand("data/distance/PERMDISP/{{sample}}+{dist}+{group}_betadisper_perm.txt, dist=config["distances"], group=config["group"]),
-      svg=expand("data/plots/{{sample}}+{dist}+{group}_boxplots_for_betadispersion.svg", dist=config["distances"], group=config["group"]))
-   params: 
-      dist=expand("{dist}",dist=config["distances"]),
-      group=expand("{group}",group=config["group"]),
-      color=config["color"][0]
-   message: "Calculating PERMDISP for {wildcards.sample}"
-   shell:
-      "mkdir -p data/distance/PERMDISP &&"
-      "echo 'for x in {params.dist}; do for y in {params.group}; do"
-      "Rscript --vanilla ./workflow/scripts/adonis_betadisper.R -i data/distance/beta_div/{wildcards.sample}+$x.tsv -o data/distance/PERMDISP/{wildcards.sample}+$x+$y -p data/plots/{wildcards.sample}+$x+$y -m data/map/{wildcards.sample}.txt -g $y -c {wildcards.color} -t betadisper "
-      "; done ; done' > tmp/PERMDISP_{wildcards.sample}.sh &&"
-      "chmod +x tmp/PERMDISP_{wildcards.sample}.sh &&"
-      "bash tmp/PERMDISP_{wildcards.sample}.sh"
 
 rule adonis: # Calculates whether the two groups have similar dispersions (variances) to their centroid
    version: "1.0"
@@ -89,16 +68,33 @@ rule adonis: # Calculates whether the two groups have similar dispersions (varia
    input:
       rules.beta_div.output
    output:
-      adonis_results=expand("data/distance/ADONIS/{{sample}}+{dist}+{group}_adonis.txt, dist=config["distances"], group=config["group"])
+      myresults=expand("data/distance/ADONIS/{{sample}}+{dist}+{group}_adonis.txt, dist=config["distances"], group=config["group"]),
+      mysh="tmp/ADONIS_{sample}.sh",
+      myfolder = directory("data/distance/ADONIS/")
    params: 
       dist=expand("{dist}",dist=config["distances"]),
       group=expand("{group}",group=config["group"]),
       color=config["color"][0]
    message: "Calculating ADONIS for {wildcards.sample}"
    shell:
-      "mkdir -p data/distance/ADONIS &&"
+      "mkdir -p {output.myfolder} &&"
       "echo 'for x in {params.dist}; do for y in {params.group}; do"
-      "Rscript --vanilla ./workflow/scripts/adonis_betadisper.R -i data/distance/beta_div/{wildcards.sample}+$x.tsv -o data/distance/ADONIS/{wildcards.sample}+$x+$y -p data/plots/{wildcards.sample}+$x+$y -m data/map/{wildcards.sample}.txt -g $y -c {wildcards.color} -t adonis "
-      "; done ; done' > tmp/ADONIS_{wildcards.sample}.sh &&"
-      "chmod +x tmp/ADONIS_{wildcards.sample}.sh &&"
-      "bash tmp/ADONIS_{wildcards.sample}.sh"
+      "Rscript --vanilla ./workflow/scripts/adonis_anosim_betadisper.R -i data/distance/beta_div/{wildcards.sample}+$x.tsv -o {output.myfolder}{wildcards.sample}+$x+$y -m data/map/{wildcards.sample}.txt -p data/plots/{wildcards.sample}+$x+$y -g $y -c {wildcards.color} -t adonis "
+      "; done ; done' > {output.mysh} &&"
+      "chmod +x tmp/ADONIS_{output.mysh}.sh &&"
+      "bash tmp/ADONIS_{output.mysh}.sh"
+
+use rule adonis as anosim:
+   output:
+      myresults=expand("data/distance/ANOSIM/{{sample}}+{dist}+{group}_anosim.txt, dist=config["distances"], group=config["group"]),
+      mysh="tmp/ANOSIM_{sample}.sh",
+      myfolder = directory("data/distance/ANOSIM/")
+   message: "Calculating ANOSIM for {wildcards.sample}"
+
+
+use rule adonis as permdisp: # Calculates whether the two groups have similar dispersions (variances) to their centroid
+   output:
+      myresults=expand("data/distance/PERMDISP/{{sample}}+{dist}+{group}_adonis.txt, dist=config["distances"], group=config["group"]),
+      mysh="tmp/PERMDISP_{sample}.sh",
+      myfolder = directory("data/distance/PERMDISP/")
+   message: "Calculating PERMDISP for {wildcards.sample}"

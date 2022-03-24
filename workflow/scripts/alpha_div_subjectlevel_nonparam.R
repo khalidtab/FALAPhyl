@@ -20,20 +20,15 @@ if (is.null(opt$input)){
 }
 
 # Load files
-map = opt$mapping # map =  "~/Documents/bioinfo_snakemake/data/map/kfp5s2_gs_GAPds_LAPds.txt"
-alpha = opt$input #  data/alpha_div/calc_kfp5s2_gs_GAPds_LAPds+shannon.txt
-#alpha = "~/Documents/bioinfo_snakemake/data/alpha_div/calc_kfp5s2_gs_GAPds_LAPds+shannon.txt"
-group = opt$group # group = "condition"
+map = opt$mapping
+alpha = opt$input
+group = opt$group
 output = opt$output 
-# output = "~/Documents/bioinfo_snakemake/data/plots/patientlevel_alphaDiv_kfp5s2_gs_GAPds_LAPds/"
-patientID = opt$patientID # patientID = "subjectID"
+patientID = opt$patientID 
 
 map = suppressMessages(read_tsv(map))
-alphaDivType = basename(alpha)
-alphaDivType = strsplit(alphaDivType, ".txt") %>% .[[1]]
-alphaDivType = strsplit(alphaDivType, "\\+")  %>% .[[1]] %>% .[2]
 alpha = suppressMessages(read_tsv(alpha))
-
+alphaDivType = colnames(alpha)[2]
 # Merge then keep only the pertinent columns
 myNames = c("SampleID","alpha")
 colnames(alpha) = myNames

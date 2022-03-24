@@ -31,55 +31,22 @@ rule jaccard_betapart_pairwise: # Create pairwise distance breakdown between eac
       " chmod +x tmp/Betapart_jaccard_pairwise_{wildcards.sample}.sh &&"
       " bash tmp/Betapart_jaccard_pairwise_{wildcards.sample}.sh"
 
-rule jaccard_anosim_betapart: # Calculates whether the intra-group variances is sig different from intergroup variances
-   version: "1.0"
-   conda:
-      "../../workflow/envs/qiime2.yaml"
+use rule bray_repl_anosim_betapart as jaccard_norepl_anosim_betapart:
    input:
-      repl  =rules.jaccard_betapart_matrix.output.repl,
-      norepl=rules.jaccard_betapart_matrix.output.norepl
+      "data/distance/beta_div/{sample}+jaccardNoRepl.tsv"
    output:
-      jaccardReplDist=temporary("data/distance/beta_div/{{sample}}+jaccardRepl.qza"),
-      jaccardNoReplDist=temporary("data/distance/beta_div/{{sample}}+jaccardNoRepl.qza"),
-      jaccardRepl=temporary(expand("data/distance/ANOSIM/ANOSIM_{{sample}}+{group}+jaccardRepl.qzv", group=config["group"])),
-      jaccardNoRepl=temporary(expand("data/distance/ANOSIM/ANOSIM_{{sample}}+{group}+jaccardNoRepl.qzv", group=config["group"]))
-   params: 
-      group=expand("{group}",group=config["group"])
-   message: "Calculating ANOSIM for Jaccard betapart of {wildcards.sample}"
-   shell:
-      "mkdir -p data/distance/ANOSIM && mkdir -p data/distance/ANOSIM && "
-      "qiime tools import --input-path {input.repl} --output-path {output.jaccardReplDist} --type DistanceMatrix &&"
-      "qiime tools import --input-path {input.norepl} --output-path {output.jaccardNoReplDist} --type DistanceMatrix &&"
-      "echo 'for y in {params.group}; do "
-      "qiime diversity beta-group-significance --p-pairwise --i-distance-matrix {output.jaccardReplDist} --m-metadata-file data/map/{wildcards.sample}.txt --m-metadata-column $y --p-method anosim --o-visualization data/distance/ANOSIM/ANOSIM_{wildcards.sample}+$y+jaccardRepl.qzv >/dev/null && "
-      "qiime diversity beta-group-significance --p-pairwise --i-distance-matrix {output.jaccardNoReplDist} --m-metadata-file data/map/{wildcards.sample}.txt --m-metadata-column $y --p-method anosim --o-visualization data/distance/ANOSIM/ANOSIM_{wildcards.sample}+$y+jaccardNoRepl.qzv >/dev/null && "
-      "qiime tools export --input-path data/distance/ANOSIM/ANOSIM_{wildcards.sample}+$y+jaccardRepl.qzv --output-path data/distance/ANOSIM/ANOSIM_{wildcards.sample}+$y+jaccardRepl >/dev/null &&"
-      "qiime tools export --input-path data/distance/ANOSIM/ANOSIM_{wildcards.sample}+$y+jaccardNoRepl.qzv --output-path data/distance/ANOSIM/ANOSIM_{wildcards.sample}+$y+jaccardNoRepl >/dev/null"
-      "; done' > tmp/ANOSIM_Betapart_jaccard_{wildcards.sample}.sh &&"
-      "chmod +x tmp/ANOSIM_Betapart_jaccard_{wildcards.sample}.sh &&"
-      "bash tmp/ANOSIM_Betapart_jaccard_{wildcards.sample}.sh"
+      myresult="data/distance/ANOSIM/ANOSIM_jaccardNoRepl_{sample}.txt",
+      mysh="tmp/ANOSIM_jacNorepl_{sample}.sh"
 
+   message: "Calculating ANOSIM for Jaccard Nestedness (ie no replacement) of {wildcards.sample}"
 
-rule jaccard_make_anosim_betapart_PDFs: # Create betapart matrices for all samples
-   version: "1.0"
-   conda: "../../workflow/envs/html2pdf.yaml"
+use rule bray_repl_anosim_betapart as jaccard_repl_anosim_betapart:
    input:
-      jaccardRepl=rules.jaccard_anosim_betapart.output.jaccardRepl,
-      jaccardNoRepl=rules.jaccard_anosim_betapart.output.jaccardNoRepl
-   output: 
-      anosim_norepl=report(expand("data/distance/ANOSIM/ANOSIM_{{sample}}+{group}+jaccardNoRepl.pdf", group=config["group"])),
-      anosim_repl=report(expand("data/distance/ANOSIM/ANOSIM_{{sample}}+{group}+jaccardRepl.pdf", group=config["group"]))
-   log: "data/logs/PDF_{sample}+ANOSIM+jaccard_Betapart.log"
-   params: 
-      group=expand("{group}",group=config["group"])
-   message: "Creating ANOSIM PDFs for Jaccard betapart of {wildcards.sample}"
-   shell:
-      "mkdir -p data/logs &&"
-      "echo 'for y in {params.group}; do weasyprint data/distance/ANOSIM/ANOSIM_{wildcards.sample}+$y+jaccardNoRepl/index.html data/distance/ANOSIM/ANOSIM_{wildcards.sample}+$y+jaccardNoRepl.pdf 2>> data/logs/PDF_{wildcards.sample}+ANOSIM+Betapart.log && rm -rf data/distance/ANOSIM/ANOSIM_{wildcards.sample}+$y+jaccardNoRepl && "
-      "weasyprint data/distance/ANOSIM/ANOSIM_{wildcards.sample}+$y+jaccardRepl/index.html data/distance/ANOSIM/ANOSIM_{wildcards.sample}+$y+jaccardRepl.pdf 2>> data/logs/PDF_{wildcards.sample}+ANOSIM+Betapart.log && rm -rf data/distance/ANOSIM/ANOSIM_{wildcards.sample}+$y+jaccardRepl"
-      "; done' > tmp/PDF_ANOSIM_jaccard_betapart_{wildcards.sample}.sh &&"
-      "chmod +x tmp/PDF_ANOSIM_jaccard_betapart_{wildcards.sample}.sh &&"
-      "bash tmp/PDF_ANOSIM_jaccard_betapart_{wildcards.sample}.sh "
+      "data/distance/beta_div/{sample}+jaccardRepl.tsv"
+   output:
+      myresult="data/distance/ANOSIM/ANOSIM_jaccardRepl_{sample}.txt",
+      mysh="tmp/ANOSIM_jacRepl_{sample}.sh"
+   message: "Calculating ANOSIM for Jaccard Turnover (ie replacement) of {wildcards.sample}"
 
 # Split biom file for the upcoming betapart steps
 

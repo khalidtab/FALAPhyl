@@ -1,4 +1,4 @@
-#install.packages("workflow/scripts/vegan_2.5-6.tar", repos = NULL, type="source", INSTALL_opts = '--no-lock')
+
 library("optparse")
 suppressMessages(library("vegan"))
 suppressMessages(library("dplyr"))
@@ -8,7 +8,7 @@ suppressMessages(library("ggpubr"))
 suppressMessages(library("cowplot"))
 
 option_list = list(
-  make_option(c("-i", "--input"), type="character", default=NULL, help="alpha div output from Qiime", metavar="Input alpha div output from Qiime"),
+  make_option(c("-i", "--input"), type="character", default=NULL, help="alpha div output", metavar="Input alpha div output"),
   make_option(c("-o", "--output"), type="character", default=NULL, help="Name of the output SVG file", metavar="Output SVG File name"),
   make_option(c("-m", "--mapping"), type="character", default=NULL, help="The mapping file", metavar="Mapping file"),
   make_option(c("-g", "--group"), type="character", default=NULL, help="The category in the mapping file", metavar="Group name"),
@@ -34,7 +34,7 @@ typeOfAlpha = colnames(alpha_table)[2]
 map = suppressMessages(read.csv(mapping_file, skip=0, header=T, sep="\t"))
 
 
-test = merge(alpha_table,map,by.x="...1",by.y="X.SampleID",sort = TRUE)
+test = merge(alpha_table,map,by.x="Samples",by.y="X.SampleID",sort = TRUE)
 
 colNames = test[which( colnames(test)==category)] %>% as.matrix(.) %>% as.character(.) %>% unique(.) 
 

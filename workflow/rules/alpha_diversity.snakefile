@@ -1,21 +1,18 @@
 rule alpha_div_calc: # Provides per sample alpha calculation
    version: "1.0"
    conda:
-      "../../workflow/envs/qiime2.yaml"
+      "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
    input:
-      qza=rules.biom_to_qza.output.qza
+      "data/biom/{sample}.biom"
    output:
       alphadiv=report(expand("data/alpha_div/calc_{{sample}}+{alpha}.txt",alpha=config["alpha"]))
    params: 
       alpha=expand("{alpha}",alpha=config["alpha"])
    message: "Calculating alpha diversity for {wildcards.sample}"
    shell:
-      "mkdir -p tmp &&"
-      "echo 'for x in {params.alpha}; do mkdir -p data/alpha_div/ && "
-      "qiime diversity alpha --i-table {input.qza} --p-metric $x --o-alpha-diversity data/alpha_div/{wildcards.sample}+$x.qza && "
-      "qiime tools export --input-path data/alpha_div/{wildcards.sample}+$x.qza --output-path data/alpha_div/calc_{wildcards.sample}+$x  >/dev/null && "
-      "rm data/alpha_div/{wildcards.sample}+$x.qza && "
-      "mv data/alpha_div/calc_{wildcards.sample}+$x/alpha-diversity.tsv data/alpha_div/calc_{wildcards.sample}+$x.txt "
+      "mkdir -p tmp data/alpha_div/ &&"
+      "echo 'for x in {params.alpha}; do "
+      "Rscript --vanilla ./workflow/scripts/alpha_generate.R -i {input} -o data/alpha_div/calc_{wildcards.sample}+$x.txt -a $x"
       "; done' > tmp/alpha_div_{wildcards.sample}.sh && "
       "chmod +x tmp/alpha_div_{wildcards.sample}.sh && "
       "bash tmp/alpha_div_{wildcards.sample}.sh"
@@ -51,7 +48,7 @@ rule alpha_div_stats: # Provides per sample alpha calculation
    conda:
       "../../workflow/envs/ggrepel.yaml"
    input:
-      qza=rules.alpha_div_calc.output
+      rules.alpha_div_calc.output
    output:
       alphadiv=report(expand("data/alpha_div/stats_{{sample}}+{group}+{alpha}.txt",alpha=config["alpha"],group=config["group"]))
    params: 

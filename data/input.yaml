@@ -34,32 +34,13 @@ distances:
 
 #This list of alpha diversity metrics is shared by both Qiime2 and PhyloToast's implementation.
 alpha: 
-#     - ace
-#     - berger_parker_d
-#     - brillouin_d
-     - chao1
-#     - dominance
-#     - doubles
-#     - enspie
-#     - fisher_alpha
-#     - gini_index
-#     - goods_coverage
-#     - heip_e
-#     - kempton_taylor_q
-#     - lladser_pe
-#     - margalef
-#     - mcintosh_d
-#     - mcintosh_e
-#     - menhinick
-#     - michaelis_menten_fit
-#     - observed_otus
-#     - osd
-#     - robbins
-     - shannon
-#     - simpson
-#     - simpson_e
-#     - singles
-#     - strong
+     - Observed
+#     - Chao1
+#     - ACE
+#     - Shannon
+#     - Simpson
+#     - InvSimpson
+#     - Fisher
 
 # If you want to look at patient level analysis, such as in case you have repeated measures, there should be a column in the mapping file that has this information.
 subjectID: 

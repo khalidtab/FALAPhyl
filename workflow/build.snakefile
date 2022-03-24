@@ -2,18 +2,6 @@ rule all:
    input: "{sample}.final"
    shell: "touch {input}"
 
-rule betapart:
-   conda:
-      "./workflow/envs/betapart.yaml"
-   message: "Creating betapart"
-   input:
-      "{sample}"
-   output:
-      temporary(touch("{sample}betapart"))
-   shell:
-      "touch {output}"
-
-
 rule biom:
    conda:
       "./workflow/envs/biom.yaml"
@@ -84,7 +72,7 @@ rule philr:
 
 rule phyloseq:
    conda:
-      "./workflow/envs/phyloseq.yaml"
+      "./workflow/envs/phyloseq_vegan_tidyverse.yaml"
    message: "Creating phyloseq"
    input:
       "{sample}"
@@ -93,6 +81,20 @@ rule phyloseq:
    shell:
       "touch {output}"
 
+<<<<<<< Updated upstream
+=======
+rule betapart:
+   conda:
+      "./workflow/envs/betapart.yaml"
+   message: "Creating betapart"
+   input:
+      "{sample}"
+   output:
+      temporary(touch("{sample}betapart"))
+   shell:
+      "touch {output}"
+
+>>>>>>> Stashed changes
 
       
 rule results:
