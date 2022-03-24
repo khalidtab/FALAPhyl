@@ -17,8 +17,6 @@ The volume mounted above should include the following files and folders:
 
 This is the folder with the biom files to be processed. Files must be in [filename].biom extension, where [filename] is the file name that is exactly the same as the other input files (biom, mapping file, and optional tree file)
 > /map/ 
- 
-Optional folder with the tree file. Files must be in [filename].tre extension
 
 > input.yaml
 
