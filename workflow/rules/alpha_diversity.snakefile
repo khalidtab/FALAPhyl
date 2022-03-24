@@ -3,7 +3,7 @@ rule alpha_div_calc: # Provides per sample alpha calculation
    conda:
       "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
    input:
-      "data/biom/{sample}.biom"
+      "data/tsv/{sample}.tsv"
    output:
       alphadiv=report(expand("data/alpha_div/calc_{{sample}}+{alpha}.txt",alpha=config["alpha"]))
    params: 
