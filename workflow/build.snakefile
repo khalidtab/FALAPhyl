@@ -84,7 +84,6 @@ rule phyloseq:
 rule results:
    version: "1.0"
    input:
-      rules.betapart.output,
       rules.biom.output,
       rules.csvkit.output,
       rules.fastspar.output,

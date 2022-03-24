@@ -3,10 +3,9 @@
 
 
 set.seed(1234)
-suppressWarnings(suppressMessages(library(optparse)))	
-suppressWarnings(suppressMessages(require(tidyverse)))	
-
-suppressWarnings(suppressMessages(library(devtools)))	
+suppressWarnings(suppressMessages(library(optparse)))
+suppressWarnings(suppressMessages(require(tidyverse)))
+suppressWarnings(suppressMessages(library(devtools)))
 suppressWarnings(suppressMessages(load_all(path = "workflow/scripts/betapart")))
 
 option_list = list(

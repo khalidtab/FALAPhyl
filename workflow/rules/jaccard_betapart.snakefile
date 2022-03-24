@@ -1,6 +1,6 @@
 rule jaccard_betapart_matrix: # Create betapart matrices for all samples
    conda:
-      "../../workflow/envs/betapart.yaml"
+      "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
    input:
       "data/tsv/{sample}.tsv"
    output:
@@ -52,7 +52,7 @@ use rule bray_repl_anosim_betapart as jaccard_repl_anosim_betapart:
 checkpoint jaccard_group_and_category: # Will export multiple biom files tagged by their group name (retrieved from parameter) and the category within that group ("group+category.txt"). The tagging is done within the R script
    version: "1.0"
    conda:
-      "../../workflow/envs/betapart.yaml"
+      "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
    input:
       "data/tsv/{sample}.tsv"
    params:
@@ -71,7 +71,7 @@ checkpoint jaccard_group_and_category: # Will export multiple biom files tagged 
 
 rule jaccard_ingroup_var: # Create betapart mean, standard deviation
    conda:
-      "../../workflow/envs/betapart.yaml"
+      "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
    input:
       "data/betapart_jaccard/{sample}/tsv/{id}.tsv"
    output:
@@ -92,7 +92,7 @@ def jaccard_ids_ingroup_var(wildcards):
 
 rule betapart_jaccard_permutations: # Create distribution per permutation
    conda:
-      "../../workflow/envs/betapart.yaml"
+      "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
    input:
       "data/betapart_jaccard/{sample}/tsv/{id}.tsv"
    output:

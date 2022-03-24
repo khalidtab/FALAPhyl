@@ -1,6 +1,6 @@
 rule bray_betapart_matrix: # Create betapart matrices for all samples
    conda:
-      "../../workflow/envs/betapart.yaml"
+      "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
    input:
       "data/tsv/{sample}.tsv"
    output:
@@ -65,7 +65,7 @@ use rule bray_repl_anosim_betapart as bray_norepl_anosim_betapart:
 checkpoint bray_group_and_category: # Will export multiple biom files tagged by their group name (retrieved from parameter) and the category within that group ("group+category.txt"). The tagging is done within the R script
    version: "1.0"
    conda:
-      "../../workflow/envs/betapart.yaml"
+      "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
    input:
       "data/tsv/{sample}.tsv"
    params:
@@ -84,7 +84,7 @@ checkpoint bray_group_and_category: # Will export multiple biom files tagged by 
 
 rule bray_ingroup_var: # Create betapart mean, standard deviation
    conda:
-      "../../workflow/envs/betapart.yaml"
+      "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
    input:
       "data/betapart_bray/{sample}/tsv/{id}.tsv"
    output:
@@ -105,7 +105,7 @@ def bray_ids_ingroup_var(wildcards):
 
 rule betapart_bray_permutations: # Create distribution per permutation
    conda:
-      "../../workflow/envs/betapart.yaml"
+      "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
    input:
       "data/betapart_bray/{sample}/tsv/{id}.tsv"
    output:

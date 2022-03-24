@@ -4,11 +4,11 @@
 
 set.seed(1234)
 
-suppressWarnings(suppressMessages(library(devtools)))	
+suppressWarnings(suppressMessages(library(devtools)))
 suppressWarnings(suppressMessages(load_all(path = "workflow/scripts/betapart")))
-suppressWarnings(suppressMessages(library(optparse)))	
-suppressWarnings(suppressMessages(require(tidyverse)))	
-suppressWarnings(suppressMessages(require(vegan)))	
+suppressWarnings(suppressMessages(library(optparse)))
+suppressWarnings(suppressMessages(require(tidyverse)))
+suppressWarnings(suppressMessages(require(vegan)))
 suppressWarnings(suppressMessages(library(dplyr)))
 suppressWarnings(suppressMessages(library(phyloseq)))
 
