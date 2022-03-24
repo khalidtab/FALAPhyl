@@ -31,7 +31,7 @@ rule jaccard_betapart_pairwise: # Create pairwise distance breakdown between eac
       " chmod +x tmp/Betapart_jaccard_pairwise_{wildcards.sample}.sh &&"
       " bash tmp/Betapart_jaccard_pairwise_{wildcards.sample}.sh"
 
-use rule bray_repl_anosim_betapart as jaccard_norepl_anosim_betapart:
+use rule bray_repl_anosim_betapart as jaccard_norepl_anosim_betapart with:
    input:
       "data/distance/beta_div/{sample}+jaccardNoRepl.tsv"
    output:
@@ -39,7 +39,7 @@ use rule bray_repl_anosim_betapart as jaccard_norepl_anosim_betapart:
       mysh="tmp/ANOSIM_jacNorepl_{sample}.sh"
    message: "Calculating ANOSIM for Jaccard Nestedness (ie no replacement) of {wildcards.sample}"
 
-use rule bray_repl_anosim_betapart as jaccard_repl_anosim_betapart:
+use rule bray_repl_anosim_betapart as jaccard_repl_anosim_betapart with:
    input:
       "data/distance/beta_div/{sample}+jaccardRepl.tsv"
    output:

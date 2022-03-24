@@ -84,7 +84,7 @@ rule adonis: # Calculates whether the two groups have similar dispersions (varia
       "chmod +x tmp/ADONIS_{output.mysh}.sh &&"
       "bash tmp/ADONIS_{output.mysh}.sh"
 
-use rule adonis as anosim:
+use rule adonis as anosim with:
    output:
       myresults=expand("data/distance/ANOSIM/{{sample}}+{dist}+{group}_anosim.txt, dist=config["distances"], group=config["group"]),
       mysh="tmp/ANOSIM_{sample}.sh",
@@ -92,7 +92,7 @@ use rule adonis as anosim:
    message: "Calculating ANOSIM for {wildcards.sample}"
 
 
-use rule adonis as permdisp: # Calculates whether the two groups have similar dispersions (variances) to their centroid
+use rule adonis as permdisp with: # Calculates whether the two groups have similar dispersions (variances) to their centroid
    output:
       myresults=expand("data/distance/PERMDISP/{{sample}}+{dist}+{group}_adonis.txt, dist=config["distances"], group=config["group"]),
       mysh="tmp/PERMDISP_{sample}.sh",

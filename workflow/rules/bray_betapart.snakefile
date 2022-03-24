@@ -52,7 +52,7 @@ rule bray_repl_anosim_betapart:
       "chmod +x {output.mysh} &&"
       "bash {output.mysh}"
 
-use rule bray_repl_anosim_betapart as bray_norepl_anosim_betapart:
+use rule bray_repl_anosim_betapart as bray_norepl_anosim_betapart with:
    input:
       "data/distance/beta_div/{sample}+BrayNoRepl.tsv"
    output:
