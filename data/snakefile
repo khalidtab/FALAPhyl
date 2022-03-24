@@ -1,6 +1,6 @@
 configfile: "data/input.yaml"
 include: "workflow/rules/fastspar.snakefile"
-include: "workflow/rules/make_qza.snakefile"
+include: "workflow/rules/make_tsv.snakefile"
 include: "workflow/rules/beta_div.snakefile"
 include: "workflow/rules/alpha_div.snakefile"
 include: "workflow/rules/beta_sig.snakefile"
@@ -17,12 +17,12 @@ rule results:
    version: "1.0"
    input:
       rules.network.output,
+      rules.pcoa.output,
+      rules.nmds.output,
       rules.make_anosim_PDFs.output,
       rules.make_permdisp_PDFs.output,
       rules.make_adonis_PDFs.output,
-      rules.pcoa.output,
       rules.alpha_div.output,
-      rules.nmds.output,
       rules.bray_betapart.output,
       rules.jaccard_betapart.output,
       rules.patient_level_analysis.output,

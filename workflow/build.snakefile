@@ -71,17 +71,6 @@ rule ggrepel:
    shell:
       "touch {output}"
 
-rule html2pdf:
-   conda:
-      "./workflow/envs/html2pdf.yaml"
-   message: "Creating html2pdf"
-   input:
-      "{sample}"
-   output:
-      temporary(touch("{sample}html2pdf"))
-   shell:
-      "touch {output}"
-
 rule philr:
    conda:
       "./workflow/envs/philr.yaml"
@@ -104,17 +93,6 @@ rule phyloseq:
    shell:
       "touch {output}"
 
-rule qiime2:
-   conda:
-      "./workflow/envs/qiime2.yaml"
-   message: "Creating qiime2"
-   input:
-      "{sample}"
-   output:
-      temporary(touch("{sample}qiime2"))
-   shell:
-      "touch {output}"
-
 
       
 rule results:
@@ -126,10 +104,8 @@ rule results:
       rules.fastspar.output,
       rules.ggpubr.output,
       rules.ggrepel.output,
-      rules.html2pdf.output,
       rules.philr.output,
-      rules.phyloseq.output,
-      rules.qiime2.output
+      rules.phyloseq.output
    message: "Cleaning up…"
    output:
       "{sample}.final"

@@ -1,6 +1,0 @@
-name: html2pdf
-channels:
-    -  conda-forge
-dependencies:
-    - weasyprint 
-    - python=3.7

@@ -7,13 +7,6 @@ dependencies:
 - r-reshape2 = 1.4.4
 - r-vegan
 - r-ggrepel
-- xvfbwrapper
 - r-svglite
 - r-cowplot
-
-# If the graphing doesn't work through xvfbwrapper, do this after the environment is created
-#apt-get update
-#apt-get install libgtk2.0-0
-#apt-get install libgconf-2-4
-#apt install chromium
-#apt-get install xvfb
+#- xvfbwrapper

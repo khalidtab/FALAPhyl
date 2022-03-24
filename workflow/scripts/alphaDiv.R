@@ -1,6 +1,6 @@
 #install.packages("workflow/scripts/vegan_2.5-6.tar", repos = NULL, type="source", INSTALL_opts = '--no-lock')
 library("optparse")
-# suppressMessages(library("vegan"))
+suppressMessages(library("vegan"))
 suppressMessages(library("dplyr"))
 suppressMessages(library("tidyverse"))
 suppressMessages(library("ggplot2"))

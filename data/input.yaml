@@ -9,6 +9,7 @@ color:
 
 # Beta diversity metrics
 distances:
+     - PhILR
      - jaccard
      - braycurtis
 #     - canberra_adkins

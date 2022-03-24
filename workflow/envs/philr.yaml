@@ -8,3 +8,5 @@ dependencies:
     - r-optparse
     - r-ape = 5.4
     - r-dplyr = 1.0.2
+    - r-igraph = 1.2.5
+    - r-reshape2 = 1.4.4
