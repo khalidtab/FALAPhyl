@@ -151,7 +151,7 @@ rule bray_betapart: # Last step from betapart. Cleans up temporary files.
         repl=rules.bray_repl_anosim_betapart.output,
         pairwise=rules.bray_betapart_pairwise.output
     output:
-        temporary(touch("data/.done_bray_betapart_{sample}.txt"))
+        temporary(touch("tmp/.done_bray_betapart_{sample}.txt"))
     shell:
         "echo Cleaning up after Bray Curtis Betapart. && rm -rf data/betapart_bray/{wildcards.sample}/perm/permutations data/betapart_bray/{wildcards.sample}/tsv data/distance/beta_div/{wildcards.sample}"
 

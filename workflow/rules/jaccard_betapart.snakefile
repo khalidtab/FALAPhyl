@@ -138,7 +138,7 @@ rule jaccard_betapart: # Last step from betapart. Cleans up temporary files.
         repl=rules.jaccard_repl_anosim_betapart.output,
         pairwise=rules.jaccard_betapart_pairwise.output
     output:
-        temporary(touch("data/.done_jaccard_betapart_{sample}.txt"))
+        temporary(touch("tmp/.done_jaccard_betapart_{sample}.txt"))
     shell:
         "echo Cleaning up after Jaccard Betapart. && rm -rf data/betapart_jaccard/{wildcards.sample}/perm/permutations data/betapart_jaccard/{wildcards.sample}/tsv data/distance/beta_div/{wildcards.sample}"
 
