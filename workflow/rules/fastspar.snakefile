@@ -20,7 +20,7 @@ rule get_categories: # Prepares the chosen categories
 rule makeCore: # SparCC works better when the feature table has less zeros. Therefore, this script will filter the feature tables to the desired level of "coreness" based on the input file values
    version: "1.0"
    conda:
-      "../../workflow/envs/phyloseq.yaml"
+      "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
    input:
       biom="data/biom/{sample}_temp.biom",
       map="data/map/{sample}.txt"
@@ -125,7 +125,7 @@ rule pvalues: # Calculates p-values by using the correlations from the core feat
 rule nodes_and_edges: #This script returns nodes and edges that pass the desired level of correlation and pvalue. It also calculates modularity, and the Zi-Pi calculations
    version: "1.0"
    conda:
-      "../../workflow/envs/phyloseq.yaml"
+      "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
    input:
       pvalues=rules.pvalues.output,
       mycat="data/network/{sample}_categories.txt"

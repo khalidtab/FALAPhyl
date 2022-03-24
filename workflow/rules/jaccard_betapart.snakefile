@@ -134,7 +134,8 @@ rule jaccard_betapart: # Last step from betapart. Cleans up temporary files.
     input:
         mean_std=jaccard_ids_ingroup_var,
         perm=rules.jaccard_betapart_plot_permutation.output,
-        PDFs=rules.jaccard_make_anosim_betapart_PDFs.output.anosim_repl,
+        norepl=rules.jaccard_norepl_anosim_betapart.output,
+        repl=rules.jaccard_repl_anosim_betapart.output,
         pairwise=rules.jaccard_betapart_pairwise.output
     output:
         temporary(touch("data/.done_jaccard_betapart_{sample}.txt"))

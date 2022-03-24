@@ -24,8 +24,7 @@ rule results:
       rules.alpha_div.output,
       rules.bray_betapart.output,
       rules.jaccard_betapart.output,
-      rules.patient_level_analysis.output,
-      rules.compositional_betadiv.output
+      rules.patient_level_analysis.output
    message: "Cleaning up…"
    output:
       "{sample}.final"

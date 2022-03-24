@@ -3,7 +3,7 @@ rule beta_div: # Calculate distances between samples based on the chosen beta di
    conda:
       "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
    input:
-      "data/biom/{sample}.tsv"
+      "data/tsv/{sample}.tsv"
    params: 
       dist=expand("{dist}",dist=config["distances"])
    output:
@@ -70,7 +70,7 @@ rule adonis: # Calculates whether the two groups have similar dispersions (varia
    output:
       myresults=expand("data/distance/ADONIS/{{sample}}+{dist}+{group}_adonis.txt", dist=config["distances"], group=config["group"]),
       mysh="tmp/ADONIS_{sample}.sh",
-      myfolder = directory("data/distance/ADONIS/")
+      myfolder = directory("data/distance/ADONIS/{sample}")
    params: 
       dist=expand("{dist}",dist=config["distances"]),
       group=expand("{group}",group=config["group"]),
@@ -86,15 +86,15 @@ rule adonis: # Calculates whether the two groups have similar dispersions (varia
 
 use rule adonis as anosim with:
    output:
-      myresults=expand("data/distance/ANOSIM/{{sample}}+{dist}+{group}_anosim.txt, dist=config["distances"], group=config["group"]),
+      myresults=expand("data/distance/ANOSIM/{{sample}}+{dist}+{group}_anosim.txt", dist=config["distances"], group=config["group"]),
       mysh="tmp/ANOSIM_{sample}.sh",
-      myfolder = directory("data/distance/ANOSIM/")
+      myfolder = directory("data/distance/ANOSIM/{sample}")
    message: "Calculating ANOSIM for {wildcards.sample}"
 
 
 use rule adonis as permdisp with: # Calculates whether the two groups have similar dispersions (variances) to their centroid
    output:
-      myresults=expand("data/distance/PERMDISP/{{sample}}+{dist}+{group}_adonis.txt, dist=config["distances"], group=config["group"]),
+      myresults=expand("data/distance/PERMDISP/{{sample}}+{dist}+{group}_adonis.txt", dist=config["distances"], group=config["group"]),
       mysh="tmp/PERMDISP_{sample}.sh",
-      myfolder = directory("data/distance/PERMDISP/")
+      myfolder = directory("data/distance/PERMDISP/{sample}")
    message: "Calculating PERMDISP for {wildcards.sample}"
