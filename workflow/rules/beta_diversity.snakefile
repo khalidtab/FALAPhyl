@@ -68,7 +68,7 @@ rule adonis: # Calculates whether the two groups have similar dispersions (varia
    input:
       rules.beta_div.output
    output:
-      myresults=expand("data/distance/ADONIS/{{sample}}+{dist}+{group}_adonis.txt, dist=config["distances"], group=config["group"]),
+      myresults=expand("data/distance/ADONIS/{{sample}}+{dist}+{group}_adonis.txt", dist=config["distances"], group=config["group"]),
       mysh="tmp/ADONIS_{sample}.sh",
       myfolder = directory("data/distance/ADONIS/")
    params: 
