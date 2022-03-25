@@ -10,27 +10,25 @@ color:
 # Beta diversity metrics
 distances:
      - PhILR
-     - jaccard
-     - braycurtis
-#     - canberra_adkins
+     - bray
+#     - manhattan
 #     - euclidean
-#     - sokalmichener
-#     - cosine
-#     - matching
-#     - kulsinski
-#     - sqeuclidean
-#     - cityblock
-#     - seuclidean
-#     - yule
 #     - canberra
-#     - dice
-#     - hamming
-#     - sokalsneath
-#     - correlation
-#     - rogerstanimoto
-#     - russellrao
-#     - aitchison
-#     - chebyshev
+#     - clark
+#     - kulczynski
+#     - jaccard
+#     - gower
+#     - altGower
+#     - morisita
+#     - horn
+#     - mountford
+#     - raup
+#     - binomial
+#     - chao
+#     - cao
+#     - mahalanobis
+#     - chisq
+#     - chord
 
 #This list of alpha diversity metrics is shared by both Qiime2 and PhyloToast's implementation.
 alpha: 
