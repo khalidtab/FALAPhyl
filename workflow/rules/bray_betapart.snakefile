@@ -46,9 +46,9 @@ rule bray_repl_anosim_betapart:
    message: "Calculating ANOSIM for Bray-Curtis balanced (ie replacement) of {wildcards.sample}"
    shell:
       "mkdir -p data/distance/ANOSIM &&"
-      "echo 'for y in {params.group}; do"
-      "Rscript --vanilla ./workflow/scripts/adonis_anosim_betadisper.R -i {input} -o {output.myresult} -m data/map/{wildcards.sample}.txt -g $y -c {wildcards.color} -t anosim"
-      "; done ; done' > {output.mysh} &&"
+      "echo 'for y in {params.group}; do "
+      "Rscript --vanilla ./workflow/scripts/adonis_anosim_betadisper.R -i {input} -o {output.myresult} -m data/map/{wildcards.sample}.txt -g $y -t anosim"
+      "; done ' > {output.mysh} &&"
       "chmod +x {output.mysh} &&"
       "bash {output.mysh}"
 

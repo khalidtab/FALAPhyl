@@ -64,7 +64,7 @@ breakdown = function(biomMatrix,distance){
 #########################
 
 # Make the phyloseq merged file
-myTable = suppressMessages(read_tsv(biomFile, skip = 1)) %>% as.data.frame(.)
+myTable = suppressMessages(readr::read_tsv(biomFile, skip = 1)) %>% as.data.frame(.)
 rownames(myTable) = myTable[,1]
 myTable[,1] = NULL
 

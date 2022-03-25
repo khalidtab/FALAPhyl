@@ -12,7 +12,7 @@ rule beta_div: # Calculate distances between samples based on the chosen beta di
    shell: 
       "mkdir -p data/distance/beta_div &&"
       "echo 'for x in {params.dist}; do "
-      "Rscript --vanilla ./workflow/scripts/beta_diversity.R -i {input.tsv} -o /data/distance/beta_div/{wildcards.sample}+$x.tsv -d $x"
+      "Rscript --vanilla ./workflow/scripts/beta_diversity.R -i {input} -o /data/distance/beta_div/{wildcards.sample}+$x.tsv -d $x"
       "; done' > tmp/beta_div_{wildcards.sample}.sh &&"
       "chmod +x tmp/beta_div_{wildcards.sample}.sh &&"
       "bash tmp/beta_div_{wildcards.sample}.sh"

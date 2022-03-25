@@ -31,4 +31,4 @@ myAlpha = phyloseq::estimate_richness(biomFile,split=TRUE,measures=alpha)
 myAlpha = cbind(row.names(myAlpha),myAlpha)
 colnames(myAlpha)[1] = "Samples"
 
-write_delim(myAlpha,output,delim="\t")
+readr::write_delim(myAlpha,output,delim="\t")

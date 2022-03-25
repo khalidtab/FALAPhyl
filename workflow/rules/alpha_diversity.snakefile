@@ -36,7 +36,7 @@ rule alpha_div_plot: # Calculates alpha diversity in each group, and outputs a P
       "echo 'for x in {params.alpha}; do for y in {params.group}; do "
       " w=$(printf \"%s{params.color}\" $y) && "
       "mkdir -p data/plots/alpha_div_{wildcards.sample}+$y+$x && "
-      "Rscript --vanilla ./workflow/scripts/alphaDiv.R -i data/alpha_div/calc_{wildcards.sample}+$x.txt -m {input.map} -c $w -g $y -o data/plots/alpha_div_{wildcards.sample}+$y+$x.svg "
+      "Rscript --vanilla ./workflow/scripts/alpha_plot.R -i data/alpha_div/calc_{wildcards.sample}+$x.txt -m {input.map} -c $w -g $y -o data/plots/alpha_div_{wildcards.sample}+$y+$x.svg "
       "; done ; done' > tmp/alpha_div_plot_{wildcards.sample}.sh && "
       "chmod +x tmp/alpha_div_plot_{wildcards.sample}.sh && "
       "bash tmp/alpha_div_plot_{wildcards.sample}.sh"

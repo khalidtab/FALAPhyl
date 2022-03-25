@@ -7,7 +7,7 @@ rule biom_to_tsv: # Since qiime requires a specific biom format (either V100/jso
    output:
         tsv=temporary("data/tsv/{sample}.tsv"),
         temp_biom=temporary("data/biom/{sample}_temp.biom")
-   message: "Generating temporary tsv and qza files of the biom file for {wildcards.sample}"
+   message: "Generating temporary tsv files of the biom file for {wildcards.sample}"
    shell:
         "mkdir -p data/tsv &&"
         "biom convert -i {input} -o {output.tsv} --to-tsv &&"
