@@ -12,6 +12,8 @@ option_list = list(
   make_option(c("-o", "--output"), type="character", default=NULL, help="Name of the output SVG file", metavar="Output SVG File name"),
   make_option(c("-m", "--mapping"), type="character", default=NULL, help="The mapping file", metavar="Mapping file"),
   make_option(c("-g", "--group"), type="character", default=NULL, help="The category in the mapping file", metavar="Group name"),
+  make_option(c("-x", "--width"), type="character", default=NULL, help="Width of the SVG", metavar="Width of SVG"),
+  make_option(c("-y", "--height"), type="character", default=NULL, help="Height of the SVG", metavar="Height of SVG"),
   make_option(c("-c", "--color"), type="character", default=NULL, help="The color column in the mapping file", metavar="Color name")
 );
 
@@ -28,6 +30,8 @@ output = opt$output
 category = opt$group
 mapping_file = opt$mapping 
 color = opt$color
+mywidth = as.numeric(opt$width)
+myheight = as.numeric(opt$height)
 
 alpha_table = suppressMessages(read_tsv(alpha))
 typeOfAlpha = colnames(alpha_table)[2]
@@ -85,4 +89,4 @@ myplot = ggviolin(test, x=category,y=typeOfAlpha,fill=category,rug=TRUE,color=ca
                        method="wilcox",hide.ns = TRUE) +
   theme(legend.position = "none") + xlab(NULL)
 
-ggsave(output,plot=myplot)
+ggsave(output,plot=myplot,width=mywidth,height=myheight)

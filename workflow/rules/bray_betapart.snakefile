@@ -1,3 +1,6 @@
+def get_mem_mb(wildcards, attempt):
+    return attempt * 1000
+
 rule bray_betapart_matrix: # Create betapart matrices for all samples
    conda:
       "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
@@ -18,15 +21,18 @@ rule bray_betapart_pairwise: # Create pairwise distance breakdown between each t
       repl="data/distance/beta_div/{sample}+BrayRepl.tsv",
       norepl="data/distance/beta_div/{sample}+BrayNoRepl.tsv",
       bray="data/distance/beta_div/{sample}+BrayCurtis_2.tsv"
+   resources:
+      mem_mb=get_mem_mb
    params:
       group=expand("{group}", group=config["group"])
    output:
-      temporary(touch("data/distance/beta_div/{sample}_braycurtis_breakdown_pairwise.done"))
+      myfile=touch("tmp/.{sample}_braycurtis_breakdown_pairwise.done"),
+      myfolder="data/plots/betapart_bray_pairwise_{sample}/"
    message: "Graphing breakdown of pairwise distances of Bray-Curtis for {wildcards.sample}"
    shell:
-      "mkdir -p data/distance/beta_div/{wildcards.sample} &&"
+      "mkdir -p {output.myfolder} &&"
       "echo 'for y in {params.group}; do "
-      " Rscript --vanilla workflow/scripts/betapart_pairwise.R -i {input.bray} -r {input.repl} -n {input.norepl} -m data/map/{wildcards.sample}.txt -d bray -c $y -o data/plots/betapart_bray_pairwise_{wildcards.sample}_"
+      " Rscript --vanilla workflow/scripts/betapart_pairwise.R -i {input.bray} -r {input.repl} -n {input.norepl} -m data/map/{wildcards.sample}.txt -d bray -c $y -o {output.myfolder} "
       " ; done' > tmp/Betapart_bray_pairwise_{wildcards.sample}.sh &&"
       " chmod +x tmp/Betapart_bray_pairwise_{wildcards.sample}.sh &&"
       " bash tmp/Betapart_bray_pairwise_{wildcards.sample}.sh"
@@ -38,26 +44,31 @@ rule bray_repl_anosim_betapart:
       "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
    input:
       "data/distance/beta_div/{sample}+BrayRepl.tsv"
-   output:
-      myresult="data/distance/ANOSIM/ANOSIM_BrayRepl_{sample}.txt",
-      mysh="tmp/ANOSIM_brayrepl_{sample}.sh"
    params: 
-      group=expand("{group}",group=config["group"])
+      group=expand("{group}",group=config["group"]),
+      mytest="BrayRepl"
+   output:
+      myresults=expand("data/distance/ANOSIM/anosim_{{sample}}+BrayRepl+{group}.txt", group=config["group"]),
+      mysh="tmp/ANOSIM_jaccardNoRepl_{sample}.sh"
    message: "Calculating ANOSIM for Bray-Curtis balanced (ie replacement) of {wildcards.sample}"
    shell:
-      "mkdir -p data/distance/ANOSIM &&"
+      "mkdir -p data/distance/ANOSIM/ &&"
       "echo 'for y in {params.group}; do "
-      "Rscript --vanilla ./workflow/scripts/adonis_anosim_betadisper.R -i {input} -o {output.myresult} -m data/map/{wildcards.sample}.txt -g $y -t anosim"
-      "; done ' > {output.mysh} &&"
+      "Rscript --vanilla ./workflow/scripts/adonis_anosim_betadisper.R -i {input} -o data/distance/ANOSIM/anosim_{wildcards.sample}+{params.mytest}+$y -m data/map/{wildcards.sample}.txt -g $y -t anosim"
+      " ; done ' > {output.mysh} &&"
       "chmod +x {output.mysh} &&"
       "bash {output.mysh}"
+
 
 use rule bray_repl_anosim_betapart as bray_norepl_anosim_betapart with:
    input:
       "data/distance/beta_div/{sample}+BrayNoRepl.tsv"
+   params: 
+      group=expand("{group}",group=config["group"]),
+      mytest="BrayNoRepl"
    output:
-      myresult="data/distance/ANOSIM/ANOSIM_BrayNoRepl_{sample}.txt",
-      mysh="tmp/ANOSIM_brayNorepl_{sample}.sh"
+      myresults=expand("data/distance/ANOSIM/anosim_{{sample}}+BrayNoRepl+{group}.txt", group=config["group"]),
+      mysh="tmp/ANOSIM_BrayNoRepl_{sample}.sh"
    message: "Calculating ANOSIM for Bray-Curtis gradient (ie no replacement) of {wildcards.sample}"
 
 # Split biom file for the upcoming betapart steps
@@ -131,7 +142,7 @@ rule bray_betapart_plot_permutation: # Plots permutations from betapart_permutat
    input:
       perm=ids_bray_betapart_permutations
    output:
-      temporary(touch("data/betapart_bray/{sample}/plots_done.txt"))
+      touch("tmp/.{sample}_bray_plots_done.txt")
    params:
       color=expand("{color}",color=config["color"])
    message: "Creating the permutations for the Bray Curtis breakdown of {wildcards.sample}"
@@ -151,7 +162,7 @@ rule bray_betapart: # Last step from betapart. Cleans up temporary files.
         repl=rules.bray_repl_anosim_betapart.output,
         pairwise=rules.bray_betapart_pairwise.output
     output:
-        temporary(touch("tmp/.done_bray_betapart_{sample}.txt"))
+        touch("tmp/.done_bray_betapart_{sample}.txt")
     shell:
         "echo Cleaning up after Bray Curtis Betapart. && rm -rf data/betapart_bray/{wildcards.sample}/perm/permutations data/betapart_bray/{wildcards.sample}/tsv data/distance/beta_div/{wildcards.sample}"
 

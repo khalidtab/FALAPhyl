@@ -13,7 +13,7 @@ rule all:
    shell: "touch {input}"
 
 rule results:
-   version: "1.0"
+   version: "2.0"
    input:
       rules.network.output,
       rules.pcoa.output,

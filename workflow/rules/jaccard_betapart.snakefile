@@ -1,3 +1,6 @@
+def get_mem_mb(wildcards, attempt):
+    return attempt * 1000
+
 rule jaccard_betapart_matrix: # Create betapart matrices for all samples
    conda:
       "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
@@ -18,15 +21,18 @@ rule jaccard_betapart_pairwise: # Create pairwise distance breakdown between eac
       repl="data/distance/beta_div/{sample}+jaccardRepl.tsv",
       norepl="data/distance/beta_div/{sample}+jaccardNoRepl.tsv",
       jaccard="data/distance/beta_div/{sample}+jaccard_2.tsv"
+   resources:
+      mem_mb=get_mem_mb
    params:
       group=expand("{group}", group=config["group"])
    output:
-      temporary(touch("data/distance/beta_div/{sample}_jaccard_breakdown_pairwise.done"))
+      myfile=touch("tmp/.{sample}_jaccard_breakdown_pairwise.done"),
+      myfolder="data/plots/betapart_jaccard_pairwise_{sample}/"
    message: "Graphing breakdown of pairwise distances of Jaccard for {wildcards.sample}"
    shell:
-      "mkdir -p data/distance/beta_div/{wildcards.sample} &&"
+      "mkdir -p {output.myfolder} &&"
       "echo 'for y in {params.group}; do "
-      " Rscript --vanilla workflow/scripts/betapart_pairwise.R -i {input.jaccard} -r {input.repl} -n {input.norepl} -m data/map/{wildcards.sample}.txt -d jaccard -c $y -o data/plots/betapart_jaccard_pairwise_{wildcards.sample}_"
+      " Rscript --vanilla workflow/scripts/betapart_pairwise.R -i {input.jaccard} -r {input.repl} -n {input.norepl} -m data/map/{wildcards.sample}.txt -d jaccard -c $y -o {output.myfolder} "
       " ; done' > tmp/Betapart_jaccard_pairwise_{wildcards.sample}.sh &&"
       " chmod +x tmp/Betapart_jaccard_pairwise_{wildcards.sample}.sh &&"
       " bash tmp/Betapart_jaccard_pairwise_{wildcards.sample}.sh"
@@ -34,17 +40,23 @@ rule jaccard_betapart_pairwise: # Create pairwise distance breakdown between eac
 use rule bray_repl_anosim_betapart as jaccard_norepl_anosim_betapart with:
    input:
       "data/distance/beta_div/{sample}+jaccardNoRepl.tsv"
+   params: 
+      group=expand("{group}",group=config["group"]),
+      mytest="jaccardNoRepl"
    output:
-      myresult="data/distance/ANOSIM/ANOSIM_jaccardNoRepl_{sample}.txt",
-      mysh="tmp/ANOSIM_jacNorepl_{sample}.sh"
+      myresults=expand("data/distance/ANOSIM/anosim_{{sample}}+jaccardNoRepl+{group}.txt", group=config["group"]),
+      mysh="tmp/ANOSIM_jaccardNoRepl_{sample}.sh"
    message: "Calculating ANOSIM for Jaccard Nestedness (ie no replacement) of {wildcards.sample}"
 
 use rule bray_repl_anosim_betapart as jaccard_repl_anosim_betapart with:
    input:
       "data/distance/beta_div/{sample}+jaccardRepl.tsv"
+   params: 
+      group=expand("{group}",group=config["group"]),
+      mytest="jaccardRepl"
    output:
-      myresult="data/distance/ANOSIM/ANOSIM_jaccardRepl_{sample}.txt",
-      mysh="tmp/ANOSIM_jacRepl_{sample}.sh"
+      myresults=expand("data/distance/ANOSIM/anosim_{{sample}}+jaccardRepl+{group}.txt", group=config["group"]),
+      mysh="tmp/ANOSIM_jacRepl_{sample}.sh",
    message: "Calculating ANOSIM for Jaccard Turnover (ie replacement) of {wildcards.sample}"
 
 # Split biom file for the upcoming betapart steps
@@ -118,7 +130,7 @@ rule jaccard_betapart_plot_permutation: # Plots permutations from betapart_permu
    input:
       perm=ids_jaccard_betapart_permutations
    output:
-      temporary(touch("data/betapart_jaccard/{sample}/plots_done.txt"))
+      touch("tmp/.{sample}_jaccard_plots_done.txt")
    params:
       color=expand("{color}",color=config["color"])
    message: "Creating the permutations for the Jaccard breakdown of {wildcards.sample}"
@@ -138,7 +150,7 @@ rule jaccard_betapart: # Last step from betapart. Cleans up temporary files.
         repl=rules.jaccard_repl_anosim_betapart.output,
         pairwise=rules.jaccard_betapart_pairwise.output
     output:
-        temporary(touch("tmp/.done_jaccard_betapart_{sample}.txt"))
+        touch("tmp/.done_jaccard_betapart_{sample}.txt")
     shell:
         "echo Cleaning up after Jaccard Betapart. && rm -rf data/betapart_jaccard/{wildcards.sample}/perm/permutations data/betapart_jaccard/{wildcards.sample}/tsv data/distance/beta_div/{wildcards.sample}"
 

@@ -11,6 +11,8 @@ option_list = list(
   make_option(c("-o", "--output"), type="character", default=NULL, help="Name of the output SVG file", metavar="Output SVG File name"),
   make_option(c("-m", "--mapping"), type="character", default=NULL, help="The mapping file", metavar="Mapping file"),
   make_option(c("-g", "--group"), type="character", default=NULL, help="The category in the mapping file", metavar="Group name"),
+  make_option(c("-x", "--width"), type="character", default=NULL, help="Width of the SVG", metavar="Width of SVG"),
+  make_option(c("-y", "--height"), type="character", default=NULL, help="Height of the SVG", metavar="Height of SVG"),
   make_option(c("-c", "--color"), type="character", default=NULL, help="The color column in the mapping file", metavar="Color name")
 );
 
@@ -27,6 +29,9 @@ output = opt$output
 category = opt$group
 mapping_file = opt$mapping 
 color = opt$color
+mywidth = as.numeric(opt$width)
+myheight = as.numeric(opt$height)
+
 
 dist = suppressMessages(read.csv(file=dissimilarity, skip=0, header=T, row.names=1, sep="\t")) %>% as.dist(.)
 map = suppressMessages(read.csv(mapping_file, skip=0, header=T, sep="\t"))
@@ -65,7 +70,7 @@ myplot = ggplot(NMDS_table, aes(x = NMDS1, y = NMDS2)) + geom_point(aes(color = 
         plot.background = element_blank(),
         panel.grid.minor = element_blank(),
         panel.grid.major = element_blank()) # these last 3 lines remove the grid lines
-ggsave(filename=output,plot=myplot)
+ggsave(filename=output,plot=myplot,width=mywidth,height=myheight)
 
 # Graph with no names  but with density plots
 xdens = axis_canvas(myplot, axis = "x")+ geom_density(data = NMDS_table, aes(x = NMDS1,fill=Category), alpha = 0.5, size = 0.1)+scale_fill_manual(values=unique(as.vector(t(NMDS_table[colorNum]))))
@@ -77,7 +82,7 @@ ydens = axis_canvas(myplot, axis = "y", coord_flip = TRUE)+
 p1 = insert_xaxis_grob(myplot, xdens, grid::unit(.1, "null"), position = "top")
 p2 = insert_yaxis_grob(p1, ydens, grid::unit(.1, "null"), position = "right")
 
-ggsave(filename=paste0(output,"noNameswithProbDF.svg"),plot=p2)
+ggsave(filename=paste0(output,"noNameswithProbDF.svg"),plot=p2,width=mywidth,height=myheight)
 
 
 
@@ -91,7 +96,7 @@ myplot = ggplot(NMDS_table, aes(x = NMDS1, y = NMDS2)) + geom_point(aes(color = 
         plot.background = element_blank(),
         panel.grid.minor = element_blank(),
         panel.grid.major = element_blank()) # these last 3 lines remove the grid lines
-ggsave(filename=paste0(output,"withnames.svg"),plot=myplot)
+ggsave(filename=paste0(output,"withnames.svg"),plot=myplot,width=mywidth,height=myheight)
 
 
 
@@ -104,7 +109,7 @@ ydens = axis_canvas(myplot, axis = "y", coord_flip = TRUE)+
 p1 = insert_xaxis_grob(myplot, xdens, grid::unit(.1, "null"), position = "top")
 p2 = insert_yaxis_grob(p1, ydens, grid::unit(.1, "null"), position = "right")
 
-ggsave(filename=paste0(output,"withnamesProbDF.svg"),plot=p2)
+ggsave(filename=paste0(output,"withnamesProbDF.svg"),plot=p2,width=mywidth,height=myheight)
 
 
 

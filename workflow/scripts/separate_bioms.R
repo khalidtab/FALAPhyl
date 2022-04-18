@@ -58,7 +58,6 @@ condNum = which(colnames(mapping)==condition)
 condName = mapping[,condNum][[1]] %>% unique(.) %>% as.character(.)
 
 myPhylo = merge_phyloseq(biom,mapping)
-
 myCondPop = c()
 
 for (myCond in condName) {

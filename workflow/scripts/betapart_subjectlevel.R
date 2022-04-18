@@ -28,8 +28,8 @@ if (is.null(opt$input)){
 }
 
 # Load variables
-cond = opt$category # cond = "condition"
-dist_type = opt$distance # dist_type = "jaccard"
+cond = opt$category
+dist_type = opt$distance
 
 patientID = opt$patientID
 
@@ -97,9 +97,12 @@ distance = distance[distance$v1subjectID==distance$v2subjectID, ]
 
 colnames(distance) = c("v2","v1",dist_type,"repl","noRepl","cond1","cond2","v1subjectID","v2subjectID")
 
-uniqueCond1 = distance$cond1 %>% unique(.)
+uniqueCond = c(distance$cond1, distance$cond2) %>% unique(.)
+comboUniq = combn(uniqueCond,2,simplify = FALSE)
 
-for (myCond1 in uniqueCond1) {
+for (myConds in comboUniq) {
+  myCond1 = myConds[1]
+  myCond2 = myConds[2]
   
   table1 = subset(distance,cond1 == myCond1)
   table1 = data.frame(table1$v1,table1$v2,table1[,3],table1$repl,table1$noRepl,table1$cond1,table1$cond2) # Rearrange the columns
@@ -111,6 +114,9 @@ for (myCond1 in uniqueCond1) {
   colnames(table2) = c("v1","v2",dist_type,"repl","noRepl","cond1","cond2") # Fix the names
   
   myTable = rbind(table1,table2)
+  # By now myTable cond1 equals myCond1. Next, subset mytable so that cond2 equals myCond2
+  myTable = subset(myTable,cond2 == myCond2)
+  
   i = c(3,4,5)
   myTable[,i] = apply(myTable[,i],2, function(x) as.numeric(as.character(x)))
   rm(table1,table2)
@@ -122,17 +128,15 @@ for (myCond1 in uniqueCond1) {
   
   numOfParticipants = dim(pd)[1]
   
-  myCond2 = myTable$cond2 %>% unique(.)
-  
   if (dist_type == "bray"){
   colnames(pd) = c("balanced variation in abundance","abundance gradients")
-  myGraph = ggpubr::ggpaired(pd, cond1 = "balanced variation in abundance", cond2 = "abundance gradients", fill = "condition", palette = "jco", line.size=0.01, subtitle = paste0("n =",numOfParticipants,". Wilcoxon signed rank sum test, P-value < ",formatC(pvalue, format = "e", digits = 5)), title= (paste(dist_type, "breakdown between ",myCond1,"and",myCond2, "Pvalue <",formatC(pvalue, format = "e", digits = 2))))
+  myGraph = ggpubr::ggpaired(pd, cond1 = "balanced variation in abundance", cond2 = "abundance gradients", fill = "condition", palette = "jco", line.size=0.01, subtitle = paste0("n =",numOfParticipants,". Wilcoxon signed rank sum test, P-value < ",formatC(pvalue, format = "e", digits = 5)), title= (paste(dist_type, "breakdown \n Between ",myCond1,"and",myCond2, "\n Pvalue <",formatC(pvalue, format = "e", digits = 2))))
   } else {
     colnames(pd) = c("Turn-over","Nestedness")
-    myGraph = ggpubr::ggpaired(pd, cond1 = "Turn-over", cond2 = "Nestedness", fill = "condition", palette = "jco", line.size=0.01, title= (paste(dist_type, "breakdown between ",myCond1,"and",myCond2)), subtitle = paste0("n =",numOfParticipants,". Wilcoxon signed rank sum test, P-value < ",formatC(pvalue, format = "e", digits = 5)))  
+    myGraph = ggpubr::ggpaired(pd, cond1 = "Turn-over", cond2 = "Nestedness", fill = "condition", palette = "jco", line.size=0.01, title= (paste(dist_type, "breakdown \n Between ",myCond1,"and",myCond2)), subtitle = paste0("n =",numOfParticipants,"\n Wilcoxon signed rank sum test, P-value < ",formatC(pvalue, format = "e", digits = 5)))  
   } 
  
-  ggsave(filename=paste0(output,dist_type,"_patientlevel_breakdown_",myCond1,"_",myCond2,".svg"),plot=myGraph) 
+  ggsave(filename=paste0(output,dist_type,"ptlvl_",myCond1,"_",myCond2,".svg"),plot=myGraph) 
   
   }
 

@@ -9,11 +9,9 @@ option_list = list(
   make_option(c("-m", "--mapping"), type="character", default=NULL, help="The mapping file", metavar="Mapping file"),
   make_option(c("-g", "--group"), type="character", default=NULL, help="The category in the mapping file", metavar="Group name"),
   make_option(c("-c", "--color"), type="character", default=NULL, help="color suffix", metavar="color suffix"),
-<<<<<<< Updated upstream:workflow/scripts/adonis_betadisper.R
+  make_option(c("-x", "--width"), type="character", default=NULL, help="Width of the SVG", metavar="Width of SVG"),
+  make_option(c("-y", "--height"), type="character", default=NULL, help="Height of the SVG", metavar="Height of SVG"),
   make_option(c("-t", "--test"), type="character", default=NULL, help="Test to be done, options: adonis, betadisper", metavar="Output of test")
-=======
-  make_option(c("-t", "--test"), type="character", default=NULL, help="Test to be done, options: adonis, anosim, betadisper", metavar="Output of test")
->>>>>>> Stashed changes:workflow/scripts/adonis_anosim_betadisper.R
 );
 
 opt_parser = OptionParser(option_list=option_list);
@@ -31,6 +29,8 @@ category = opt$group
 mapping_file = opt$mapping 
 color = opt$color
 output_for_graph = opt$graph
+mywidth = as.numeric(opt$width)
+myheight = as.numeric(opt$height)
 
 dis = read.table(dissimilarity,sep="\t",head=TRUE,row.names = 1) %>% as.dist(.)
 
@@ -59,41 +59,45 @@ pergroup        = betadisper_test %>% TukeyHSD(.,which="group",conf.level = 0.95
 arrangedColors = unique(working_map[ , c("condition", "color")]) %>% arrange(condition) %>% .$color # Get the correct order of colors based on the alphabetical order of the condition
 arrangedCateg = unique(working_map[ , c("condition", "color")]) %>% arrange(condition) %>% .$condition # Get the correct order of categories based on the alphabetical order of the condition
 
-svg(file = paste0(output_for_graph,"_PCoA_centroids_stdev_ellipses_for_betadispersion.svg"))
-plot(betadisper_test,hull=FALSE,label=FALSE,col=as.character(arrangedColors),
+
+
+svg(file = paste0(output_for_graph,"_boxplots_for_betadispersion.svg"),family="sans")
+myboxplot = boxplot(betadisper_test,
+                    notch=TRUE,outline=TRUE,
+                    col=as.character(arrangedColors), 
+                    xlab = paste0(category),
+                    main = "Beta-dispersion distance from centroid",show.names=FALSE)
+legend("topright", legend = myboxplot$names, border="black", fill = as.character(arrangedColors),cex=0.5)
+dev.off()
+
+
+
+svg(file = paste0(output_for_graph,"PCoA_for_betadispersion.svg"),width = mywidth,height=myheight,family="sans")
+p1 = plot(betadisper_test,hull=FALSE,label=FALSE,col=as.character(arrangedColors),
      ellipse=TRUE,lty="solid",lwd=5, 
      segments=TRUE,seg.col="grey",seg.lty=1,seg.lwd=0.3,
      pch=rep(16,length(arrangedColors)), # type of point
      xlab="PCoA1",ylab="PCoA2",
-     main=paste("PCoA with centroids and beta-dispersion confidence-interval")) 
+     main=paste("PCoA with centroids and beta-dispersion confidence-interval"))
 legend("topright", legend = myboxplot$names, border="black", fill = as.character(arrangedColors),cex=0.5)
 dev.off()
 
-svg(file = paste0(output_for_graph,"_boxplots_for_betadispersion.svg"))
-myboxplot = boxplot(betadisper_test,
-        notch=TRUE,outline=TRUE,
-        col=as.character(arrangedColors), 
-        xlab = paste0(category),
-        main = "Beta-dispersion distance from centroid",show.names=FALSE)
-legend("topright", legend = myboxplot$names, border="black", fill = as.character(arrangedColors),cex=0.5)
-dev.off()
+output_betadisper_perm = paste0(output,".txt")
 
-output_betadisper_perm = paste0(output,"betadisper_perm.txt")
-
-write.table(betadisper_perm$tab,output_betadisper_perm,
+suppressMessages(write.table(betadisper_perm$tab,output_betadisper_perm,
             sep="\t",append = TRUE,
             row.names = TRUE, 
-            col.names = TRUE)
+            col.names = TRUE))
 
-write.table((betadisper_perm$pairwise %>% as.data.frame(.)),
+suppressMessages(write.table((betadisper_perm$pairwise %>% as.data.frame(.)),
             output_betadisper_perm,
             sep="\t",append = TRUE,
             row.names = TRUE, 
-            col.names = TRUE)
+            col.names = TRUE))
 
 } else if (mytest == "adonis"){
-output_adonis = paste0(output,"adonis.txt")
-output_pairwise_adonis = paste0(output,"pairwise_adonis.txt")
+output_adonis = paste0(output,".txt")
+output_pairwise_adonis = paste0(output,"_pairwise.txt")
 
 myAdonis = vegan::adonis2(dis~condition, data=working_map)
 
@@ -147,8 +151,8 @@ write.table(pairwise_adonis_results,output_pairwise_adonis,sep="\t",append = FAL
   pairwise_fdr_padj = p.adjust(pairwise_p,method="fdr")
   pairwise_anosim_results = cbind(pairwise_R,pairwise_p,pairwise_fdr_padj) %>% as.data.frame(.)
   
-  output_anosim = paste0(output)
-  output_pairwise_anosim = paste0(tools::file_path_sans_ext(output),"_pairwise_anosim.txt")
+  output_anosim = paste0(output,".txt")
+  output_pairwise_anosim = paste0(tools::file_path_sans_ext(output),"_pairwise.txt")
   
   sink(output_anosim)
   print(myANOSIM)

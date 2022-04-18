@@ -8,4 +8,5 @@ dependencies:
 - r-reshape2 = 1.4.4
 - r-ggpubr
 - r-svglite
+- r-vegan
 #- xvfbwrapper

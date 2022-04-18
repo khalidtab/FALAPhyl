@@ -25,18 +25,19 @@ rule alpha_div_plot: # Calculates alpha diversity in each group, and outputs a P
       map="data/map/{sample}.txt",
       alphadiv=rules.alpha_div_calc.output
    output:
-      svg=report(expand("data/plots/alpha_div_{{sample}}+{group}+{alpha}.svg",alpha=config["alpha"],group=config["group"]))
+      svg=report(expand("data/plots/alpha_div_{{sample}}/{group}+{alpha}.svg",alpha=config["alpha"],group=config["group"]))
    params: 
       alpha=expand("{alpha}",alpha=config["alpha"]),
       group=expand("{group}",group=config["group"]),
-      color=config["color"][0]
+      color=config["color"][0],
+      width=config["width"][0],
+      height=config["height"][0]
    message: "Plotting alpha diversity on {wildcards.sample}"
    shell:
-      "mkdir -p tmp &&"
+      "mkdir -p tmp data/plots/alpha_div_{wildcards.sample} &&"
       "echo 'for x in {params.alpha}; do for y in {params.group}; do "
       " w=$(printf \"%s{params.color}\" $y) && "
-      "mkdir -p data/plots/alpha_div_{wildcards.sample}+$y+$x && "
-      "Rscript --vanilla ./workflow/scripts/alpha_plot.R -i data/alpha_div/calc_{wildcards.sample}+$x.txt -m {input.map} -c $w -g $y -o data/plots/alpha_div_{wildcards.sample}+$y+$x.svg "
+      "Rscript --vanilla ./workflow/scripts/alpha_plot.R -i data/alpha_div/calc_{wildcards.sample}+$x.txt -m {input.map} -c $w -g $y -o data/plots/alpha_div_{wildcards.sample}/$y+$x.svg -x {params.width} -y {params.height} "
       "; done ; done' > tmp/alpha_div_plot_{wildcards.sample}.sh && "
       "chmod +x tmp/alpha_div_plot_{wildcards.sample}.sh && "
       "bash tmp/alpha_div_plot_{wildcards.sample}.sh"

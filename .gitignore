@@ -5,3 +5,5 @@ data/map/test.txt
 data/FALAPhyl/
 workflow/scripts/.Rhistory
 workflow/scripts/.Rhistory
+workflow/scripts/.Rhistory
+workflow/scripts/separate_bioms.R

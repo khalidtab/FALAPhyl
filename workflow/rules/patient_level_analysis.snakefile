@@ -1,3 +1,6 @@
+def get_mem_mb(wildcards, attempt):
+    return attempt * 1000
+
 rule patient_level_alpha_comparison:
    version: "1.0"
    conda: "../../workflow/envs/ggpubr.yaml"
@@ -27,6 +30,8 @@ rule patient_level_betapart_jaccard: # Plots the PhILR distances using the Non-M
       jac=rules.jaccard_betapart_matrix.output.jaccard
    output: 
       plots=directory("data/plots/patientlevel_betapart_jaccard_{sample}/")
+   resources:
+      mem_mb=get_mem_mb
    params:
       group=expand("{group}",group=config["group"]),
       subjectID=expand("subjectID",subjectID=config["subjectID"])
@@ -48,6 +53,8 @@ rule patient_level_betapart_bray: # Plots the PhILR distances using the Non-Metr
       repl=rules.bray_betapart_matrix.output.repl,
       norepl=rules.bray_betapart_matrix.output.norepl,
       jac=rules.bray_betapart_matrix.output.bray
+   resources:
+      mem_mb=get_mem_mb
    output: 
       plots=directory("data/plots/patientlevel_betapart_bray_{sample}/")
    params:
@@ -71,6 +78,6 @@ rule patient_level_analysis: # Last step from betapart. Cleans up temporary file
         beta_jac=rules.patient_level_betapart_jaccard.output,
         beta_bray=rules.patient_level_betapart_bray.output
     output:
-        temporary(touch("data/.done_patientlevelanalysis_{sample}.txt"))
+        touch("tmp/.done_patientlevelanalysis_{sample}.txt")
     shell:
         "echo Done with patient-level analysis."

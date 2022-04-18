@@ -1,7 +1,6 @@
 # The group column name in your mapping file. If multiple were listed, they will used as if they are univariates.
 group: 
      - condition
-     - sex
 
 # The suffix to the color column in your mapping file. Only one entry possible. Every column in your "group" variable below will have to have a corresponding column ending with the suffix you have written here, otherwise, you will get an error if you are trying to create plots with them
 color: 
@@ -10,7 +9,7 @@ color:
 # Beta diversity metrics
 distances:
      - PhILR
-     - bray
+#     - bray
 #     - manhattan
 #     - euclidean
 #     - canberra
@@ -21,14 +20,11 @@ distances:
 #     - altGower
 #     - morisita
 #     - horn
-#     - mountford
 #     - raup
 #     - binomial
 #     - chao
 #     - cao
 #     - mahalanobis
-#     - chisq
-#     - chord
 
 #This list of alpha diversity metrics is shared by both Qiime2 and PhyloToast's implementation.
 alpha: 
@@ -44,11 +40,17 @@ alpha:
 subjectID: 
      - subjectID
 
-threshold: # SparCC: Level to filter the core by represented in a fraction. EG: 0.8 means that only features present in 80% of the group will be kept. Everything else will be collapsed into "Other" category. This will preserve compoationalitt of the data (subcompositional coherence). This is a pre-filtereing step for SparCC
+width: 
+     - 16
+
+height: 
+     - 8
+
+threshold: # SparCC: Level to filter the core by represented in a fraction. EG: 0.8 means that only features present in 80% of the group will be kept. Everything else will be collapsed into "Other" category. This will preserve compoationality of the data (subcompositional coherence). This is a pre-filtereing step for SparCC
      - 0.5
      
 sparcc_corr: # SparCC: Level of correlation strength to filter
-     - 0.5
+     - 0.1
      
 sparcc_pvalue: # SparCC: P-values for sparcc
      - 0.05

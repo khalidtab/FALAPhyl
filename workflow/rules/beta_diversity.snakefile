@@ -1,9 +1,14 @@
+def get_mem_mb(wildcards, attempt):
+    return attempt * 1000
+
 rule beta_div: # Calculate distances between samples based on the chosen beta diversity choices in the input file
    version: "2.0"
    conda:
       "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
    input:
       "data/tsv/{sample}.tsv"
+   resources:
+      mem_mb=get_mem_mb
    params: 
       dist=expand("{dist}",dist=config["distances"])
    output:
@@ -23,18 +28,21 @@ rule nmds: # Plots the beta diversity distances using the Non-Metric Dimensional
    input:
       rules.beta_div.output.tsv
    output: 
-      report(expand("data/plots/NMDS_{{sample}}+{dist}+{group}.svg",dist=config["distances"],group=config["group"]))
+      report(expand("data/plots/betaDiv_{{sample}}/NMDS+{dist}+{group}.svg",dist=config["distances"],group=config["group"]))
    params:
       dist=expand("{dist}",dist=config["distances"]),
       group=expand("{group}",group=config["group"]),
-      color=config["color"][0]
+      color=config["color"][0],
+      width=config["width"][0],
+      height=config["height"][0]
    log:
       expand("data/logs/NMDS_{{sample}}+{dist}+{group}.log", dist=config["distances"],group=config["group"])
    message: "Generating NMDS plots for {wildcards.sample}"
    shell:
+      "mkdir -p data/plots/betaDiv_{wildcards.sample}/ &&"
       "echo 'for x in {params.dist}; do for w in {params.group}; do "
       "y=$(printf \"%s{params.color}\" $w) && "
-      "Rscript --vanilla ./workflow/scripts/NMDS.R -i data/distance/beta_div/{wildcards.sample}+$x.tsv -o data/plots/NMDS_{wildcards.sample}+$x+$w.svg -m data/map/{wildcards.sample}.txt -g $w -c $y > data/logs/NMDS_{wildcards.sample}+$x+$w.log 2>>/dev/null; done; done' > tmp/SVG_NMDS_{wildcards.sample}.sh &&"
+      "Rscript --vanilla ./workflow/scripts/NMDS.R -i data/distance/beta_div/{wildcards.sample}+$x.tsv -o data/plots/betaDiv_{wildcards.sample}/NMDS+$x+$w.svg -m data/map/{wildcards.sample}.txt -g $w -c $y -x {params.width} -y {params.height} > data/logs/NMDS_{wildcards.sample}+$x+$w.log 2>>/dev/null; done; done' > tmp/SVG_NMDS_{wildcards.sample}.sh &&"
       "chmod +x tmp/SVG_NMDS_{wildcards.sample}.sh &&"
       "bash tmp/SVG_NMDS_{wildcards.sample}.sh"
 
@@ -47,15 +55,17 @@ rule pcoa: # Plots the beta diversity distances using the Principal Coordinates 
    params: 
       dist=expand("{dist}",dist=config["distances"]),
       group=expand("{group}",group=config["group"]),
-      color=config["color"][0]
+      color=config["color"][0],
+      width=config["width"][0],
+      height=config["height"][0]
    output:
-      report(expand("data/plots/PCoA_{{sample}}+{dist}+{group}.svg",dist=config["distances"],group=config["group"]))
+      report(expand("data/plots/betaDiv_{{sample}}/PCoA+{dist}+{group}.svg",dist=config["distances"],group=config["group"]))
    message: "Generating PCoA plots for {wildcards.sample}"
    shell: 
-      "mkdir -p data/plots &&"
+      "mkdir -p data/plots/betaDiv_{wildcards.sample}/ &&"
       "echo 'for x in {params.dist}; do for y in {params.group}; do "
       "z=$(printf \"%s{params.color}\" $y) && " 
-      "Rscript --vanilla ./workflow/scripts/PCoA.R -i data/distance/PCoA/PCoA_{wildcards.sample}+$x.tsv -m data/map/{wildcards.sample}.txt -g $y -c $z -o data/plots/PCoA_{wildcards.sample}+$x+$y.svg ; done ; done'"
+      "Rscript --vanilla ./workflow/scripts/PCoA.R -i data/distance/beta_div/{wildcards.sample}+$x.tsv -m data/map/{wildcards.sample}.txt -g $y -c $z -o data/plots/betaDiv_{wildcards.sample}/PCoA+$x+$y.svg -x {params.width} -y {params.height} ; done ; done'"
       "> tmp/SVG_PCoA_{wildcards.sample}.sh &&"
       "chmod +x tmp/SVG_PCoA_{wildcards.sample}.sh &&"
       "bash tmp/SVG_PCoA_{wildcards.sample}.sh "
@@ -68,33 +78,56 @@ rule adonis: # Calculates whether the two groups have similar dispersions (varia
    input:
       rules.beta_div.output
    output:
-      myresults=expand("data/distance/ADONIS/{{sample}}+{dist}+{group}_adonis.txt", dist=config["distances"], group=config["group"]),
+      myresults=expand("data/distance/ADONIS/{{sample}}/adonis+{dist}+{group}.txt", dist=config["distances"], group=config["group"]),
       mysh="tmp/ADONIS_{sample}.sh",
-      myfolder = directory("data/distance/ADONIS/{sample}")
+      myfolder = directory("data/distance/ADONIS/{sample}/")
+   resources:
+      mem_mb=get_mem_mb
    params: 
       dist=expand("{dist}",dist=config["distances"]),
       group=expand("{group}",group=config["group"]),
-      color=config["color"][0]
+      color=config["color"][0],
+      test="adonis",
+      width=config["width"][0],
+      height=config["height"][0]
    message: "Calculating ADONIS for {wildcards.sample}"
    shell:
-      "mkdir -p {output.myfolder} &&"
+      "mkdir -p {output.myfolder} data/plots/betaDiv_{wildcards.sample}/ &&"
       "echo 'for x in {params.dist}; do for y in {params.group}; do"
-      "Rscript --vanilla ./workflow/scripts/adonis_anosim_betadisper.R -i data/distance/beta_div/{wildcards.sample}+$x.tsv -o {output.myfolder}{wildcards.sample}+$x+$y -m data/map/{wildcards.sample}.txt -p data/plots/{wildcards.sample}+$x+$y -g $y -c {wildcards.color} -t adonis "
+      " Rscript --vanilla ./workflow/scripts/adonis_anosim_betadisper.R -i data/distance/beta_div/{wildcards.sample}+$x.tsv -o {output.myfolder}/{params.test}+$x+$y -m data/map/{wildcards.sample}.txt -p data/plots/{wildcards.sample}/$x+$y -g $y -c {params.color} -t {params.test} -x {params.width} -y {params.height} "
       "; done ; done' > {output.mysh} &&"
-      "chmod +x tmp/ADONIS_{output.mysh}.sh &&"
-      "bash tmp/ADONIS_{output.mysh}.sh"
+      "chmod +x {output.mysh} &&"
+      "bash {output.mysh}"
 
 use rule adonis as anosim with:
    output:
-      myresults=expand("data/distance/ANOSIM/{{sample}}+{dist}+{group}_anosim.txt", dist=config["distances"], group=config["group"]),
+      myresults=expand("data/distance/ANOSIM/{{sample}}/anosim+{dist}+{group}.txt", dist=config["distances"], group=config["group"]),
       mysh="tmp/ANOSIM_{sample}.sh",
-      myfolder = directory("data/distance/ANOSIM/{sample}")
+      myfolder = directory("data/distance/ANOSIM/{sample}/")
+   resources:
+      mem_mb=get_mem_mb
+   params: 
+      dist=expand("{dist}",dist=config["distances"]),
+      group=expand("{group}",group=config["group"]),
+      color=config["color"][0],
+      test="anosim",
+      width=config["width"][0],
+      height=config["height"][0]
    message: "Calculating ANOSIM for {wildcards.sample}"
 
 
 use rule adonis as permdisp with: # Calculates whether the two groups have similar dispersions (variances) to their centroid
    output:
-      myresults=expand("data/distance/PERMDISP/{{sample}}+{dist}+{group}_adonis.txt", dist=config["distances"], group=config["group"]),
+      myresults=expand("data/distance/PERMDISP/{{sample}}/betadisper+{dist}+{group}.txt", dist=config["distances"], group=config["group"]),
       mysh="tmp/PERMDISP_{sample}.sh",
-      myfolder = directory("data/distance/PERMDISP/{sample}")
-   message: "Calculating PERMDISP for {wildcards.sample}"
+      myfolder = directory("data/distance/PERMDISP/{sample}/")
+   resources:
+      mem_mb=get_mem_mb
+   params: 
+      dist=expand("{dist}",dist=config["distances"]),
+      group=expand("{group}",group=config["group"]),
+      color=config["color"][0],
+      test="betadisper",
+      width=config["width"][0],
+      height=config["height"][0]
+   message: "Calculating beta dispersion for {wildcards.sample}"

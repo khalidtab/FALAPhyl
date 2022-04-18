@@ -27,10 +27,8 @@ dissimilarity = opt$dissimilarity
 output = opt$output 
 
 # Format the input file
-mytsv = read.table(tsvfile,sep="\t",row.names = 1)
-colnames(mytsv) = mytsv[1,] 
-mytsv = mytsv[-1,] 
-
+mytsv = read.table(tsvfile,sep="\t",skip=1,comment.char = "@",header = TRUE,row.names = 1)
+mytsv = mytsv %>% mutate_if(is.character,as.numeric)
 
 
 if (dissimilarity == "PhILR"){
