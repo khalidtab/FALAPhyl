@@ -59,16 +59,6 @@ rule ggrepel:
    shell:
       "touch {output}"
 
-rule philr:
-   conda:
-      "./workflow/envs/philr.yaml"
-   message: "Creating philr"
-   input:
-      "{sample}"
-   output:
-      temporary(touch("{sample}philr"))
-   shell:
-      "touch {output}"
 
 rule phyloseq:
    conda:
@@ -89,8 +79,7 @@ rule results:
       rules.fastspar.output,
       rules.ggpubr.output,
       rules.ggrepel.output,
-      rules.philr.output,
-      rules.phyloseq.output
+      rules.philr.output
    message: "Cleaning up…"
    output:
       "{sample}.final"
