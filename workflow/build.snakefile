@@ -79,7 +79,7 @@ rule results:
       rules.fastspar.output,
       rules.ggpubr.output,
       rules.ggrepel.output,
-      rules.philr.output
+      rules.phyloseq.output
    message: "Cleaning up…"
    output:
       "{sample}.final"
