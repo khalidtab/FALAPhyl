@@ -11,6 +11,8 @@ option_list = list(
   make_option(c("-c", "--color"), type="character", default=NULL, help="the suffix that is used for colors of the column", metavar="Color column suffix"),
   make_option(c("-b", "--basename"), type="character", default=NULL, help="Basename of the biom file", metavar="Basename of the biom file"),
   make_option(c("-d", "--distance"), type="character", default=NULL, help="Type of distance matrix. Either the string 'bray' or 'jaccard'.", metavar="Distance matrix"),
+  make_option(c("-x", "--width"), type="character", default=NULL, help="Width for the graph", metavar="Graph width"),
+  make_option(c("-y", "--height"), type="character", default=NULL, help="Height for the graph", metavar="Graph height"),
   make_option(c("-o", "--output"), type="character", default=NULL, help="output folder to save the files", metavar="Output folder")
 );
 
@@ -24,7 +26,7 @@ if (is.null(opt$input)){
 distance = opt$distance
 
 myFolder = opt$input 
-myFiles = list.files(path = myFolder, pattern = paste0("^betapart_permutations_",distance,"_"))
+myFiles = list.files(path = myFolder)
 
 output = opt$output
 color = opt$color 
@@ -34,56 +36,52 @@ mapping = opt$mapping
 mapping = suppressMessages(read.delim(mapping))
 myGroups = c()
 
+myheight = as.numeric(opt$height)
+mywidth = as.numeric(opt$width)
+
 basename = opt$basename
 
 
 for(myfile in myFiles){
-  s1 = unlist(strsplit(myfile, split=paste0('betapart_permutations_',distance,"_"), fixed=TRUE))[2]
-  myGroups = c(myGroups, unlist(strsplit(s1, split='+', fixed=TRUE))[1])  
+  s1 = unlist(strsplit(myfile, split=paste0("+"), fixed=TRUE))[2]
+  myGroups = c(myGroups, unlist(strsplit(s1, split='–permutations.txt', fixed=TRUE))[1])
 }
 
 myGroups = unique(myGroups)
 
-#Functions
-getCurrentFileTable = function(currentFile){
-  
-  currentCategory = unlist(strsplit(currentFile, split='betapart_permutations_', fixed=TRUE))[2]
-  currentCategory = unlist(strsplit(currentCategory, split='+', fixed=TRUE))[2]
-  currentCategory = unlist(strsplit(currentCategory, split='.tsv', fixed=TRUE))[1]
-  
-  currentFileTable = suppressMessages(readr::read_tsv(paste0(myFolder,currentFile))) %>% as.data.frame(.)
-  colnames(currentFileTable) = c("Balanced","Gradient","BrayCurtis")
-  
-  currentColor = which(filteredMapping[,1] == currentCategory) %>% filteredMapping[.,2] %>% as.character(.)
-  currentCategory = rep(currentCategory, times = dim(currentFileTable)[1])
-  
-  longTable = tidyr::pivot_longer(cbind(currentCategory,currentFileTable),
-                                  cols= -currentCategory)
-  currentColor = rep(currentColor, times = dim(longTable)[1])
-  longTableColor = cbind(longTable,currentColor)
-  
-  
-  
-  
-  return(longTableColor)
-}
-#########
+condition = unlist(strsplit(myFiles[1], split=paste0("+"), fixed=TRUE))[1]
 
+concatLongTable = NULL
 
 # Let's now filter the files based on the groups
 for (thisGroup in myGroups) {
 
-  mappingCategory = select(mapping, paste(thisGroup))
-  mappingColor    = select(mapping, paste0(thisGroup,color))
+  mappingCategory = select(mapping, paste(condition))
+  mappingColor    = select(mapping, paste0(condition,color))
   filteredMapping = cbind(mappingCategory,mappingColor) %>% unique(.)
   
   currentFiles = list.files(path = myFolder, pattern = thisGroup)
-  concatLongTable = NULL
  
- for (currentFile in currentFiles) {
-   currentLongTable = getCurrentFileTable(currentFile)
-   colnames(currentLongTable) = c("Category","Type","Value","Color")
-     concatLongTable = rbind(concatLongTable,currentLongTable)
+   currentFileTable = suppressMessages(readr::read_tsv(paste0(myFolder,condition,"+",thisGroup,"–permutations.txt"))) %>% as.data.frame(.)
+   
+   currentColor = which(filteredMapping[,1] == thisGroup) %>% filteredMapping[.,2] %>% as.character(.)
+   currentCategory = rep(thisGroup, times = dim(currentFileTable)[1])
+   
+   if (distance == "bray"){
+     colnames(currentFileTable) = c("Balanced","Gradient","BrayCurtis")
+   }else{
+     colnames(currentFileTable) = c("Turnover","Nestedness","Jaccard")
+    }
+   
+   
+   longTable = tidyr::pivot_longer(cbind(currentCategory,currentFileTable),
+                                   cols= -currentCategory)
+   currentColor = rep(currentColor, times = dim(longTable)[1])
+   longTable = cbind(longTable,currentColor)
+   
+   
+   colnames(longTable) = c("Category","Type","Value","Color")
+     concatLongTable = rbind(concatLongTable,longTable)
  }
   
 
@@ -95,9 +93,7 @@ myPlot =  ggplot2::ggplot(concatLongTable,aes(x=Value,color=Category, linetype=T
      scale_linetype_manual(values=c("twodash","solid", "dotted"))
 
 
-ggsave(filename=paste0(output,"betapart_",basename,"+",thisGroup,".svg"),plot=myPlot)
-   
-   }
+ggsave(filename=paste0(output),plot=myPlot,width=mywidth,height=myheight,device="svg")
  
 
  

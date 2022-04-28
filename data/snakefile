@@ -1,9 +1,8 @@
 configfile: "data/input.yaml"
 include: "workflow/rules/alpha_diversity.snakefile"
 include: "workflow/rules/beta_diversity.snakefile"
-include: "workflow/rules/bray_betapart.snakefile"
+include: "workflow/rules/betapart.snakefile"
 include: "workflow/rules/fastspar.snakefile"
-include: "workflow/rules/jaccard_betapart.snakefile"
 include: "workflow/rules/make_tsv.snakefile"
 include: "workflow/rules/patient_level_analysis.snakefile"
 
@@ -22,9 +21,7 @@ rule results:
       rules.permdisp.output,
       rules.adonis.output,
       rules.alpha_div.output,
-      rules.bray_betapart.output,
-      rules.jaccard_betapart.output,
-      rules.patient_level_analysis.output
+      rules.betapart.output
    message: "Cleaning up…"
    output:
       "{sample}.final"

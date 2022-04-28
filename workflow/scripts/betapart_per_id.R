@@ -10,7 +10,10 @@ suppressWarnings(suppressMessages(load_all(path = "workflow/scripts/betapart")))
 
 option_list = list(
   make_option(c("-i", "--input"), type="character", default=NULL, help="tsv file", metavar="Features input file formatted as tsv from a biom file"),
-  make_option(c("-o", "--output"), type="character", default=NULL, help="Output file", metavar="Output file"),
+  make_option(c("-z", "--diffoutput"), type="character", default=NULL, help="Ingroup variation Output file", metavar="Diff Output file"),
+  make_option(c("-o", "--permuoutput"), type="character", default=NULL, help="output folder to save the permutation files", metavar="Output permutation files"),
+  make_option(c("-r", "--reps"), type="character", default=10, help="number of samples per each permutation", metavar="Samples per permutation"),
+  make_option(c("-p", "--perm"), type="character", default=1000, help="number of permutations to run", metavar="Number of permutations"),
   make_option(c("-d", "--distance"), type="character", default=NULL, help="Type of distance matrix. Either the string 'bray' or 'jaccard'.", metavar="Distance matrix")
 );
 
@@ -23,14 +26,27 @@ if (is.null(opt$input)){
 }
 
 biomFile = opt$input
-output = opt$output 
-dist = opt$distance
+output = opt$diffoutput 
+distance = opt$distance
+numOfSamplesPerTrial = opt$reps
+NumOfPermutations = opt$perm
+outputPerm = opt$permuoutput
 
 subsetTable = suppressMessages(read.delim(biomFile, row.names = 1))
 
+
+if (distance == "bray"){
+  phylo.popu = beta.sample.abund(subsetTable, index.family = "bray", sites= as.numeric(numOfSamplesPerTrial), samples=as.numeric(NumOfPermutations))
+  populationTable = phylo.popu$sampled.values
+} else if (distance == "jaccard") {
+  phylo.popu = beta.sample(vegan::decostand(x=subsetTable, method="pa"), index.family = "jaccard", sites= as.numeric(numOfSamplesPerTrial), samples=as.numeric(NumOfPermutations))  
+  populationTable = phylo.popu$sampled.values
+}
+
+
 sink(output)
 
-if (dist == "bray"){
+if (distance == "bray"){
 print(paste("# Per Baselga (2017), Bray-Curtis dissimilarity can be broken down to 'Balanced variation in abundance' and 'Abundance gradients'. Simply put, 'balanced variation in abundance' is analogous to 'Spatial turnover' in incidence terms, that is, replacement by another species. 'abundance gradients' means that one sample is a subset of the other. This is analogous to 'nestness' in incidence terms, that is, removal and no replacement by another species (one sample is a subset of the other). Raw Bray-Curtis is a combination of these two differences. This script will calculate raw Bray-Curtis dissimilarity, as well as the two components of Bray-Curtis."))
 
 brayCalc.core = betapart.core.abund(subsetTable)
@@ -38,7 +54,7 @@ brayCalc.multi = beta.multi.abund(brayCalc.core) # multiple site measures (this 
 print(paste0("Within group values: Bray Curtis: ",brayCalc.multi$beta.BRAY," Balanced: ", brayCalc.multi$beta.BRAY.BAL," Gradients: ", brayCalc.multi$beta.BRAY.GRA))
 print(paste0("This means that Balanced represents:", (brayCalc.multi$beta.BRAY.BAL/brayCalc.multi$beta.BRAY)*100,"% and Gradients represents ", (brayCalc.multi$beta.BRAY.GRA/brayCalc.multi$beta.BRAY)*100, "%"))
 
-} else if (dist == "jaccard"){
+} else if (distance == "jaccard"){
   
   print(paste("# Per Baselga (2012), Jaccard dissimilarity can be broken down to 'Turn-over' (replacement) and 'Nestedness'. Simply put, 'Turn-over' is replacement of one feature by another. 'Nestedness' means that one sample is a subset of the other. Raw Jaccard distances are a combination of these two types of differences. This script will calculate raw Jaccard dissimilarity, as well as the two components of Jaccard."))
   jacCalc.core = betapart.core(vegan::decostand(x=subsetTable, method="pa"))
@@ -48,4 +64,11 @@ print(paste0("This means that Balanced represents:", (brayCalc.multi$beta.BRAY.B
     
 }
 
+print(paste0("Permutation-based mean values for balanced, gradient, and full matrix of ", distance))
+print(paste(phylo.popu$mean.values))
+print(paste("Permutation-based SD values for balanced, gradient, and full matrix of", distance))
+print(paste(phylo.popu$sd.values))
+
 sink()
+
+write.table(populationTable,outputPerm,sep="\t",row.names = FALSE)

@@ -9,4 +9,4 @@ dependencies:
 - r-ggpubr
 - r-svglite
 - r-vegan
-#- xvfbwrapper
+-  r-effectsize

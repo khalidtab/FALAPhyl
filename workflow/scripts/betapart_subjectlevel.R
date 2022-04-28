@@ -136,7 +136,7 @@ for (myConds in comboUniq) {
     myGraph = ggpubr::ggpaired(pd, cond1 = "Turn-over", cond2 = "Nestedness", fill = "condition", palette = "jco", line.size=0.01, title= (paste(dist_type, "breakdown \n Between ",myCond1,"and",myCond2)), subtitle = paste0("n =",numOfParticipants,"\n Wilcoxon signed rank sum test, P-value < ",formatC(pvalue, format = "e", digits = 5)))  
   } 
  
-  ggsave(filename=paste0(output,dist_type,"ptlvl_",myCond1,"_",myCond2,".svg"),plot=myGraph) 
+  ggsave(filename=paste0(output,"/",myCond1,"_",myCond2,".svg"),plot=myGraph) 
   
   }
 

@@ -5,17 +5,11 @@ rule alpha_div_calc: # Provides per sample alpha calculation
    input:
       "data/tsv/{sample}.tsv"
    output:
-      alphadiv=report(expand("data/alpha_div/calc_{{sample}}+{alpha}.txt",alpha=config["alpha"]))
-   params: 
-      alpha=expand("{alpha}",alpha=config["alpha"])
-   message: "Calculating alpha diversity for {wildcards.sample}"
+      alphadiv=report("data/alpha_div/calc_{sample}–{alpha}.txt")
+   message: "Alpha diversity - {wildcards.alpha}: Calculating alpha diversity for {wildcards.sample}"
    shell:
-      "mkdir -p tmp data/alpha_div/ &&"
-      "echo 'for x in {params.alpha}; do "
-      "Rscript --vanilla ./workflow/scripts/alpha_generate.R -i {input} -o data/alpha_div/calc_{wildcards.sample}+$x.txt -a $x"
-      "; done' > tmp/alpha_div_{wildcards.sample}.sh && "
-      "chmod +x tmp/alpha_div_{wildcards.sample}.sh && "
-      "bash tmp/alpha_div_{wildcards.sample}.sh"
+      "Rscript --vanilla ./workflow/scripts/alpha_generate.R -i {input} -o {output.alphadiv} -a {wildcards.alpha} "
+
 
 rule alpha_div_plot: # Calculates alpha diversity in each group, and outputs a PDF plot, and calculates the alpha diversity statistical analysis using nonparametric methods
    version: "1.0"
@@ -23,25 +17,17 @@ rule alpha_div_plot: # Calculates alpha diversity in each group, and outputs a P
       "../../workflow/envs/ggpubr.yaml"
    input:
       map="data/map/{sample}.txt",
-      alphadiv=rules.alpha_div_calc.output
+      alphadiv="data/alpha_div/calc_{sample}–{alpha}.txt"
    output:
-      svg=report(expand("data/plots/alpha_div_{{sample}}/{group}+{alpha}.svg",alpha=config["alpha"],group=config["group"]))
+      svg=report("data/plots/alpha_div_{sample}/{group}–{alpha}.svg")
    params: 
-      alpha=expand("{alpha}",alpha=config["alpha"]),
-      group=expand("{group}",group=config["group"]),
       color=config["color"][0],
       width=config["width"][0],
       height=config["height"][0]
-   message: "Plotting alpha diversity on {wildcards.sample}"
+   message: "Alpha diversity - {wildcards.alpha}: Plotting variable {wildcards.group} for {wildcards.sample}"
    shell:
       "mkdir -p tmp data/plots/alpha_div_{wildcards.sample} &&"
-      "echo 'for x in {params.alpha}; do for y in {params.group}; do "
-      " w=$(printf \"%s{params.color}\" $y) && "
-      "Rscript --vanilla ./workflow/scripts/alpha_plot.R -i data/alpha_div/calc_{wildcards.sample}+$x.txt -m {input.map} -c $w -g $y -o data/plots/alpha_div_{wildcards.sample}/$y+$x.svg -x {params.width} -y {params.height} "
-      "; done ; done' > tmp/alpha_div_plot_{wildcards.sample}.sh && "
-      "chmod +x tmp/alpha_div_plot_{wildcards.sample}.sh && "
-      "bash tmp/alpha_div_plot_{wildcards.sample}.sh"
-
+      "Rscript --vanilla ./workflow/scripts/alpha_plot.R -i {input.alphadiv} -m {input.map} -c {wildcards.group}{params.color} -g {wildcards.group} -o {output.svg} -x {params.width} -y {params.height} "
 
 
 rule alpha_div_stats: # Provides per sample alpha calculation
@@ -49,32 +35,27 @@ rule alpha_div_stats: # Provides per sample alpha calculation
    conda:
       "../../workflow/envs/ggrepel.yaml"
    input:
-      rules.alpha_div_calc.output
+      "data/alpha_div/calc_{sample}–{alpha}.txt"
    output:
-      alphadiv=report(expand("data/alpha_div/stats_{{sample}}+{group}+{alpha}.txt",alpha=config["alpha"],group=config["group"]))
-   params: 
-      alpha=expand("{alpha}",alpha=config["alpha"]),
-      group=expand("{group}",group=config["group"])
-   message: "Performing non-parametric testing on alpha diversity of {wildcards.sample}"
+      alphadiv=report("data/alpha_div/stats_{sample}–{group}–{alpha}.txt")
+   message: "Alpha diversity - {wildcards.alpha}: Performing non-parametric testing on  {wildcards.sample}'s variable {wildcards.group}"
    shell:
-      "echo 'for x in {params.alpha}; do for y in {params.group}; do mkdir -p data/alpha_div/ && "
-      "Rscript --vanilla ./workflow/scripts/alpha_div_nonparam.R -i data/alpha_div/calc_{wildcards.sample}+$x.txt -o data/alpha_div/stats_{wildcards.sample}+$y+$x.txt -m data/map/{wildcards.sample}.txt -g $y 2>> /dev/null"
-      "; done; done' > tmp/stats_alpha_div_{wildcards.sample}.sh && "
-      "chmod +x tmp/stats_alpha_div_{wildcards.sample}.sh && "
-      "bash tmp/stats_alpha_div_{wildcards.sample}.sh"
-
-
-
+      "Rscript --vanilla ./workflow/scripts/alpha_div_nonparam.R -i data/alpha_div/calc_{wildcards.sample}–{wildcards.alpha}.txt -o {output.alphadiv} -m data/map/{wildcards.sample}.txt -g {wildcards.group} 2>> /dev/null"
 
 
 rule alpha_div: # Final step in alpha diversity calculations, to clean up temporary files
    version: "1.0"
    input:
-      svg=rules.alpha_div_plot.output.svg,
-      stats=rules.alpha_div_stats.output.alphadiv
+      svg="data/plots/alpha_div_{sample}/{group}–{alpha}.svg",
+      stats="data/alpha_div/stats_{sample}–{group}–{alpha}.txt"
    output:
-      temporary(touch("tmp/{sample}_alpha_div_all_done.tmp"))
-   message: "Cleaning up from alpha diversity"
+      touch("tmp/expand–{sample}–{alpha}–{group}.txt")
+   message: "Alpha diversity: Cleaning up…"
    shell:
       "find data/plots/alpha_* -empty -type d -delete &&"
       "find data/alpha_div/ -empty -type d -delete "
+
+
+rule alpha:
+  input:
+   expand("tmp/expand–{sample}–{alpha}–{group}.txt", sample=config["mysample"], alpha=config["alpha"], group=config["group"])

@@ -5,7 +5,6 @@ set.seed(1234)
 suppressWarnings(suppressMessages(library(dplyr)))
 suppressWarnings(suppressMessages(require(tidyverse)))
 suppressWarnings(suppressMessages(library(optparse)))
-suppressWarnings(suppressMessages(library(ggpubr)))
 
 
 option_list = list(
@@ -110,17 +109,13 @@ for (myCond1 in uniqueCond1) {
   
   if (dist_type == "bray"){
   colnames(pd) = c("balanced variation in abundance","abundance gradients")
-  myGraph = ggpubr::ggpaired(pd, cond1 = "balanced variation in abundance", cond2 = "abundance gradients", fill = "condition", palette = "jco", line.size=0.01, title= (paste(dist_type, "breakdown \n Between ",myCond1,"and",myCond2, "\n Pvalue <",formatC(pvalue, format = "e", digits = 2))))
   } else {
     colnames(pd) = c("Turn-over","Nestedness")
-    myGraph = ggpubr::ggpaired(pd, cond1 = "Turn-over", cond2 = "Nestedness", fill = "condition", palette = "jco", line.size=0.01, title= (paste(dist_type, "Breakdown \n Between ",myCond1,"and",myCond2, "\n Pvalue <",formatC(pvalue, format = "e", digits = 2))))  
-  } 
-  
-  
-  ggsave(filename=paste0(output,"/",myCond1,"_",myCond2,".svg"),plot=myGraph)
   }
-
   
+  write.table(pd,file=paste0(output,"/",myCond1,"–",myCond2,".tsv"),quote=FALSE,sep="\t",col.names = TRUE,row.names = FALSE)
+  
+  }
     }
 
 
