@@ -1,0 +1,27 @@
+name: betapart
+channels:
+    - bioconda
+    - conda-forge
+    - r_test
+    - r
+    - skyblued
+dependencies:
+    - bioconductor-phyloseq = 1.30.0
+    - r-optparse
+    - r-tidyverse 
+    - r-vegan
+    - r-dplyr = 1.0.4
+    - r-ape = 5.4
+    - r-rcdd
+    - r-snow
+    - r-foreach
+    - r-itertools
+    - r-geometry
+    - r-fastmatch
+    - r-picante
+    - r-doSNOW
+    - r-devtools
+    - bioconductor-philr = 1.12.0
+    - r-igraph = 1.2.5
+    - r-reshape2 = 1.4.4
+    - mscorefonts

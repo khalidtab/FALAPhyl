@@ -51,7 +51,7 @@ height:
      - 8
 
 threshold: # SparCC: Level to filter the core by represented in a fraction. EG: 0.8 means that only features present in 80% of the group will be kept. Everything else will be collapsed into "Other" category. This will preserve compoationality of the data (subcompositional coherence). This is a pre-filtereing step for SparCC
-     - 0.5
+     - 0.3
      
 sparcc_corr: # SparCC: Level of correlation strength to filter
      - 0.1
@@ -60,7 +60,7 @@ sparcc_pvalue: # SparCC: P-values for sparcc
      - 0.05
 
 sparcc_bootstrap: # SparCC: Number of bootstrapping iterations to perform
-     - 100
+     - 1000
 
 betapart_samples: # How many samples to use per permutation?
      - 10

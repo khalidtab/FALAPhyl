@@ -9,7 +9,6 @@ option_list = list(
   make_option(c("-p", "--pvalue"), type="character", default=NULL, help="p-value matrix", metavar="pvalue file"),
   make_option(c("-n", "--nodes"), type="character", default=NULL, help="Name of the output nodes table", metavar="output nodes table file name"),
   make_option(c("-e", "--edges"), type="character", default=NULL, help="Name of the output edges table", metavar="output edges table file name"),
-  make_option(c("-z", "--zipi"), type="character", default=NULL, help="Name of the ZiPi plot file name in SVG format.", metavar="output ZiPi plot file name"),
   make_option(c("-a", "--threshold"), type="character", default=NULL, help="Correlation cut off threshold below which correlations will be discarded", metavar="Correlation threshold"),  
   make_option(c("-b", "--pvaluethreshold"), type="character", default=NULL, help="P-value cut off threshold below which pvalues will be discarded", metavar="P-value threshold")
 );
@@ -31,7 +30,6 @@ pvaluethreshold = as.numeric(pvaluethreshold)
 
 nodesOutput = opt$nodes
 edgesOutput = opt$edges
-zipiOutput = opt$zipi 
 
 # Unpack/Melt the correlation matrix table
 myInput = suppressMessages(read_tsv(input))
@@ -73,6 +71,7 @@ row.names(myTable) = NULL # At this point, you have a pairwise table that was fi
 
 tableForModularity = myTable
 tableForModularity = subset(tableForModularity, tableForModularity$weight != 0) # Subset to only correlations that fit the criteria
+tableForModularity = subset(tableForModularity, tableForModularity$Source != "Others") # Remove others so it doesn't mess up the Louvain algorithm
 
 myigraph = graph.data.frame(tableForModularity, directed = FALSE)
 myModularity = cluster_louvain(myigraph) #Same method as Gephi

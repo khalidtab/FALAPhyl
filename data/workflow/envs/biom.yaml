@@ -1,0 +1,5 @@
+name: biom
+channels:
+    - conda-forge
+dependencies:
+    - biom-format = 2.1.8

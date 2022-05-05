@@ -4,3 +4,4 @@ channels:
     - anaconda
 dependencies:
     - fastspar
+    - parallel 

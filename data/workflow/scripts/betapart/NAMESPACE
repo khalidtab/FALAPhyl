@@ -1,0 +1,19 @@
+## Export all names
+exportPattern(".")
+
+## Import required packages
+import(stats)
+import(graphics)
+import(doSNOW)
+import(snow)
+import(foreach)
+import(geometry)
+importFrom("utils", "combn", "setTxtProgressBar", "txtProgressBar", "write.table")
+importFrom(rcdd, d2q, q2d, redundant, scdd)
+importFrom(ape, drop.tip, is.rooted, read.tree)
+importFrom(picante, node.age)
+importFrom(fastmatch, fmatch)
+importFrom(itertools, isplitIndices, isplitCols)
+
+## S3 methods
+S3method(plot, decay)

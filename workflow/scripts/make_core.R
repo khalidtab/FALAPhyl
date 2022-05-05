@@ -61,6 +61,6 @@ myCurrentOTU_amalgamated = cbind(ID,myCurrentOTU_amalgamated)
 colnames(myCurrentOTU_amalgamated)[colnames(myCurrentOTU_amalgamated) == "ID"] <- "#OTU ID" #Change name of column before saving the file to the standard in biom files
 myCurrentOTU_amalgamated[is.na(myCurrentOTU_amalgamated)] = 0
 
-myOutput = paste0(output,"_core+",currentCat,".tsv")
+myOutput = paste0(output,currentCat,".tsv")
 write_tsv(myCurrentOTU_amalgamated,myOutput,col_names = TRUE)
 }
