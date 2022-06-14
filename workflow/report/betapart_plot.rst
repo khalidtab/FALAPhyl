@@ -1,1 +1,0 @@
-Betapart of {{ snakemake.wildcards.distance }} beta diversity using the different categories within the {{ snakemake.wildcards.group }}.

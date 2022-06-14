@@ -1,1 +1,0 @@
-{{ snakemake.wildcards.alpha }} alpha-diversity calculations using the different categories within the {{ snakemake.wildcards.group }} variable. pairwise, FDR-adjusted pvalues are included if the {{ snakemake.wildcards.group }} variable has more than 2 categories.

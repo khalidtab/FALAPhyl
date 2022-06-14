@@ -1,1 +1,0 @@
-Principal Coordinates Analysis (PCoA). Grouping was done based on the [{{ snakemake.wildcards.group }}] variable. 

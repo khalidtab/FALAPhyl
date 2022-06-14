@@ -1,1 +1,0 @@
-{{ snakemake.wildcards.alpha }} alpha-diversity. The file contains the raw alpha scores of all samples.
