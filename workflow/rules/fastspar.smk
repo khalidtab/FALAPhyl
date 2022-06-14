@@ -7,7 +7,7 @@ checkpoint makeCore: # SparCC works better when the feature table has less zeros
       "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
    input:
       biom="data/biom/{sample}_temp.biom",
-      map="data/map/{sample}.txt"
+      map="data/{sample}.txt"
    params:
       threshold=config["threshold"][0]
    output:
@@ -83,8 +83,24 @@ rule nodes_and_edges: #This script returns nodes and edges that pass the desired
       pvalues=rules.pvalues.output,
       corr=rules.fastspar.output
    output:
-      nodes="data/network/{sample}–{group}/nodes–{groupcategory}.tsv",
-      edges="data/network/{sample}–{group}/edges–{groupcategory}.tsv"
+      nodes=report("data/network/{sample}–{group}/nodes–{groupcategory}.tsv",
+      caption="../report/network_nodes_edges.rst",
+      category="SparCC",
+      subcategory="Nodes and edges",
+      labels={
+         "File type": "Nodes - Text file",
+         "Pairwise comparison": "{groupcategory}",
+         "Grouping category": "{group}"
+              }),
+      edges=report("data/network/{sample}–{group}/edges–{groupcategory}.tsv",
+      caption="../report/network_nodes_edges.rst",
+      category="SparCC",
+      subcategory="Nodes and edges",
+      labels={
+         "File type": "Edges - Text file",
+         "Pairwise comparison": "{groupcategory}",
+         "Grouping category": "{group}"
+              })
    params:
       pvalue=config["sparcc_pvalue"][0],
       threshold=config["sparcc_corr"][0]
@@ -99,7 +115,15 @@ rule zipi: # This script plots the Zi-Pi plots from the nodes_and_edges output
    input:
       rules.nodes_and_edges.output.nodes
    output:
-      "data/plots/network/ZiPi_{sample}–{group}/ZiPi-{groupcategory}.svg"
+      report("data/plots/network/ZiPi_{sample}–{group}/ZiPi-{groupcategory}.svg",
+      caption="../report/network_zipi.rst",
+      category="SparCC",
+      subcategory="ZiPi plots",
+      labels={
+         "File type": "ZiPi plot",
+         "Comparison": "{groupcategory}",
+         "Grouping category": "{group}"
+              })
    params:
       pvalue=config["sparcc_pvalue"][0],
       corr=config["sparcc_corr"][0],

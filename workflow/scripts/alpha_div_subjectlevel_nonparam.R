@@ -73,6 +73,6 @@ for (x in 1:numOfComparisons){
   numOfPatients = length(tablesMerged[,1])
   
   myGraph = ggpubr::ggpaired(tablesMerged, cond1 = category1, cond2 = category2, fill = "condition", palette = "jco", line.size=0.01, title= (paste("Patient-level comparison of",alphaDivType,"between",category1,"&",category2)), subtitle = paste("n =",numOfPatients,"Wilcoxon signed rank sum test, P-value <",formatC(pvalue, format = "e", digits = 5)))
-  ggsave(filename=paste0(output,"/alpha_div_patientLevel_",alphaDivType,"_",category1,"_",category2,".svg"),plot=myGraph)
+  ggsave(filename=paste0(output,"/",category1,"_",category2,".svg"),plot=myGraph)
 }
 

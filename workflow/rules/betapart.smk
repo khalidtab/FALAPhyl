@@ -7,13 +7,26 @@ rule betapart_matrix: # Create betapart matrices for all samples
    input:
       "data/tsv/{sample}.tsv"
    output:
-      repl="data/distance/beta_div/Repl–{sample}–{distance}.tsv",
-      norepl="data/distance/beta_div/NoRepl–{sample}–{distance}.tsv",
+      repl=report("data/distance/beta_div/Repl–{sample}–{distance}.tsv",
+      caption="../report/beta_matrix.rst",
+      category="Beta diversity",
+      subcategory="{distance}",
+      labels={
+         "Data type": "Distance Matrix - Replacement",
+         "Distance type": "{distance} breakdown"
+              }),
+      norepl=report("data/distance/beta_div/NoRepl–{sample}–{distance}.tsv",
+      caption="../report/beta_matrix.rst",
+      category="Beta diversity",
+      subcategory="{distance}",
+      labels={
+         "Data type": "Distance Matrix - No replacement",
+         "Distance type": "{distance} breakdown"
+              }),
       bray=temporary("data/distance/beta_div/{distance}_2–{sample}.tsv")
    message: "Creating the matrices for the {wildcards.distance} breakdown for {wildcards.sample}"
    shell:
       "Rscript --vanilla workflow/scripts/betapart_matrix.R -i {input} -r {output.repl} -n {output.norepl} -f {output.bray} -d {wildcards.distance}"
-      
 
 ## 1. Pairwise analysis
 
@@ -31,7 +44,7 @@ checkpoint betapart_pairwise_write: # Create pairwise distance breakdown between
    message: "Filtering {wildcards.distance} breakdown of pairwise distances for {wildcards.sample} {wildcards.group}"
    shell:
       "mkdir -p data/plots/betapart_pairwise/{wildcards.sample}–{wildcards.distance}–{wildcards.group}/ && "
-      " Rscript --vanilla workflow/scripts/betapart_pairwise_write.R -i {input.bray} -r {input.repl} -n {input.norepl} -m data/map/{wildcards.sample}.txt -d {wildcards.distance} -c {wildcards.group} -o {output} "
+      " Rscript --vanilla workflow/scripts/betapart_pairwise_write.R -i {input.bray} -r {input.repl} -n {input.norepl} -m data/{wildcards.sample}.txt -d {wildcards.distance} -c {wildcards.group} -o {output} "
 
 rule betapart_pairwise_draw:
    conda:
@@ -41,12 +54,15 @@ rule betapart_pairwise_draw:
    input:
       "data/plots/betapart_pairwise/{sample}–{distance}–{group}/{i}.tsv"
    output:
-      "data/plots/betapart_pairwise/{sample}–{distance}–{group}/{i}.svg"
+      report("data/plots/betapart_pairwise/{sample}–{distance}–{group}/{i}.svg",
+      caption="../report/betapart_plot.rst",
+      category="pairwise",
+      subcategory="{distance}")
    log: 
       "data/logs/betapart_pairwise_draw–{sample}–{distance}–{group}–{i}.txt"
    message: "Graphing {wildcards.distance} breakdown between {wildcards.i} for variable {wildcards.group} of {wildcards.sample}"
    shell:
-      " Rscript --vanilla workflow/scripts/betapart_pairwise_draw.R -i {input} -m data/map/{wildcards.sample}.txt -d {wildcards.distance} -c {wildcards.group} -o {output} 2> {log} && "
+      " Rscript --vanilla workflow/scripts/betapart_pairwise_draw.R -i {input} -m data/{wildcards.sample}.txt -d {wildcards.distance} -c {wildcards.group} -o {output} 2> {log} && "
       "rm data/plots/betapart_pairwise/{wildcards.sample}–{wildcards.distance}–{wildcards.group}/{wildcards.i}.tsv "
 
 def pairwise_output(wildcards):
@@ -76,10 +92,18 @@ rule repl_anosim_betapart:
    log: 
       "data/logs/ANOSIM–Repl–{sample}–{distance}–{group}.txt"
    output:
-      "data/distance/ANOSIM/anosim–Repl–{sample}–{distance}–{group}.txt"
+      report("data/distance/ANOSIM/anosim–Repl–{sample}–{distance}–{group}.txt",
+      caption="../report/beta_anosim.rst",
+      category="Beta diversity",
+      subcategory="{distance}",
+      labels={
+         "Grouping category": "{group}",
+         "Data type": "ANOSIM Replacement - text file",
+         "Distance type": "{distance} breakdown"
+              })
    message: "Calculating ANOSIM for {wildcards.distance} balanced (ie replacement) of {wildcards.sample} {wildcards.group}"
    shell:
-      " Rscript --vanilla ./workflow/scripts/adonis_anosim_betadisper.R -i {input} -o {output} -m data/map/{wildcards.sample}.txt -g {wildcards.group} -t anosim > {log} "
+      " Rscript --vanilla ./workflow/scripts/adonis_anosim_betadisper.R -i {input} -o {output} -m data/{wildcards.sample}.txt -g {wildcards.group} -t anosim > {log} "
 
 
 
@@ -89,7 +113,15 @@ use rule repl_anosim_betapart as norepl_anosim_betapart with:
    log: 
       "data/logs/ANOSIM–NoRepl–{sample}–{distance}–{group}.txt"
    output:
-      "data/distance/ANOSIM/anosim–NoRepl–{sample}–{distance}–{group}.txt"
+      report("data/distance/ANOSIM/anosim–NoRepl–{sample}–{distance}–{group}.txt",
+      caption="../report/beta_anosim.rst",
+      category="Beta diversity",
+      subcategory="{distance}",
+      labels={
+         "Grouping category": "{group}",
+         "Data type": "ANOSIM No replacement - text file",
+         "Distance type": "{distance} breakdown"
+              })
    message: "Calculating ANOSIM for {wildcards.distance} gradient (ie no replacement) of {wildcards.sample} {wildcards.group}"
 
 ## 3. Graphing breakdown based on permutation
@@ -107,7 +139,7 @@ checkpoint group_and_category: # Will export multiple biom files tagged by their
    message: "Creating biom files separated by {wildcards.group} for {wildcards.sample}"
    shell:
       "mkdir -p data/tsv/{wildcards.sample}–{wildcards.group}/tsv/ && "
-      "Rscript --vanilla workflow/scripts/separate_bioms.R -i {input} -o {output} -m data/map/{wildcards.sample}.txt -g {wildcards.group} "
+      "Rscript --vanilla workflow/scripts/separate_bioms.R -i {input} -o {output} -m data/{wildcards.sample}.txt -g {wildcards.group} "
 
 ### 3.A
 rule ingroup_var: # Create betapart mean, standard deviation
@@ -116,8 +148,15 @@ rule ingroup_var: # Create betapart mean, standard deviation
    input:
       "data/tsv/{sample}–{group}/tsv/{id}.tsv"
    output:
-      ingroupdiff="data/betapart/{sample}–{distance}–{group}/ingroupdiff/{id}–ingroupdiff.txt",
-      permu_file= "data/betapart/{sample}–{distance}–{group}/permutations/{id}–permutations.txt"
+      ingroupdiff=report("data/betapart/{sample}–{distance}–{group}/ingroupdiff/{id}–ingroupdiff.txt",
+      category="Beta diversity",
+      subcategory="{distance}",
+            labels={
+         "Data type": "In-group variance calc. – {id}",
+         "Grouping category": "{group}",
+         "Distance type": "{distance} breakdown"
+              }),
+      permu_file="data/betapart/{sample}–{distance}–{group}/permutations/{id}–permutations.txt"
    message: "Calculating mean and standard deviation, and permutation based distribution for {wildcards.distance} within {wildcards.id} {wildcards.group}."
    params:
       per_perm=expand("{per_perm}",per_perm=config["betapart_samples"]),
@@ -125,7 +164,7 @@ rule ingroup_var: # Create betapart mean, standard deviation
    log: 
       "data/logs/ingroupdiff–{sample}–{distance}–{group}–{id}.log"
    shell:
-      " Rscript --vanilla workflow/scripts/betapart_per_id.R -i {input} -z {output.ingroupdiff} -d {wildcards.distance} -r {params.per_perm} -p {params.permutations} > {log} -o {output.permu_file}"
+      " Rscript --vanilla workflow/scripts/betapart_per_id.R -i {input} -z {output.ingroupdiff} -d {wildcards.distance} -r {params.per_perm} -p {params.permutations} -o {output.permu_file} > {log} "
 
 def ids_ingroup_var(wildcards):
     splitbiom_checkpoint_output = checkpoints.group_and_category.get(**wildcards).output[0]    
@@ -147,7 +186,13 @@ rule betapart_plot_permutation: # Plots permutations from betapart_permutations 
    input:
       ids_ingroup_var
    output:
-      "data/plots/Breakdown–{sample}–{distance}–{group}.svg"
+      report("data/plots/Breakdown–{sample}–{distance}–{group}.svg",
+      category="Beta diversity",
+      subcategory="{distance}",
+            labels={
+         "Data type": "Plot of permutation-based dissimilarity breakdown",
+         "Grouping category": "{group}",
+         "Distance type": "{distance} breakdown"})
    params:
       color=expand("{color}",color=config["color"]),
       width=config["width"],
@@ -155,7 +200,7 @@ rule betapart_plot_permutation: # Plots permutations from betapart_permutations 
    message: "Plotting permutations for {wildcards.distance} breakdown of {wildcards.sample} {wildcards.group}"
    log: "data/logs/betapart_permutation_plot_{sample}–{distance}–{group}.log"
    shell:
-      " Rscript --vanilla workflow/scripts/betapart_plot_permutation.R -i data/betapart/{wildcards.sample}–{wildcards.distance}–{wildcards.group}/permutations/ -o {output} -m data/map/{wildcards.sample}.txt -b {wildcards.sample} -c {params.color} -d {wildcards.distance} -x {params.width} -y {params.height} > {log} "
+      " Rscript --vanilla workflow/scripts/betapart_plot_permutation.R -i data/betapart/{wildcards.sample}–{wildcards.distance}–{wildcards.group}/permutations/ -o {output} -m data/{wildcards.sample}.txt -b {wildcards.sample} -c {params.color} -d {wildcards.distance} -x {params.width} -y {params.height} > {log} "
 
 
 ### Finalizing betapart results
@@ -170,12 +215,13 @@ rule betapart:
    output:
       touch("tmp/betapart–{distance}–{sample}–{group}.txt")
 
+rule breakdown:
+   input:
+      expand("tmp/betapart–{distance}–{sample}–{group}.txt",  sample=config["mysample"],group=config["group"],distance=["bray","jaccard"])
 
 rule bray_breakdown:
    input:
       expand("tmp/betapart–{distance}–{sample}–{group}.txt",  sample=config["mysample"],group=config["group"],distance="bray")
-
-
 
 rule jaccard_breakdown:
    input:

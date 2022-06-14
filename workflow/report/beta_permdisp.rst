@@ -1,0 +1,4 @@
+Betadisper (beta dispersion) of the {{ snakemake.wildcards.distance }} dissimilarity matrix. The variable {{ snakemake.wildcards.group }} was used for grouping the samples.
+
+Beta dispersion implements analysis of multivariate homogeneity of group dispersions (variances). betadisper is a multivariate analogue of Levene's test for homogeneity of variances. Non-euclidean distances between objects and group centroids are handled by reducing the original distances to principal coordinates. This procedure has latterly been used as a means of assessing beta diversity.
+If you have more than 2 categories in the variable, TukeyHSD.betadisper creates a set of confidence intervals on the differences between the mean distance-to-centroid of the levels of the grouping factor with the specified family-wise probability of coverage. The intervals are based on the Studentized range statistic, Tukey's 'Honest Significant Difference' method.

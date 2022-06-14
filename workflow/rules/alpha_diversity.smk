@@ -5,7 +5,14 @@ rule alpha_div_calc: # Provides per sample alpha calculation
    input:
       "data/tsv/{sample}.tsv"
    output:
-      alphadiv=report("data/alpha_div/calc_{sample}–{alpha}.txt")
+      alphadiv=report("data/alpha_div/calc_{sample}–{alpha}.txt",
+      caption="../report/alpha_calc.rst",
+      category="Alpha diversity",
+      subcategory="{alpha}",
+      labels={
+              "Data type": "Calculations - text file",
+              "Method": "{alpha}"
+              })
    message: "Alpha diversity - {wildcards.alpha}: Calculating alpha diversity for {wildcards.sample}"
    shell:
       "Rscript --vanilla ./workflow/scripts/alpha_generate.R -i {input} -o {output.alphadiv} -a {wildcards.alpha} "
@@ -16,10 +23,18 @@ rule alpha_div_plot: # Calculates alpha diversity in each group, and outputs a P
    conda:
       "../../workflow/envs/ggpubr.yaml"
    input:
-      map="data/map/{sample}.txt",
+      map="data/{sample}.txt",
       alphadiv="data/alpha_div/calc_{sample}–{alpha}.txt"
    output:
-      svg=report("data/plots/alpha_div_{sample}/{group}–{alpha}.svg")
+      svg=report("data/plots/alpha_div_{sample}/{group}–{alpha}.svg",
+      caption="../report/alpha_plot.rst",
+      category="Alpha diversity",
+      subcategory="{alpha}",
+      labels={
+              "Data type": "Violin plot",
+              "Method": "{alpha}",
+              "Grouping category": "{group}"
+              })
    params: 
       color=config["color"][0],
       width=config["width"][0],
@@ -37,10 +52,18 @@ rule alpha_div_stats: # Provides per sample alpha calculation
    input:
       "data/alpha_div/calc_{sample}–{alpha}.txt"
    output:
-      alphadiv=report("data/alpha_div/stats_{sample}–{group}–{alpha}.txt")
+      alphadiv=report("data/alpha_div/stats_{sample}–{group}–{alpha}.txt",
+      caption="../report/alpha_stats.rst",
+      category="Alpha diversity",
+      subcategory="{alpha}",
+      labels={
+              "Data type": "Nonparametric statistical testing - text file",
+              "Method": "{alpha}",
+              "Grouping category": "{group}"
+              })
    message: "Alpha diversity - {wildcards.alpha}: Performing non-parametric testing on  {wildcards.sample}'s variable {wildcards.group}"
    shell:
-      "Rscript --vanilla ./workflow/scripts/alpha_div_nonparam.R -i data/alpha_div/calc_{wildcards.sample}–{wildcards.alpha}.txt -o {output.alphadiv} -m data/map/{wildcards.sample}.txt -g {wildcards.group} 2>> /dev/null"
+      "Rscript --vanilla ./workflow/scripts/alpha_div_nonparam.R -i data/alpha_div/calc_{wildcards.sample}–{wildcards.alpha}.txt -o {output.alphadiv} -m data/{wildcards.sample}.txt -g {wildcards.group} 2>> /dev/null"
 
 
 rule alpha_div: # Final step in alpha diversity calculations, to clean up temporary files

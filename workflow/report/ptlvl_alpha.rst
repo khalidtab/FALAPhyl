@@ -1,0 +1,1 @@
+{{ snakemake.wildcards.alpha }} alpha-diversity within 2 matched samples (ID: {{ snakemake.params.subjectID }} was used in this case) using the different categories within the {{ snakemake.wildcards.group }} variable using Wilcoxon signed rank sum test 
