@@ -1,0 +1,1 @@
+Non-Metric Multidimensional Scaling (NMDS). Grouping was done based on the [{{ snakemake.wildcards.group }}] variable. 

@@ -10,7 +10,7 @@ option_list = list(
   make_option(c("-n", "--nodes"), type="character", default=NULL, help="Name of the output nodes table", metavar="output nodes table file name"),
   make_option(c("-e", "--edges"), type="character", default=NULL, help="Name of the output edges table", metavar="output edges table file name"),
   make_option(c("-a", "--threshold"), type="character", default=NULL, help="Correlation cut off threshold below which correlations will be discarded", metavar="Correlation threshold"),  
-  make_option(c("-b", "--pvaluethreshold"), type="character", default=NULL, help="P-value cut off threshold below which pvalues will be discarded", metavar="P-value threshold")
+  make_option(c("-b", "--pvaluethreshold"), type="character", default=NULL, help="P-value cut off threshold above which pvalues will be discarded", metavar="P-value threshold")
 );
 
 opt_parser = OptionParser(option_list=option_list);
@@ -70,7 +70,7 @@ myTable$weight[myTable$weight < 0] = 0 # This way, the louvain modularity functi
 row.names(myTable) = NULL # At this point, you have a pairwise table that was filtered to the level specified
 
 tableForModularity = myTable
-tableForModularity = subset(tableForModularity, tableForModularity$weight != 0) # Subset to only correlations that fit the criteria
+tableForModularity = subset(tableForModularity, tableForModularity$weight != 0) # Subset to only correlations that are positive
 tableForModularity = subset(tableForModularity, tableForModularity$Source != "Others") # Remove others so it doesn't mess up the Louvain algorithm
 
 myigraph = graph.data.frame(tableForModularity, directed = FALSE)

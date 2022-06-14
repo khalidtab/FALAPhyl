@@ -1,6 +1,19 @@
 # file names without the extension
 mysample:
      - v35_oral_gs
+#     - LAPd_func_different
+#     - LAPd_functaxa_different
+#     - LAPd_taxa_different
+#     - func_LAPdSame
+#     - func_LAPsDifferent
+#     - func_LAPsSame
+#     - functaxa_LAPdSame
+#     - functaxa_LAPsDifferent
+#     - functaxa_LAPsSame
+#     - taxaLAPdSame
+#     - taxa_LAPsDifferent
+#     - taxa_LAPsSame
+#      - white_spots_primer_averaged_with_code
 
 # The group column name in your mapping file. If multiple were listed, they will used as if they are univariates.
 group: 
@@ -14,12 +27,12 @@ color:
 distances:
      - PhILR
      - bray
+     - jaccard
 #     - manhattan
 #     - euclidean
 #     - canberra
 #     - clark
 #     - kulczynski
-     - jaccard
 #     - gower
 #     - altGower
 #     - morisita
@@ -36,9 +49,9 @@ alpha:
      - Chao1
      - ACE
      - Shannon
-#     - Simpson
+     - Simpson
      - InvSimpson
-#     - Fisher
+     - Fisher
 
 # If you want to look at patient level analysis, such as in case you have repeated measures, there should be a column in the mapping file that has this information.
 subjectID: 
@@ -53,8 +66,8 @@ height:
 threshold: # SparCC: Level to filter the core by represented in a fraction. EG: 0.8 means that only features present in 80% of the group will be kept. Everything else will be collapsed into "Other" category. This will preserve compoationality of the data (subcompositional coherence). This is a pre-filtereing step for SparCC
      - 0.3
      
-sparcc_corr: # SparCC: Level of correlation strength to filter
-     - 0.1
+sparcc_corr: # SparCC: Level of correlation strength to filter 
+     - 0.5
      
 sparcc_pvalue: # SparCC: P-values for sparcc
      - 0.05

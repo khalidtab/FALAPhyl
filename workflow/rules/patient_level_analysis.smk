@@ -7,7 +7,17 @@ rule patient_level_alpha_comparison:
    input:
       rules.alpha_div_calc.output
    output: 
-      plots=directory("data/plots/patientlvl_alphaDiv_{sample}–{group}–{alpha}/")
+      plots=report(directory("data/plots/patientlvl_alphaDiv_{sample}–{group}–{alpha}/"),
+      caption="../report/ptlvl_alpha.rst",
+      category="Patient-level analysis",
+      patterns=["{name}.svg"],
+      subcategory="Alpha – {alpha}",
+      labels={
+              "Data type": "Plot",
+              "Comparison": "{name}",
+              "Method": "{alpha}",
+              "Grouping category": "{group}"
+              })
    params:
       subjectID=expand("subjectID",subjectID=config["subjectID"])
    log:
@@ -15,11 +25,11 @@ rule patient_level_alpha_comparison:
    message: "{wildcards.alpha} Alpha diversity Patient-level calculations for {wildcards.sample}"
    shell:
       " mkdir {output} && "
-      "Rscript --vanilla ./workflow/scripts/alpha_div_subjectlevel_nonparam.R -i {input} -g {wildcards.group} -m data/map/{wildcards.sample}.txt -p {params.subjectID} -o {output} > {log} 2>&1 "
+      "Rscript --vanilla ./workflow/scripts/alpha_div_subjectlevel_nonparam.R -i {input} -g {wildcards.group} -m data/{wildcards.sample}.txt -p {params.subjectID} -o {output} > {log} 2>&1 "
 
       
       
-rule patient_level_betapart: # Plots the PhILR distances using the Non-Metric Dimensional Scaling (NMDS) algorithm, and adds a hull around the samples
+rule patient_level_betapart: 
    version: "1.0"
    conda: "../../workflow/envs/ggpubr.yaml"
    input:
@@ -29,7 +39,18 @@ rule patient_level_betapart: # Plots the PhILR distances using the Non-Metric Di
    resources:
       mem_mb=get_mem_mb
    output: 
-      plots=directory("data/plots/patientlvl_betapart_{sample}–{group}–{distance}/")
+      plots=report(directory("data/plots/patientlvl_betapart_{sample}–{group}–{distance}/"),
+      caption="../report/ptlvl_beta.rst",
+      category="Patient-level analysis",
+      patterns=["{name}.svg"],
+      subcategory="Beta – {distance} breakdown",
+      labels={
+              "Data type": "Plot",
+              "Comparison": "{name}",
+              "Method": "{distance}",
+              "Grouping category": "{group}"
+              }
+)
    params:
       subjectID=expand("subjectID",subjectID=config["subjectID"])
    log:
@@ -37,7 +58,7 @@ rule patient_level_betapart: # Plots the PhILR distances using the Non-Metric Di
    message: "Betapart {wildcards.distance} Patient-level calculations for {wildcards.sample}"
    shell:
       " mkdir {output} && "
-      " Rscript --vanilla ./workflow/scripts/betapart_subjectlevel.R -i {input.jac} -r {input.repl} -n {input.norepl} -m data/map/{wildcards.sample}.txt -c {wildcards.group} -p {params.subjectID} -o {output} -d {wildcards.distance} > {log} 2>&1 "
+      " Rscript --vanilla ./workflow/scripts/betapart_subjectlevel.R -i {input.jac} -r {input.repl} -n {input.norepl} -m data/{wildcards.sample}.txt -c {wildcards.group} -p {params.subjectID} -o {output} -d {wildcards.distance} > {log} 2>&1 "
 
 
 

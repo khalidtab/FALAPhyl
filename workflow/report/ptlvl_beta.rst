@@ -1,0 +1,1 @@
+{{ snakemake.wildcards.distance }} break down, demonstrating replacement and no-replacement components of the distance index. The 2 sites were matched by same sample ID: {{ snakemake.params.subjectID }}. Sites were chosen based on the {{ snakemake.wildcards.group }} variable. Statistical significance was done using Wilcoxon signed rank sum test.

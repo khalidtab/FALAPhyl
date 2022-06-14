@@ -3,7 +3,7 @@ rule biom_to_tsv: # Since qiime requires a specific biom format (either V100/jso
    conda:
         "../../workflow/envs/biom.yaml"
    input:
-        "data/biom/{sample}.biom"
+        "data/{sample}.biom"
    output:
         tsv=temporary("data/tsv/{sample}.tsv"),
         temp_biom=temporary("data/biom/{sample}_temp.biom")
