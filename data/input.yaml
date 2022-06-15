@@ -32,12 +32,12 @@ distances:
 
 #This list of alpha diversity metrics is shared by both Qiime2 and PhyloToast's implementation.
 alpha: 
-     - Observed
+#     - Observed
      - Chao1
-     - ACE
-     - Shannon
+#     - ACE
+#     - Shannon
 #     - Simpson
-     - InvSimpson
+#     - InvSimpson
 #     - Fisher
 
 # If you want to look at patient level analysis, such as in case you have repeated measures, there should be a column in the mapping file that has this information.
@@ -51,7 +51,7 @@ height:
      - 8
 
 threshold: # SparCC: Level to filter the core by represented in a fraction. EG: 0.8 means that only features present in 80% of the group will be kept. Everything else will be collapsed into "Other" category. This will preserve compoationality of the data (subcompositional coherence). This is a pre-filtereing step for SparCC
-     - 0.3
+     - 0.6
      
 sparcc_corr: # SparCC: Level of correlation strength to filter
      - 0.1
@@ -60,10 +60,10 @@ sparcc_pvalue: # SparCC: P-values for sparcc
      - 0.05
 
 sparcc_bootstrap: # SparCC: Number of bootstrapping iterations to perform
-     - 1000
+     - 100
 
 betapart_samples: # How many samples to use per permutation?
      - 10
      
 betapart_permutations: # How many permutations to create?
-     - 1000
+     - 100

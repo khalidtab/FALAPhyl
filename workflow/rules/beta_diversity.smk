@@ -18,8 +18,7 @@ rule beta_div: # Calculate distances between samples based on the chosen beta di
       subcategory="{dist}",
       labels={
               "Data type": "Distance Matrix",
-              "Distance type": "{dist}"
-              })
+              "Distance type": "{dist}"})
    message: "Beta diversity: Calculating beta dissimilarity {wildcards.dist} for {wildcards.sample}"
    shell: 
       "Rscript --vanilla ./workflow/scripts/beta_diversity.R -i {input} -o {output} -d {wildcards.dist} "
@@ -35,37 +34,37 @@ rule nmds: # Plots the beta diversity distances using the Non-Metric Dimensional
       category="Beta diversity",
       subcategory="{dist}",
       labels={
-              "Data type": "NMDS Plot",
+              "Description": "NMDS",
+              "Data type": "Plot - SVG",
               "Distance type": "{dist}",
-              "Grouping category": "{group}"
-              }),
+              "Grouping category": "{group}"}),
       mysvgpdf=report("data/plots/betaDiv_{sample}/NMDS–{dist}–{group}.svgnoNameswithProbDF.svg",
       caption="../report/beta_nmds.rst", 
       category="Beta diversity",
       subcategory="{dist}",
       labels={
-              "Data type": "NMDS Plot with probability density functions",
+              "Description": "NMDS with probability density functions",
+              "Data type": "Plot - SVG",
               "Distance type": "{dist}",
-              "Grouping category": "{group}"
-              }),
+              "Grouping category": "{group}"}),
       mysvgnames=report("data/plots/betaDiv_{sample}/NMDS–{dist}–{group}.svgwithnames.svg",
       caption="../report/beta_nmds.rst", 
       category="Beta diversity",
       subcategory="{dist}",
       labels={
-              "Data type": "NMDS Plot with sample names",
+              "Description": "NMDS with sample names",
+              "Data type": "Plot - SVG",
               "Distance type": "{dist}",
-              "Grouping category": "{group}"
-              }),
+              "Grouping category": "{group}"}),
       mysvgnamespdf= report("data/plots/betaDiv_{sample}/NMDS–{dist}–{group}.svgwithnamesProbDF.svg",
       caption="../report/beta_nmds.rst", 
       category="Beta diversity",
       subcategory="{dist}",
       labels={
-              "Data type": "NMDS Plot with sample names and probability density functions",
+              "Description": "NMDS with sample names and probability density functions",
+              "Data type": "Plot - SVG",
               "Distance type": "{dist}",
-              "Grouping category": "{group}"
-              })
+              "Grouping category": "{group}"})
    params:
       dist=expand("{dist}",dist=config["distances"]),
       group=expand("{group}",group=config["group"]),
@@ -98,37 +97,37 @@ rule pcoa: # Plots the beta diversity distances using the Principal Coordinates 
       category="Beta diversity",
       subcategory="{dist}",
       labels={
-              "Data type": "PCoA Plot",
+              "Description": "PCoA",
+              "Data type": "Plot - SVG",
               "Distance type": "{dist}",
-              "Grouping category": "{group}"
-              }),
+              "Grouping category": "{group}"}),
       mysvgpdf=report("data/plots/betaDiv_{sample}/PCoA–{dist}–{group}.svgnoNameswProbDF.svg",
       caption="../report/beta_pcoa.rst", 
       category="Beta diversity",
       subcategory="{dist}",
       labels={
-              "Data type": "PCoA Plot with probability density functions",
+              "Description": "PCoA with probability density functions",
+              "Data type": "Plot - SVG",
               "Distance type": "{dist}",
-              "Grouping category": "{group}"
-              }),
+              "Grouping category": "{group}"}),
       mysvgnames=report("data/plots/betaDiv_{sample}/PCoA–{dist}–{group}.svgwithnames.svg",
       caption="../report/beta_pcoa.rst", 
       category="Beta diversity",
       subcategory="{dist}",
       labels={
-              "Data type": "PCoA Plot with sample names",
+              "Description": "PCoA Plot with sample names",
+              "Data type": "Plot - SVG",
               "Distance type": "{dist}",
-              "Grouping category": "{group}"
-              }),
+              "Grouping category": "{group}"}),
       mysvgnamespdf=report("data/plots/betaDiv_{sample}/PCoA–{dist}–{group}.svgwithnamesprobDF.svg",
       caption="../report/beta_pcoa.rst", 
       category="Beta diversity",
       subcategory="{dist}",
       labels={
-              "Data type": "PCoA Plot with sample names and probability density functions",
+              "Description": "PCoA Plot with sample names and probability density functions",
+              "Data type": "Plot - SVG",
               "Distance type": "{dist}",
-              "Grouping category": "{group}"
-              })
+              "Grouping category": "{group}"})
    message: "Beta diversity - {wildcards.dist}: Plotting PCoA for variable {wildcards.group} in {wildcards.sample}"
    shell: 
       "Rscript --vanilla ./workflow/scripts/PCoA.R -i {input} -m data/{wildcards.sample}.txt -g {wildcards.group} -c {wildcards.group}{params.color} -o {output.mysvg} -x {params.width} -y {params.height} > {log} 2>&1 "
@@ -146,10 +145,19 @@ rule adonis: # Calculates whether the two groups have similar dispersions (varia
       category="Beta diversity",
       subcategory="{dist}",
       labels={
-              "Data type": "ADONIS - text file",
+              "Description": "ADONIS",
+              "Data type": "Text file",
               "Distance type": "{dist}",
-              "Grouping category": "{group}"
-              })
+              "Grouping category": "{group}"}),
+      mypairwise=report("data/distance/ADONIS/{sample}/adonis–{dist}–{group}.txt_pairwise.txt",
+      caption="../report/beta_adonis.rst",
+      category="Beta diversity",
+      subcategory="{dist}",
+      labels={
+              "Description": "ADONIS - Pairwise with FDR correction",
+              "Data type": "Text file",
+              "Distance type": "{dist}",
+              "Grouping category": "{group}"})
    resources:
       mem_mb=get_mem_mb
    threads: workflow.cores * 0.5
@@ -173,10 +181,19 @@ use rule adonis as anosim with:
       category="Beta diversity",
       subcategory="{dist}",
       labels={
-              "Data type": "ANOSIM - text file",
+              "Description": "ANOSIM",
+              "Data type": "Text file",
               "Distance type": "{dist}",
-              "Grouping category": "{group}"
-              })
+              "Grouping category": "{group}"}),
+      mypairwise=report("data/distance/ANOSIM/{sample}/anosim–{dist}–{group}_pairwise.txt",
+      caption="../report/beta_anosim.rst",
+      category="Beta diversity",
+      subcategory="{dist}",
+      labels={
+              "Description": "ANOSIM - Pairwise with FDR correction",
+              "Data type": "Text file",
+              "Distance type": "{dist}",
+              "Grouping category": "{group}"})
    log: 
       "data/logs/ANOSIM–{sample}–{dist}–{group}.txt"
    params: 
@@ -200,28 +217,28 @@ rule permdisp: # Calculates whether the two groups have similar dispersions (var
       category="Beta diversity",
       subcategory="{dist}",
       labels={
-              "Data type": "Beta dispersion - text file",
+              "Description": "Beta dispersion and pairwise comparisons with FDR correction",
+              "Data type": "Text file",
               "Distance type": "{dist}",
-              "Grouping category": "{group}"
-              }),
+              "Grouping category": "{group}"}),
       myPCoA=report("data/plots/PCoA_betadispersion–{sample}–{dist}–{group}.svg",
       caption="../report/beta_permdisp.rst",
       category="Beta diversity",
       subcategory="{dist}",
       labels={
-              "Data type": "PCoA Plot with standard deviation ellipsis of the dispersion from group centroid",
+              "Description": "PCoA Plot with standard deviation ellipsis of the dispersion from group centroid",
+              "Data type": "Plot - SVG",
               "Distance type": "{dist}",
-              "Grouping category": "{group}"
-              }),
+              "Grouping category": "{group}"}),
       myBoxplot=report("data/plots/boxplot_betadispersion–{sample}–{dist}–{group}.svg",
       caption="../report/beta_permdisp.rst",
       category="Beta diversity",
       subcategory="{dist}",
       labels={
-              "Data type": "Boxplot of the beta dispersion",
+              "Description": "Boxplot of the beta dispersion",
+              "Data type": "Plot - SVG",
               "Distance type": "{dist}",
-              "Grouping category": "{group}"
-              })
+              "Grouping category": "{group}"})
    resources:
       mem_mb=get_mem_mb
    threads: workflow.cores * 0.5

@@ -57,10 +57,10 @@ if (pvalue == 0){ # R sets the pvalue to zero if it is below a certain level, so
 
 if (dist_type == "bray"){
   myGraph = ggpubr::ggpaired(dist, cond1 = "balanced variation in abundance", cond2 = "abundance gradients", fill = "condition", palette = "jco", line.size=0.01, 
-                             title= (paste0(dist_type, " breakdown \nbetween ",myCond1," and ",myCond2, "\np-value =",formatC(pvalue, format = "g", digits = 2),  ", Rank biserial effect size=",formatC(effectSize$r_rank_biserial, format = "g", digits = 2))))
+                             title= (paste0(dist_type, " breakdown\n",myCond1," and ",myCond2, "\np-value =",formatC(pvalue, format = "g", digits = 2),  ", Rank biserial effect size=",formatC(effectSize$r_rank_biserial, format = "g", digits = 2))))
 } else {
   myGraph = ggpubr::ggpaired(dist, cond1 = "Turn-over", cond2 = "Nestedness", fill = "condition", palette = "jco", line.size=0.01, 
-                             title= (paste0(dist_type, " breakdown \nbetween ",myCond1," and ",myCond2, "\np-value =",formatC(pvalue, format = "g", digits = 2),". Rank biserial effect size= ",formatC(effectSize$r_rank_biserial, format = "g", digits = 2))))  
+                             title= (paste0(dist_type, " breakdown\n",myCond1," and ",myCond2, "\np-value =",formatC(pvalue, format = "g", digits = 2),". Rank biserial effect size= ",formatC(effectSize$r_rank_biserial, format = "g", digits = 2))))  
 } 
 
 

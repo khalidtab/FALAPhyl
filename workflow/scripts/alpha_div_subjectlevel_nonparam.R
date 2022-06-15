@@ -1,7 +1,7 @@
 suppressPackageStartupMessages(suppressWarnings(library(tidyverse)))
 suppressPackageStartupMessages(suppressWarnings(library("optparse")))
 suppressPackageStartupMessages(suppressWarnings(library(reshape2)))
-
+suppressWarnings(suppressMessages(library(effectsize)))
 
 option_list = list(
   make_option(c("-m", "--mapping"), type="character", default=NULL, help="The mapping file", metavar="Mapping file"),
@@ -70,9 +70,13 @@ for (x in 1:numOfComparisons){
   #Otherwise, if there are matches, continue
   
   pvalue = wilcox.test(tablesMerged[,1],tablesMerged[,2], paired = TRUE) %>% .$p.value
+  effectSize = rank_biserial(tablesMerged[,1],tablesMerged[,2], paired = TRUE) %>% interpret(., rules = "funder2019")
   numOfPatients = length(tablesMerged[,1])
   
-  myGraph = ggpubr::ggpaired(tablesMerged, cond1 = category1, cond2 = category2, fill = "condition", palette = "jco", line.size=0.01, title= (paste("Patient-level comparison of",alphaDivType,"between",category1,"&",category2)), subtitle = paste("n =",numOfPatients,"Wilcoxon signed rank sum test, P-value <",formatC(pvalue, format = "e", digits = 5)))
+  myGraph = ggpubr::ggpaired(tablesMerged, cond1 = category1, cond2 = category2, fill = "condition", palette = "jco", line.size=0.01, 
+                             title= (paste("Patient-level comparison of",alphaDivType,"\nBetween",category1,"&",category2)), 
+                             subtitle = paste("n =",numOfPatients,"\nWilcoxon signed rank sum test, P-value <",formatC(pvalue, format = "e", digits = 5)),
+                             ". Rank biserial effect size= ",formatC(effectSize$r_rank_biserial, format = "g", digits = 2))
   ggsave(filename=paste0(output,"/",category1,"_",category2,".svg"),plot=myGraph)
 }
 

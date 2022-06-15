@@ -7,6 +7,7 @@ suppressWarnings(suppressMessages(require(tidyverse)))
 suppressWarnings(suppressMessages(library(optparse)))	
 suppressWarnings(suppressMessages(library(ggpubr)))	
 suppressWarnings(suppressMessages(library(ggplot2)))	
+suppressWarnings(suppressMessages(library(effectsize)))
 
 option_list = list(
   make_option(c("-i", "--input"), type="character", default=NULL, help="Distance matrix", metavar="Bray-Curtis or Jaccard Distance matrix that is going to be deconstructed to pairwise distances"),
@@ -121,7 +122,8 @@ for (myConds in comboUniq) {
   myTable[,i] = apply(myTable[,i],2, function(x) as.numeric(as.character(x)))
   rm(table1,table2)
   
-  pvalue = wilcox.test(myTable$repl,myTable$noRepl, paired = TRUE) %>% .$p.value
+  effectSize = rank_biserial(myTable$repl,myTable$noRepl, paired = TRUE) %>% interpret(., rules = "funder2019")
+  pvalue = wilcox.test(myTable$repl,myTable$noRepl, paired = TRUE, exact = FALSE) %>% .$p.value
   
   
   pd = data.frame(replacement = myTable$repl, noreplacement = myTable$noRepl)
@@ -130,17 +132,20 @@ for (myConds in comboUniq) {
   
   if (dist_type == "bray"){
   colnames(pd) = c("balanced variation in abundance","abundance gradients")
-  myGraph = ggpubr::ggpaired(pd, cond1 = "balanced variation in abundance", cond2 = "abundance gradients", fill = "condition", palette = "jco", line.size=0.01, subtitle = paste0("n =",numOfParticipants,". Wilcoxon signed rank sum test, P-value < ",formatC(pvalue, format = "e", digits = 5)), title= (paste(dist_type, "breakdown \n Between ",myCond1,"and",myCond2, "\n Pvalue <",formatC(pvalue, format = "e", digits = 2))))
-  } else {
+  myGraph = ggpubr::ggpaired(pd, cond1 = "balanced variation in abundance", cond2 = "abundance gradients", fill = "condition", palette = "jco", line.size=0.01, 
+                             title= (paste(dist_type, "breakdown \n",myCond1,"and",myCond2)),
+                             subtitle = paste0("n =",numOfParticipants,
+                             ". Wilcoxon signed rank sum test\nP-value < ", formatC(pvalue, format = "e", digits = 5)),
+                             ". Rank biserial effect size= ",formatC(effectSize$r_rank_biserial, format = "g", digits = 2)
+                             )} else {
     colnames(pd) = c("Turn-over","Nestedness")
-    myGraph = ggpubr::ggpaired(pd, cond1 = "Turn-over", cond2 = "Nestedness", fill = "condition", palette = "jco", line.size=0.01, title= (paste(dist_type, "breakdown \n Between ",myCond1,"and",myCond2)), subtitle = paste0("n =",numOfParticipants,"\n Wilcoxon signed rank sum test, P-value < ",formatC(pvalue, format = "e", digits = 5)))  
-  } 
+    myGraph = ggpubr::ggpaired(pd, cond1 = "Turn-over", cond2 = "Nestedness", fill = "condition", palette = "jco", line.size=0.01, 
+                               title= (paste(dist_type, "breakdown\n",myCond1,"and",myCond2)), 
+                               subtitle = paste0("n =",numOfParticipants,
+                               "\nWilcoxon signed rank sum test\nP-value < ",formatC(pvalue, format = "e", digits = 5),
+                               ". Rank biserial effect size= ",formatC(effectSize$r_rank_biserial, format = "g", digits = 2))
+                               )} 
  
   ggsave(filename=paste0(output,"/",myCond1,"_",myCond2,".svg"),plot=myGraph) 
   
   }
-
-
-
-
-

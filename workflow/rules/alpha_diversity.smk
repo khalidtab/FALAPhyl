@@ -10,7 +10,8 @@ rule alpha_div_calc: # Provides per sample alpha calculation
       category="Alpha diversity",
       subcategory="{alpha}",
       labels={
-              "Data type": "Calculations - text file",
+              "Description": "Calculations of alpha diversity",
+              "Data type": "Text file",
               "Method": "{alpha}"
               })
    message: "Alpha diversity - {wildcards.alpha}: Calculating alpha diversity for {wildcards.sample}"
@@ -31,7 +32,8 @@ rule alpha_div_plot: # Calculates alpha diversity in each group, and outputs a P
       category="Alpha diversity",
       subcategory="{alpha}",
       labels={
-              "Data type": "Violin plot",
+              "Description": "Violin plot with statistically significant calculations",
+              "Data type": "Plot - SVG",
               "Method": "{alpha}",
               "Grouping category": "{group}"
               })
@@ -57,7 +59,8 @@ rule alpha_div_stats: # Provides per sample alpha calculation
       category="Alpha diversity",
       subcategory="{alpha}",
       labels={
-              "Data type": "Nonparametric statistical testing - text file",
+              "Description": "Nonparametric statistical testing",
+              "Data type": "Text file",
               "Method": "{alpha}",
               "Grouping category": "{group}"
               })

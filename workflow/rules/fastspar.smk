@@ -90,8 +90,7 @@ rule nodes_and_edges: #This script returns nodes and edges that pass the desired
       labels={
          "File type": "Nodes - Text file",
          "Pairwise comparison": "{groupcategory}",
-         "Grouping category": "{group}"
-              }),
+         "Grouping category": "{group}"}),
       edges=report("data/network/{sample}–{group}/edges–{groupcategory}.tsv",
       caption="../report/network_nodes_edges.rst",
       category="SparCC",
@@ -99,8 +98,7 @@ rule nodes_and_edges: #This script returns nodes and edges that pass the desired
       labels={
          "File type": "Edges - Text file",
          "Pairwise comparison": "{groupcategory}",
-         "Grouping category": "{group}"
-              })
+         "Grouping category": "{group}"})
    params:
       pvalue=config["sparcc_pvalue"][0],
       threshold=config["sparcc_corr"][0]
@@ -122,8 +120,7 @@ rule zipi: # This script plots the Zi-Pi plots from the nodes_and_edges output
       labels={
          "File type": "ZiPi plot",
          "Comparison": "{groupcategory}",
-         "Grouping category": "{group}"
-              })
+         "Grouping category": "{group}"})
    params:
       pvalue=config["sparcc_pvalue"][0],
       corr=config["sparcc_corr"][0],

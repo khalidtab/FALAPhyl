@@ -16,8 +16,7 @@ rule patient_level_alpha_comparison:
               "Data type": "Plot",
               "Comparison": "{name}",
               "Method": "{alpha}",
-              "Grouping category": "{group}"
-              })
+              "Grouping category": "{group}"})
    params:
       subjectID=expand("subjectID",subjectID=config["subjectID"])
    log:
@@ -48,9 +47,7 @@ rule patient_level_betapart:
               "Data type": "Plot",
               "Comparison": "{name}",
               "Method": "{distance}",
-              "Grouping category": "{group}"
-              }
-)
+              "Grouping category": "{group}"})
    params:
       subjectID=expand("subjectID",subjectID=config["subjectID"])
    log:
