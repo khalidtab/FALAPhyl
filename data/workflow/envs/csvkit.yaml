@@ -1,5 +1,0 @@
-name: csvkit
-channels:
-    - anaconda
-dependencies:
-    - csvkit
