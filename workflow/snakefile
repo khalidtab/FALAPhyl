@@ -1,0 +1,25 @@
+report: "report/workflow.rst"
+
+configfile: "../data/input.yaml"
+include: "rules/alpha_diversity.smk"
+include: "rules/beta_diversity.smk"
+include: "rules/betapart.smk"
+include: "rules/fastspar.smk"
+include: "rules/make_tsv.smk"
+include: "rules/patient_level_analysis.smk"
+
+
+rule all:
+   input:
+      expand("../tmp/expand–{sample}–{alpha}–{group}.txt",                       sample=config["mysample"], alpha=config["alpha"], group=config["group"]),
+      expand("../data/distance/PERMDISP/{sample}/betadisper–{dist}–{group}.txt", sample=config["mysample"], dist=config["distances"], group=config["group"]),
+      expand("../data/distance/ANOSIM/{sample}/anosim–{dist}–{group}.txt",       sample=config["mysample"], dist=config["distances"], group=config["group"]),
+      expand("../data/distance/ADONIS/{sample}/adonis–{dist}–{group}.txt",       sample=config["mysample"], dist=config["distances"], group=config["group"]),
+      expand("../data/plots/betaDiv_{sample}/NMDS–{dist}–{group}.svg",           sample=config["mysample"], dist=config["distances"], group=config["group"]),
+      expand("../data/plots/betaDiv_{sample}/PCoA–{dist}–{group}.svg",           sample=config["mysample"], dist=config["distances"], group=config["group"]),
+      expand("../tmp/betapart–{distance}–{sample}–{group}.txt",                  sample=config["mysample"],group=config["group"],distance=["bray","jaccard"]),      
+      expand("../data/plots/patientlvl_betapart_{sample}–{group}–{distance}/",   sample=config["mysample"],group=config["group"],distance=["bray","jaccard"]),
+      expand("../data/plots/patientlvl_alphaDiv_{sample}–{group}–{alpha}/",      sample=config["mysample"],group=config["group"],alpha=config["alpha"]),
+      expand("../tmp/network_{sample}–{group}.done",                             sample=config["mysample"],group=config["group"])
+
+
