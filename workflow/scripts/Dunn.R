@@ -76,15 +76,26 @@ myDis = load_and_fix_Dis(opt$input) # Load dissimilarity matrix, "melt" it, and 
 myKruskall =  myDis %$% kruskal.test(value,comparison)
 
 if (myKruskall$p.value < 0.05){
+if (length(unique(myDis$comparison)) == 2){
+sink(opt$output)
+print("Only 2 categories are available. No Dunn's comparison can be done. Below is the Kruskal-Wallis results")  
+myKruskall
+sink()
+}else{
 sink(opt$output)
 myKruskall
 sink()
 suppressWarnings(write.table(GiveMeDunn(myDis),file = opt$output,append=TRUE,quote=FALSE,sep="\t",row.names = FALSE)) # Do Dunn test and format it as a table
 
 
-} else {
-  sink(opt$output)
+}} else {
+  if (length(unique(myDis$comparison)) == 2){
+    sink(opt$output)
+    print("Only 2 categories are available. No Dunn's comparison can be done. Below is the Kruskal-Wallis results")  
+    myKruskall
+    sink()
+  }else{ sink(opt$output)
   print("Kruskal-Wallis Rank Sum Test p-value is larger than 0.05, as such, Dunn test below may not correct.")
   sink()
   suppressWarnings(write.table(GiveMeDunn(myDis),file = opt$output,append=TRUE,quote=FALSE,sep="\t",row.names = FALSE)) # Do Dunn test and format it as a table
-}
+}}

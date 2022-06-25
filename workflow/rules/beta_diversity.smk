@@ -254,12 +254,35 @@ rule permdisp: # Calculates whether the two groups have similar dispersions (var
    message: "Beta diversity - {wildcards.dist}: Calculating beta dispersion for variable {wildcards.group} in {wildcards.sample}"
    shell:
       " Rscript --vanilla ./workflow/scripts/adonis_anosim_betadisper.R -i {input} -o {output.myresults} -m data/{wildcards.sample}.txt -p {output.myPCoA} -b {output.myBoxplot} -g {wildcards.group} -c {params.color} -t {params.test} -x {params.width} -y {params.height} > {log} 2>&1 "
-   
+
+rule dunns: # Plots the beta diversity distances using the Non-Metric Dimensional Scaling (NMDS) algorithm
+   version: "1.0"
+   conda: "../../workflow/envs/dunn.yaml"
+   input:
+      rules.beta_div.output.tsv
+   output: 
+      report("data/distance/Dunns/{sample}/Dunns–{dist}–{group}.txt",
+      category="Beta diversity",
+      subcategory="{dist}",
+      labels={
+              "Description": "Dunn's multiple comparisons of the distances between the groups",
+              "Data type": "Text file",
+              "Distance type": "{dist}",
+              "Grouping category": "{group}"})
+   log:
+      "data/logs/Dunn_{sample}–{dist}–{group}.log"
+   message: "Beta diversity - {wildcards.dist}: Calculating distances between groups based on Dunn's multiple comaparison for variable {wildcards.group} in {wildcards.sample}"
+   shell:
+      "Rscript --vanilla ./workflow/scripts/Dunn.R -i {input} -o {output} -m data/{wildcards.sample}.txt -c {wildcards.group} > {log} 2>&1 "
+
+
+
 rule beta:
    input:
       expand("data/distance/PERMDISP/{sample}/betadisper–{dist}–{group}.txt", sample=config["mysample"], dist=config["distances"], group=config["group"]),
       expand("data/distance/ANOSIM/{sample}/anosim–{dist}–{group}.txt",       sample=config["mysample"], dist=config["distances"], group=config["group"]),
       expand("data/distance/ADONIS/{sample}/adonis–{dist}–{group}.txt",       sample=config["mysample"], dist=config["distances"], group=config["group"]),
       expand("data/plots/betaDiv_{sample}/NMDS–{dist}–{group}.svg",           sample=config["mysample"], dist=config["distances"], group=config["group"]),
-      expand("data/plots/betaDiv_{sample}/PCoA–{dist}–{group}.svg",           sample=config["mysample"], dist=config["distances"], group=config["group"])
+      expand("data/plots/betaDiv_{sample}/PCoA–{dist}–{group}.svg",           sample=config["mysample"], dist=config["distances"], group=config["group"]),
+      expand("data/distance/Dunns/{sample}/Dunns–{dist}–{group}.txt",           sample=config["mysample"], dist=config["distances"], group=config["group"])
       

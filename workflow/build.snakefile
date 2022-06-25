@@ -70,6 +70,18 @@ rule phyloseq:
       temporary(touch("{sample}phyloseq"))
    shell:
       "touch {output}"
+
+rule dunn:
+   conda:
+      "./workflow/envs/dunn.yaml"
+   message: "Creating Dunn"
+   input:
+      "{sample}"
+   output:
+      temporary(touch("{sample}dunn"))
+   shell:
+      "touch {output}"
+
       
 rule results:
    version: "1.0"
@@ -79,6 +91,7 @@ rule results:
       rules.fastspar.output,
       rules.ggpubr.output,
       rules.ggrepel.output,
+      rules.dunn.output,
       rules.phyloseq.output
    message: "Cleaning up…"
    output:
