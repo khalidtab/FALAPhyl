@@ -72,20 +72,29 @@ mymap = cbind(mymap[,1],mymap[,catNum]) %>% as.data.frame(.)
 colnames(mymap) = c("SampleID","condition")
 
 myDis = load_and_fix_Dis(opt$input) # Load dissimilarity matrix, "melt" it, and make sure that category 1 and category 2 do not switch places
+myStats = myDis%>% group_by(comparison)%>% summarise(Median=median(as.numeric(value)), Max=max(as.numeric(value)), Min=min(as.numeric(value)), IQR=IQR(as.numeric(value)))
+
 
 myKruskall =  myDis %$% kruskal.test(value,comparison)
 
 if (myKruskall$p.value < 0.05){
 if (length(unique(myDis$comparison)) == 2){
 sink(opt$output)
-print("Only 2 categories are available. No Dunn's comparison can be done. Below is the Kruskal-Wallis results")  
+print("Only 2 categories are available. No Dunn's comparison can be done. Below is the Kruskal-Wallis results, and distance characteristics")  
 myKruskall
+myStats
 sink()
 }else{
+
 sink(opt$output)
 myKruskall
+myStats
 sink()
-suppressWarnings(write.table(GiveMeDunn(myDis),file = opt$output,append=TRUE,quote=FALSE,sep="\t",row.names = FALSE)) # Do Dunn test and format it as a table
+myDunn = GiveMeDunn(myDis)
+myTable = left_join(myDunn,myStats, by=c("Category.1"="comparison"))
+myTable = left_join(myTable,myStats, by=c("Category.2"="comparison"))
+colnames(myTable) = c("Category.1","Category.2","Z","P","P.adjusted","DistanceInCategory1BiggerThanCategory2","Median.Category1","Max.Category1","Min.Category1","IQR.Category1","Median.Category2","Max.Category2","Min.Category2","IQR.Category2")
+suppressWarnings(write.table(myTable,file = opt$output,append=TRUE,quote=FALSE,sep="\t",row.names = FALSE)) # Do Dunn test and format it as a table
 
 
 }} else {
