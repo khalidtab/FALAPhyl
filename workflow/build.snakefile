@@ -23,7 +23,7 @@ rule DAtest:
       temporary(touch("{sample}DAtest"))
    shell:
       '''R 
-      devtools::install_github("Russel88/DAtest",quiet=TRUE,upgrade="never")
+      devtools::install_github("Russel88/DAtest")
       quit(save = "no")
       '''
 
