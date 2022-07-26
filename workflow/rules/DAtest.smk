@@ -12,8 +12,8 @@ checkpoint biom_pairwise: # Create pairwise biom files for all the variables so 
 
 rule testDA:
    version: "1.0"
-   container:
-        "docker://khalidtab/datest:latest"
+   conda:
+      "../../workflow/envs/DAtest.yml"
    input:
       tsv="data/diff/pairwise–{sample}–{group}/{annie}.tsv",
       map="data/diff/pairwise–{sample}–{group}/{annie}.txt"
