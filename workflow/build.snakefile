@@ -107,7 +107,8 @@ rule results:
       rules.ggpubr.output,
       rules.ggrepel.output,
       rules.dunn.output,
-      rules.phyloseq.output
+      rules.phyloseq.output,
+      rules.DAtest.output
    message: "Cleaning up…"
    output:
       "{sample}.final"
