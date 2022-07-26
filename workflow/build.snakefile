@@ -20,7 +20,7 @@ rule DAtest:
    input:
       "{sample}"
    output:
-      temporary(touch("{sample}biom"))
+      temporary(touch("{sample}DAtest"))
    shell:
       '''R 
       devtools::install_github("Russel88/DAtest",quiet=TRUE,upgrade="never")
