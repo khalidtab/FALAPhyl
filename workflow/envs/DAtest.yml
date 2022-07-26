@@ -4,28 +4,19 @@ channels:
     - r
 dependencies:
     - bioconductor-deseq2
-    - r-reshape2
-    - bioconductor-bayseq
-    - bioconductor-limma
-    - r-ggplot2
-    - bioconductor-biomformat
-    - bioconductor-edger
     - r-devtools
-    - r-igraph
+    - bioconductor-limma
+    - bioconductor-edger
     - bioconductor-metagenomeseq
-    - r-shape
-    - r-readr
+    - bioconductor-bayseq
     - bioconductor-aldex2
-    - r-permute
-    - r-zcompositions
-    - bioconductor-keggrest
-    - r-magrittr
-    - bioconductor-phyloseq
-    - r-optparse
-    - bioconductor-rhdf5filters
-    - bioconductor-microbiome
-    - bioconductor-ancombc
     - bioconductor-impute
-    - r-vegan
+    - r-samr
+    - r-pscl
+    - r-statmod
+    - bioconductor-ancombc
+    - bioconductor-phyloseq
+    - r-base
     - r-tidyverse
-
+    - r-optparse
+    - r-eulerr
