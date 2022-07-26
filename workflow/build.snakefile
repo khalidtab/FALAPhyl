@@ -13,6 +13,21 @@ rule biom:
    shell:
       "touch {output}"
 
+rule DAtest:
+   conda:
+      "./workflow/envs/DAtest.yml"
+   message: "Creating DAtest environment"
+   input:
+      "{sample}"
+   output:
+      temporary(touch("{sample}biom"))
+   shell:
+      '''R 
+      devtools::install_github("Russel88/DAtest",quiet=TRUE,upgrade="never")
+      quit(save = "no")
+      '''
+
+
 rule csvkit:
    conda:
       "./workflow/envs/csvkit.yaml"
