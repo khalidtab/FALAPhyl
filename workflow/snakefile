@@ -20,6 +20,7 @@ rule all:
       expand("tmp/betapart–{distance}–{sample}–{group}.txt",                  sample=config["mysample"],group=config["group"],distance=["bray","jaccard"]),      
       expand("data/plots/patientlvl_betapart_{sample}–{group}–{distance}/",   sample=config["mysample"],group=config["group"],distance=["bray","jaccard"]),
       expand("data/plots/patientlvl_alphaDiv_{sample}–{group}–{alpha}/",      sample=config["mysample"],group=config["group"],alpha=config["alpha"]),
-      expand("tmp/network_{sample}–{group}.done",                             sample=config["mysample"],group=config["group"])
+      expand("tmp/network_{sample}–{group}.done",                             sample=config["mysample"],group=config["group"]),
+      expand("tmp/testDA_{sample}–{group}–done.txt",  sample=config["mysample"],group=config["group"])
 
 
