@@ -7,6 +7,7 @@ include: "rules/betapart.smk"
 include: "rules/fastspar.smk"
 include: "rules/make_tsv.smk"
 include: "rules/patient_level_analysis.smk"
+include: "rules/DAtest.smk"
 
 
 rule all:
