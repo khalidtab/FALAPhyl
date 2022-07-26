@@ -1,0 +1,31 @@
+channels:
+    - bioconda
+    - conda-forge
+    - r
+dependencies:
+    - bioconductor-deseq2
+    - r-reshape2
+    - bioconductor-bayseq
+    - bioconductor-limma
+    - r-ggplot2
+    - bioconductor-biomformat
+    - bioconductor-edger
+    - r-devtools
+    - r-igraph
+    - bioconductor-metagenomeseq
+    - r-shape
+    - r-readr
+    - bioconductor-aldex2
+    - r-permute
+    - r-zcompositions
+    - bioconductor-keggrest
+    - r-magrittr
+    - bioconductor-phyloseq
+    - r-optparse
+    - bioconductor-rhdf5filters
+    - bioconductor-microbiome
+    - bioconductor-ancombc
+    - bioconductor-impute
+    - r-vegan
+    - r-tidyverse
+
