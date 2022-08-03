@@ -13,6 +13,17 @@ rule biom:
    shell:
       "touch {output}"
 
+rule DAtest:
+   conda:
+      "./workflow/envs/DAtest.yaml"
+   message: "Creating DAtest"
+   input:
+      "{sample}"
+   output:
+      temporary(touch("{sample}datest"))
+   shell:
+      "R -e 'devtools::install_github(\"Russel88/DAtest\")'"
+
 rule csvkit:
    conda:
       "./workflow/envs/csvkit.yaml"
@@ -92,6 +103,7 @@ rule results:
       rules.ggpubr.output,
       rules.ggrepel.output,
       rules.dunn.output,
+      rules.DAtest.output,
       rules.phyloseq.output
    message: "Cleaning up…"
    output:

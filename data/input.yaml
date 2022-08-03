@@ -1,6 +1,6 @@
 # file names without the extension
 mysample:
-     - v35_oral_gs
+     - whitespots
 
 # The group column name in your mapping file. If multiple were listed, they will used as if they are univariates.
 group: 
@@ -67,3 +67,58 @@ betapart_samples: # How many samples to use per permutation?
      
 betapart_permutations: # How many permutations to create?
      - 100
+
+
+# The differential abundance types of tests you want to perform. 
+# adx = ALDEx2
+# abc = ANCOM-BC
+# bay = baySeq
+# ds2x,ds2 = (DESeq2,DESeq2 man. geoMeans)
+# ere,ere2,erq,erq2 = EdgeR (Exact test,Exact test2,Quasi likelihood,Quasi likelihood2)
+# neb,poi,qpo,znb,zpo = GLM (Negative binomial,Poisson,Quasi-poisson,ZI Negative Binomial,ZI Poisson)
+# lia,lic,lli,lli2,vli = LIMMA( ALR,CLR,log,log #2,voom)
+# msf = MetagenomeSeq featuremodel
+# per = Permutation test
+# sam = SAMseq
+# tta,ttc = t-test (ALR,CLR)
+# ttt,ltt,ltt2,ttr = Welch(t.test,t.test log,t.test log #2,t.test Rank-normalization)
+# wil = Wilcoxon
+DA_tests:
+     - adx
+     - abc
+     - bay
+     - ds2x
+     - ds2
+     - ere
+     - erq
+     - erq2
+     - neb
+     - poi
+     - qpo
+     - znb
+     - zpo
+     - lia
+     - lic
+     - lli
+     - lli2
+     - vli
+     - msf
+     - per
+#     - sam
+     - tta
+     - ttc
+     - ttt
+     - ltt
+     - ltt2
+     - ttr
+     - wil
+
+DA_minsample: # Differential abundance (DA) prefiltering step. Integer. Minimal number of samples a feature must be present in to be retained. Otherwise it will be bundled with other features as "Others"
+     - 2
+
+DA_minread: # Differential abundance (DA) prefiltering step. Integer. Minimal number of reads a feature must be present in to be retained. Otherwise it will be bundled with other features as "Others"
+     - 5
+
+DA_minabund: # Differential abundance (DA) prefiltering step. Real. Minimal number of mean relative abundance a feature must be present in to be retained. Otherwise it will be bundled with other features as "Others"
+     - 0.001
+
