@@ -22,7 +22,7 @@ rule DAtest:
    output:
       temporary(touch("{sample}datest"))
    shell:
-      "Rscript --vanilla ../../workflow/scripts/install_datest.R"
+      "Rscript --vanilla ./workflow/scripts/install_datest.R"
 
 rule csvkit:
    conda:
