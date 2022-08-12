@@ -38,6 +38,7 @@ rule testDA:
       testfile="data/diff/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/diff–{annie}–{theTest}.tsv"
    resources:
       mem_mb=get_mem_mb
+   threads: workflow.cores * 0.5
    log: 
       "data/logs/DAtest–{sample}–{group}–{annie}–{theTest}–minAbd{minabund}minR{minread}minS{minsample}.txt"
    message: "Differential abundance: Test {wildcards.theTest} for {wildcards.sample} – {wildcards.annie}."
@@ -73,6 +74,7 @@ rule PowerDA:
       testfile="data/diff/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/diffPower–{annie}–{theTest}.tsv"
    resources:
       mem_mb=get_mem_mb
+   threads: workflow.cores * 0.5
    log: 
       "data/logs/DAtest–Power–{sample}–{group}–{annie}–{theTest}–minAbd{minabund}minR{minread}minS{minsample}.txt"
    message: "Differential abundance: Power analysis for the test {wildcards.theTest} using {wildcards.sample} – {wildcards.annie}."
@@ -122,6 +124,7 @@ rule EffSizePowerTest:
       "data/logs/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–{annie}–AUC_FDR_Power.txt"
    resources:
       mem_mb=get_mem_mb
+   threads: workflow.cores * 0.5
    params:
       DAtest=config["DA_tests"]
    message: "Effect size power testing for {wildcards.sample} – {wildcards.annie}."
