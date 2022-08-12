@@ -6,12 +6,12 @@ channels:
     - r
     - skyblued
 dependencies:
-    - bioconductor-phyloseq = 1.30.0
+    - bioconductor-phyloseq
     - r-optparse
     - r-tidyverse 
     - r-vegan
-    - r-dplyr = 1.0.4
-    - r-ape = 5.4
+    - r-dplyr
+    - r-ape
     - r-rcdd
     - r-snow
     - r-foreach
@@ -23,5 +23,5 @@ dependencies:
     - r-devtools
     - bioconductor-philr = 1.12.0
     - r-igraph = 1.2.5
-    - r-reshape2 = 1.4.4
+    - r-reshape2
     - mscorefonts

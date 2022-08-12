@@ -1,7 +1,3 @@
-def get_mem_mb(wildcards, attempt):
-    return attempt * 1000
-
-
 checkpoint biom_pairwise1: # Create pairwise biom files for all the variables so that the differential abundance tests would work
    conda:
       "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
@@ -36,8 +32,6 @@ rule testDA:
       map="data/diff/pairwise–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–{theTest}/{annie}.txt"
    output:
       testfile="data/diff/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/diff–{annie}–{theTest}.tsv"
-   resources:
-      mem_mb=get_mem_mb
    threads: workflow.cores * 0.5
    log: 
       "data/logs/DAtest–{sample}–{group}–{annie}–{theTest}–minAbd{minabund}minR{minread}minS{minsample}.txt"
@@ -72,8 +66,6 @@ rule PowerDA:
       map="data/diff/pairwise–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–{theTest}/{annie}.txt"
    output:
       testfile="data/diff/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/diffPower–{annie}–{theTest}.tsv"
-   resources:
-      mem_mb=get_mem_mb
    threads: workflow.cores * 0.5
    log: 
       "data/logs/DAtest–Power–{sample}–{group}–{annie}–{theTest}–minAbd{minabund}minR{minread}minS{minsample}.txt"
@@ -122,8 +114,6 @@ rule EffSizePowerTest:
       testfile=temporary(directory("data/diff/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/{annie}/AUC_FDR_Power"))
    log: 
       "data/logs/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–{annie}–AUC_FDR_Power.txt"
-   resources:
-      mem_mb=get_mem_mb
    threads: workflow.cores * 0.5
    params:
       DAtest=config["DA_tests"]
