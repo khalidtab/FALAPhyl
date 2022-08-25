@@ -1,7 +1,10 @@
 channels:
     - bioconda
     - conda-forge
+    - r_test
     - r
+    - skyblued
+    - anaconda
 dependencies:
     - bioconductor-deseq2
     - r-devtools
