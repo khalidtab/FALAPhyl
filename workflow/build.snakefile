@@ -22,7 +22,7 @@ rule DAtest:
    output:
       temporary(touch("{sample}datest"))
    shell:
-      "R -e 'devtools::install_github(\"Russel88/DAtest\")'"
+      "Rscript --vanilla ./workflow/scripts/install_datest.R"
 
 rule csvkit:
    conda:

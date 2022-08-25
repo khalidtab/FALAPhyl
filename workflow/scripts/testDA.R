@@ -37,7 +37,7 @@ df[] = lapply(df, as.numeric)
 df = t(df)
 
 if ( as.numeric(opt$minsample)==0 && as.numeric(opt$minread)==0 && as.numeric(opt$minabund)==0){df = df}else{
-df = preDA(df, min.samples = as.numeric(opt$minsample), min.reads = as.numeric(opt$minread), min.abundance =  as.numeric(opt$minabund))
+  df = preDA(df, min.samples = as.numeric(opt$minsample), min.reads = as.numeric(opt$minread), min.abundance =  as.numeric(opt$minabund))
 }
 
 # Load mapping file
@@ -223,4 +223,3 @@ if (mymethod == "abc"){
 }
 
 write_tsv(as.data.frame(final$table),opt$output)
-

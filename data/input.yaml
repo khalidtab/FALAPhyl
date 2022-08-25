@@ -90,6 +90,7 @@ DA_tests:
      - ds2x
      - ds2
      - ere
+     - ere2
      - erq
      - erq2
      - neb

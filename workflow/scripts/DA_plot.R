@@ -8,7 +8,10 @@ suppressMessages(library("ggpubr"))
 
 option_list = list(
   make_option(c("-i", "--input"), type="character", default=NULL, help="Folder with the files to create the graph", metavar="Input folder"),
-  make_option(c("-g", "--graph"), type="character", default=NULL, help="Name of the output SVG file", metavar="Output SVG File name"),
+  make_option(c("-a", "--auc"), type="character", default=NULL, help="Path for AUC graph", metavar="Path for AUC graph"),
+  make_option(c("-f", "--fdr"), type="character", default=NULL, help="Path for FDR graph", metavar="Path for FDR graph"),
+  make_option(c("-p", "--power"), type="character", default=NULL, help="Path for Power graph", metavar="Path for Power graph"),
+  make_option(c("-s", "--score"), type="character", default=NULL, help="Path for Score graph", metavar="Path for Scores graph"),
   make_option(c("-o", "--output"), type="character", default=NULL, help="Name of the output tsv file", metavar="Output tsv File name")
 );
 
@@ -20,13 +23,13 @@ if (is.null(opt$input)){
   stop("At least one argument must be supplied (input file)", call.=FALSE)
 }
 
-myFiles = list.files(path=opt$input,pattern="diffPower–")
+myFiles = list.files(path=opt$input,pattern="EffSizePowerTest-")
 
 readFiles = data.frame(matrix(ncol = 6, nrow = 0))
 
 for (myFile in myFiles){
-  myReadFile = suppressMessages(read_tsv(paste0(opt$input,myFile)))
-  readFiles = rbind(hi,readFiles)
+  myReadFile = suppressMessages(read_tsv(paste0(opt$input,"/",myFile)))
+  readFiles = rbind(myReadFile,readFiles)
 }
 
 myReadFile = readFiles %>%
@@ -55,9 +58,20 @@ myScores = ggerrorplot(myReadFile, x = "Method", y = "score",
 
 
 
-figure = ggarrange(myAUC, myPower, myFDR,myScores, ncol = 1, nrow = 4)
 
-svg(opt$graph,width = 10, height = 20)
-figure
+
+svg(opt$auc,width = 10, height = 20)
+myAUC
 dev.off()
 
+svg(opt$power,width = 10, height = 20)
+myPower
+dev.off()
+
+svg(opt$fdr,width = 10, height = 20)
+myFDR
+dev.off()
+
+svg(opt$score ,width = 10, height = 20)
+myScores
+dev.off()
