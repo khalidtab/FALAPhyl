@@ -51,175 +51,175 @@ vec = working_map$condition %>% as.factor(.)
 mymethod = opt$test
 
 if (mymethod == "abc"){
-  final=powerDA(df, predictor = vec, test = "abc", cores = 1)
+  final=powerDA(df, predictor = vec, test = "abc")
   
   
 } else if (mymethod == "adx") {
-  final=powerDA(df, predictor = vec, test = "adx", cores = 1)
+  final=powerDA(df, predictor = vec, test = "adx")
   
   
 } else if (mymethod == "aov") {
-  final=powerDA(df, predictor = vec, test = "aov", cores = 1)
+  final=powerDA(df, predictor = vec, test = "aov")
   
   
 } else if (mymethod == "lao") {
-  final=powerDA(df, predictor = vec, test = "lao", cores = 1)
+  final=powerDA(df, predictor = vec, test = "lao")
   
   
 }  else if (mymethod == "lao2") {
-  final=powerDA(df, predictor = vec, test = "lao2", cores = 1)
+  final=powerDA(df, predictor = vec, test = "lao2")
   
   
 } else if (mymethod == "bay") {
-  final=powerDA(df, predictor = vec, test = "bay", cores = 1)
+  final=powerDA(df, predictor = vec, test = "bay")
   
   
 } else if (mymethod == "pea") {
-  final=powerDA(df, predictor = vec, test = "pea", cores = 1)
+  final=powerDA(df, predictor = vec, test = "pea")
   
   
 } else if (mymethod == "spe") {
-  final=powerDA(df, predictor = vec, test = "spe", cores = 1)
+  final=powerDA(df, predictor = vec, test = "spe")
   
   
 } else if (mymethod == "ds2x") {
-  final=powerDA(df, predictor = vec, test = "ds2x", cores = 1)
+  final=powerDA(df, predictor = vec, test = "ds2x")
   
   
 } else if (mymethod == "ds2") {
-  final=powerDA(df, predictor = vec, test = "ds2", cores = 1)
+  final=powerDA(df, predictor = vec, test = "ds2")
   
   
 } else if (mymethod == "ere") {
-  final=powerDA(df, predictor = vec, test = "ere", cores = 1)
+  final=powerDA(df, predictor = vec, test = "ere")
   
   
 } else if (mymethod == "ere2") {
-  final=powerDA(df, predictor = vec, test = "ere2", cores = 1)
+  final=powerDA(df, predictor = vec, test = "ere2")
   
   
 } else if (mymethod == "erq") {
-  final=powerDA(df, predictor = vec, test = "erq", cores = 1)
+  final=powerDA(df, predictor = vec, test = "erq")
   
   
 } else if (mymethod == "erq2") {
-  final=powerDA(df, predictor = vec, test = "erq2", cores = 1)
+  final=powerDA(df, predictor = vec, test = "erq2")
   
   
 } else if (mymethod == "fri") {
-  final=powerDA(df, predictor = vec, test = "fri", cores = 1)
+  final=powerDA(df, predictor = vec, test = "fri")
   
   
 } else if (mymethod == "neb") {
-  final=powerDA(df, predictor = vec, test = "neb", cores = 1)
+  final=powerDA(df, predictor = vec, test = "neb")
   
   
 } else if (mymethod == "poi") {
-  final=powerDA(df, predictor = vec, test = "poi", cores = 1)
+  final=powerDA(df, predictor = vec, test = "poi")
   
   
 } else if (mymethod == "qpo") {
-  final=powerDA(df, predictor = vec, test = "qpo", cores = 1)
+  final=powerDA(df, predictor = vec, test = "qpo")
   
   
 } else if (mymethod == "znb") {
-  final=powerDA(df, predictor = vec, test = "znb", cores = 1)
+  final=powerDA(df, predictor = vec, test = "znb")
   
   
 } else if (mymethod == "zpo") {
-  final=powerDA(df, predictor = vec, test = "zpo", cores = 1)
+  final=powerDA(df, predictor = vec, test = "zpo")
   
   
 } else if (mymethod == "kru") {
-  final=powerDA(df, predictor = vec, test = "kru", cores = 1)
+  final=powerDA(df, predictor = vec, test = "kru")
   
   
 } else if (mymethod == "lim") {
-  final=powerDA(df, predictor = vec, test = "lim", cores = 1)
+  final=powerDA(df, predictor = vec, test = "lim")
   
   
 } else if (mymethod == "lli") {
-  final=powerDA(df, predictor = vec, test = "lli", cores = 1)
+  final=powerDA(df, predictor = vec, test = "lli")
   
   
 } else if (mymethod == "lli2") {
-  final=powerDA(df, predictor = vec, test = "lli2", cores = 1)
+  final=powerDA(df, predictor = vec, test = "lli2")
   
   
 } else if (mymethod == "vli") {
-  final=powerDA(df, predictor = vec, test = "vli", cores = 1)
+  final=powerDA(df, predictor = vec, test = "vli")
   
   
 } else if (mymethod == "lrm") {
-  final=powerDA(df, predictor = vec, test = "lrm", cores = 1)
+  final=powerDA(df, predictor = vec, test = "lrm")
   
   
 } else if (mymethod == "llm") {
-  final=powerDA(df, predictor = vec, test = "llm", cores = 1)
+  final=powerDA(df, predictor = vec, test = "llm")
   
   
 } else if (mymethod == "llm2") {
-  final=powerDA(df, predictor = vec, test = "llm2", cores = 1)
+  final=powerDA(df, predictor = vec, test = "llm2")
   
   
 } else if (mymethod == "msf") {
-  final=powerDA(df, predictor = vec, test = "msf", cores = 1)
+  final=powerDA(df, predictor = vec, test = "msf")
   
   
 } else if (mymethod == "zig") {
-  final=powerDA(df, predictor = vec, test = "zig", cores = 1)
+  final=powerDA(df, predictor = vec, test = "zig")
   
   
 } else if (mymethod == "mva") {
-  final=powerDA(df, predictor = vec, test = "mva", cores = 1)
+  final=powerDA(df, predictor = vec, test = "mva")
   
   
 } else if (mymethod == "per") {
-  final=powerDA(df, predictor = vec, test = "per", cores = 1)
+  final=powerDA(df, predictor = vec, test = "per")
   
   
 } else if (mymethod == "qua") {
-  final=powerDA(df, predictor = vec, test = "qua", cores = 1)
+  final=powerDA(df, predictor = vec, test = "qua")
   
   
 } else if (mymethod == "sam") {
-  final=powerDA(df, predictor = vec, test = "sam", cores = 1) 
+  final=powerDA(df, predictor = vec, test = "sam") 
   
   
 } else if (mymethod == "ttt") {
-  final=powerDA(df, predictor = vec, test = "ttt", cores = 1)
+  final=powerDA(df, predictor = vec, test = "ttt")
   
   
 } else if (mymethod == "ltt") {
-  final=powerDA(df, predictor = vec, test = "ltt", cores = 1)
+  final=powerDA(df, predictor = vec, test = "ltt")
   
   
 } else if (mymethod == "ltt2") {
-  final=powerDA(df, predictor = vec, test = "ltt2", cores = 1)
+  final=powerDA(df, predictor = vec, test = "ltt2")
   
   
 } else if (mymethod == "ttr") {
-  final=powerDA(df, predictor = vec, test = "ttr", cores = 1)
+  final=powerDA(df, predictor = vec, test = "ttr")
   
   
 } else if (mymethod == "wil") {
-  final=powerDA(df, predictor = vec, test = "wil", cores = 1)
+  final=powerDA(df, predictor = vec, test = "wil")
   
   
 }  else if (mymethod == "ttc") {
-  final=powerDA(df, predictor = vec, test = "ttc", cores = 1)
+  final=powerDA(df, predictor = vec, test = "ttc")
   
   
 }  else if (mymethod == "lic") {
-  final=powerDA(df, predictor = vec, test = "lic", cores = 1)
+  final=powerDA(df, predictor = vec, test = "lic")
   
   
  } else if (mymethod == "tta") {
-  final=powerDA(df, predictor = vec, test = "tta", cores = 1)
+  final=powerDA(df, predictor = vec, test = "tta")
   
   
  } else if (mymethod == "lia") {
-   final=powerDA(df, predictor = vec, test = "lia", cores = 1)
+   final=powerDA(df, predictor = vec, test = "lia")
    
  }
 
