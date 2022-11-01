@@ -96,19 +96,6 @@ rule cleanup_DAtest_pairwise:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 rule EffSizePowerTest:
    conda:
       "../../workflow/envs/DAtest.yaml"
