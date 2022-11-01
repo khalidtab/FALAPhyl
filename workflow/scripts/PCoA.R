@@ -135,7 +135,7 @@ p1 = myplot + xlab(paste0("PCoA1 - variance explained: ",
                           ProportionsExplainedPCoA1,
                           "%"))
 p2 = p1 + ylab(paste0("PCoA2 - variance explained: ",
-                      ProportionsExplainedPCoA1,
+                      ProportionsExplainedPCoA2,
                       "%"))
 p3 = insert_xaxis_grob(p2, xdens, grid::unit(.1, "null"), position = "top")
 p4 = insert_yaxis_grob(p3, ydens, grid::unit(.1, "null"), position = "right")

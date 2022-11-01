@@ -12,6 +12,7 @@ option_list = list(
   make_option(c("-i", "--input"), type="character", default=NULL, help="Biom file", metavar="Features input file formatted as biom"),
   make_option(c("-m", "--mapping"), type="character", default=NULL, help="Mapping file", metavar="Input mapping file"),
   make_option(c("-g", "--groups"), type="character", default=NULL, help="Column name in the mapping file that indicates which grouping the samples belong to", metavar="Group indication column"),
+  make_option(c("-t", "--theTest"), type="character", default=NULL, help="The DA test being done", metavar="The test being done"),
   make_option(c("-o", "--output"), type="character", default=NULL, help="output folder to save the files", metavar="Output folder")
 );
 
@@ -73,15 +74,9 @@ subsetMeta2 = sample_data(subsetPhylo2) %>% as.matrix(.) %>% as.data.frame(.)
 combinedBiom = bind_rows(subsetTable, subsetTable2)
 combinedmeta = bind_rows(subsetMeta,subsetMeta2)
 
-#Rearrange combinedmeta based on the columns in the combinedBiom in case they are not in the same arrangement
-#Done by getting the names from the biom file, then left joining the combinedmeta file to it
-biomNames = rownames(combinedBiom) %>% as.data.frame(.) 
-colnames(biomNames) = "X.SampleID"
-rearrangedMeta = left_join(biomNames,combinedmeta,by="X.SampleID")
-
-write.table(combinedBiom,file=paste0(output,"/",myCond[1],"+",myCond[2],".tsv"), 
+write.table(combinedBiom,file=paste0(output,"/",myCond[1],"!",myCond[2],".tsv"), 
             quote = FALSE, sep = "\t",col.names = NA)
 
-write.table(rearrangedMeta,file=paste0(output,"/",myCond[1],"+",myCond[2],".txt"), 
+write.table(combinedmeta,file=paste0(output,"/",myCond[1],"!",myCond[2],".txt"), 
             quote = FALSE, sep = "\t", row.names = FALSE)
 }

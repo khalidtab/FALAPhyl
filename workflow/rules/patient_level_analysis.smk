@@ -18,7 +18,7 @@ rule patient_level_alpha_comparison:
               "Method": "{alpha}",
               "Grouping category": "{group}"})
    params:
-      subjectID=expand("subjectID",subjectID=config["subjectID"])
+      subjectID=expand("{subjectID}",subjectID=config["subjectID"])
    log:
       "data/logs/ptlevel_alpha–{sample}–{group}–{alpha}.txt"
    message: "{wildcards.alpha} Alpha diversity Patient-level calculations for {wildcards.sample}"
@@ -49,7 +49,7 @@ rule patient_level_betapart:
               "Method": "{distance}",
               "Grouping category": "{group}"})
    params:
-      subjectID=expand("subjectID",subjectID=config["subjectID"])
+      subjectID=expand("{subjectID}",subjectID=config["subjectID"])
    log:
       "data/logs/ptlevel_beta–{sample}–{distance}–{group}.txt"
    message: "Betapart {wildcards.distance} Patient-level calculations for {wildcards.sample}"

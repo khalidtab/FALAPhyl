@@ -11,6 +11,9 @@ option_list = list(
   make_option(c("-m", "--mapping"), type="character", default=NULL, help="Mapping file", metavar="Input mapping file"),
   make_option(c("-c", "--category"), type="character", default=NULL, help="Category", metavar="Name of category column to compare"),
   make_option(c("-g", "--graph"), type="character", default=NULL, help="output file name for the graph", metavar="Output file name for the graph"),
+  make_option(c("-s", "--minsample"), type="character", default=NULL, help="Prefiltering number. Minimal number of samples a feature needs to be present in. Otherwise it will be filtered out, and combined as Others", metavar="Min number of samples"),
+  make_option(c("-r", "--minread"), type="character", default=NULL, help="Prefiltering number. Minimal number of reads a feature needs to be present in. Otherwise it will be filtered out, and combined as Others", metavar="Min number of reads"),
+  make_option(c("-a", "--minabund"), type="character", default=NULL, help="Prefiltering number. Minimal mean relative abundance a feature needs to be present in. Otherwise it will be filtered out, and combined as Others", metavar="Min number of mean relative abundance"),
   make_option(c("-o", "--output"), type="character", default=NULL, help="output file name", metavar="Output file name")
 );
 
@@ -31,6 +34,9 @@ rownames(df) = dfRows[,1]
 df[,1] = NULL
 df[] = lapply(df, as.numeric)
 df = t(df)
+if ( as.numeric(opt$minsample)==0 && as.numeric(opt$minread)==0 && as.numeric(opt$minabund)==0){df = df}else{
+  df = preDA(df, min.samples = as.numeric(opt$minsample), min.reads = as.numeric(opt$minread), min.abundance =  as.numeric(opt$minabund))
+}
 # Load mapping file
 map = opt$mapping
 map = read.csv(map,sep="\t") %>% as.data.frame(.)
@@ -42,7 +48,7 @@ working_map = cbind(as.character(map[,1]),
 colnames(working_map) = c("SampleID","condition")
 vec = working_map$condition %>% as.factor(.)
 
-testa = allDA(df, predictor = vec)
+testa = allDA(df, predictor = vec, cores = 2)
 
 output = opt$output
 

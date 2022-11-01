@@ -36,7 +36,6 @@ df = t(df)
 if ( as.numeric(opt$minsample)==0 && as.numeric(opt$minread)==0 && as.numeric(opt$minabund)==0){df = df}else{
   df = preDA(df, min.samples = as.numeric(opt$minsample), min.reads = as.numeric(opt$minread), min.abundance =  as.numeric(opt$minabund))
 }
-
 # Load mapping file
 map = opt$mapping
 map = read.csv(map,sep="\t") %>% as.data.frame(.)
@@ -54,174 +53,133 @@ mymethod = opt$test
 if (mymethod == "abc"){
   final=DA.abc(df, predictor = vec)
   
-  
+} else if (mymethod == "lia"){
+  final=DA.lia(df, predictor = vec)
+ 
+}  else if (mymethod == "tta"){
+    final=DA.tta(df, predictor = vec)
+   
 } else if (mymethod == "adx") {
   final=DA.adx(df, predictor = vec)
-  
   
 } else if (mymethod == "aov") {
   final=DA.aov(df, predictor = vec)
   
-  
 } else if (mymethod == "lao") {
   final=DA.lao(df, predictor = vec)
-  
   
 }  else if (mymethod == "lao2") {
   final=DA.lao2(df, predictor = vec)
   
-  
 } else if (mymethod == "bay") {
   final=DA.bay(df, predictor = vec)
-  
   
 } else if (mymethod == "pea") {
   final=DA.pea(df, predictor = vec)
   
-  
 } else if (mymethod == "spe") {
   final=DA.spe(df, predictor = vec)
-  
   
 } else if (mymethod == "ds2x") {
   final=DA.ds2x(df, predictor = vec)
   
-  
 } else if (mymethod == "ds2") {
   final=DA.ds2(df, predictor = vec)
-  
   
 } else if (mymethod == "ere") {
   final=DA.ere(df, predictor = vec)
   
-  
 } else if (mymethod == "ere2") {
   final=DA.ere2(df, predictor = vec)
-  
   
 } else if (mymethod == "erq") {
   final=DA.erq(df, predictor = vec)
   
-  
 } else if (mymethod == "erq2") {
   final=DA.erq2(df, predictor = vec)
-  
   
 } else if (mymethod == "fri") {
   final=DA.fri(df, predictor = vec)
   
-  
 } else if (mymethod == "neb") {
   final=DA.neb(df, predictor = vec)
-  
   
 } else if (mymethod == "poi") {
   final=DA.poi(df, predictor = vec)
   
-  
 } else if (mymethod == "qpo") {
   final=DA.qpo(df, predictor = vec)
-  
   
 } else if (mymethod == "znb") {
   final=DA.znb(df, predictor = vec)
   
-  
 } else if (mymethod == "zpo") {
   final=DA.zpo(df, predictor = vec)
-  
   
 } else if (mymethod == "kru") {
   final=DA.kru(df, predictor = vec)
   
-  
 } else if (mymethod == "lim") {
   final=DA.lim(df, predictor = vec)
-  
   
 } else if (mymethod == "lli") {
   final=DA.lli(df, predictor = vec)
   
-  
 } else if (mymethod == "lli2") {
   final=DA.lli2(df, predictor = vec)
-  
   
 } else if (mymethod == "vli") {
   final=DA.vli(df, predictor = vec)
   
-  
 } else if (mymethod == "lrm") {
   final=DA.lrm(df, predictor = vec)
-  
   
 } else if (mymethod == "llm") {
   final=DA.llm(df, predictor = vec)
   
-  
 } else if (mymethod == "llm2") {
   final=DA.llm2(df, predictor = vec)
-  
   
 } else if (mymethod == "msf") {
   final=DA.msf(df, predictor = vec)
   
-  
 } else if (mymethod == "zig") {
   final=DA.zig(df, predictor = vec)
   
-  
 } else if (mymethod == "mva") {
   final=DA.mva(df, predictor = vec)
-  
+
+  } else if (mymethod == "lic") {
+  final=DA.lic(df, predictor = vec)
   
 } else if (mymethod == "per") {
   final=DA.per(df, predictor = vec)
   
-  
 } else if (mymethod == "qua") {
   final=DA.qua(df, predictor = vec)
-  
   
 } else if (mymethod == "sam") {
   final=DA.sam(df, predictor = vec) 
   
-  
 } else if (mymethod == "ttt") {
   final=DA.ttt(df, predictor = vec)
   
+} else if (mymethod == "ttc") {
+  final=DA.ttc(df, predictor = vec)
   
 } else if (mymethod == "ltt") {
   final=DA.ltt(df, predictor = vec)
   
-  
 } else if (mymethod == "ltt2") {
   final=DA.ltt2(df, predictor = vec)
-  
   
 } else if (mymethod == "ttr") {
   final=DA.ttr(df, predictor = vec)
   
-  
 } else if (mymethod == "wil") {
   final=DA.wil(df, predictor = vec)
   
-  
-}  else if (mymethod == "ttc") {
-  final=DA.ttc(df, predictor = vec)
-  
-  
-}  else if (mymethod == "lic") {
-  final=DA.lic(df, predictor = vec)
-  
-  
- } else if (mymethod == "tta") {
-  final=DA.tta(df, predictor = vec)
-  
-  
- } else if (mymethod == "lia") {
-   final=DA.lia(df, predictor = vec)
-   
- }
+}
 
 write_tsv(final,opt$output)
+

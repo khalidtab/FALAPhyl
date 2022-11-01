@@ -1,6 +1,7 @@
 # file names without the extension
 mysample:
-     - whitespots
+     - v35_oral
+
 
 # The group column name in your mapping file. If multiple were listed, they will used as if they are univariates.
 group: 
@@ -13,13 +14,13 @@ color:
 # Beta diversity metrics
 distances:
      - PhILR
-     - bray
+#     - bray
 #     - manhattan
 #     - euclidean
 #     - canberra
 #     - clark
 #     - kulczynski
-     - jaccard
+#     - jaccard
 #     - gower
 #     - altGower
 #     - morisita
@@ -32,17 +33,17 @@ distances:
 
 #This list of alpha diversity metrics is shared by both Qiime2 and PhyloToast's implementation.
 alpha: 
-#     - Observed
+     - Observed
      - Chao1
 #     - ACE
-#     - Shannon
+     - Shannon
 #     - Simpson
-#     - InvSimpson
+     - InvSimpson
 #     - Fisher
 
 # If you want to look at patient level analysis, such as in case you have repeated measures, there should be a column in the mapping file that has this information.
 subjectID: 
-     - subjectID
+     - subject_ID
 
 width: 
      - 16
@@ -63,7 +64,7 @@ sparcc_bootstrap: # SparCC: Number of bootstrapping iterations to perform
      - 100
 
 betapart_samples: # How many samples to use per permutation?
-     - 10
+     - 5
      
 betapart_permutations: # How many permutations to create?
      - 100
@@ -84,34 +85,62 @@ betapart_permutations: # How many permutations to create?
 # ttt,ltt,ltt2,ttr = Welch(t.test,t.test log,t.test log #2,t.test Rank-normalization)
 # wil = Wilcoxon
 DA_tests:
-     - adx
      - abc
      - bay
-     - ds2x
      - ds2
+     - ds2x
      - ere
+     - ere2
      - erq
      - erq2
-     - neb
-     - poi
-     - qpo
-     - znb
-     - zpo
      - lia
      - lic
      - lli
      - lli2
-     - vli
+     - ltt
+     - ltt2
      - msf
+     - neb
      - per
+     - poi
+     - qpo
 #     - sam
      - tta
      - ttc
+     - ttr
      - ttt
+     - vli
+     - wil
+     - znb
+     - zpo
+     - adx
+
+paired_DA_tests:
+     - ds2
+     - ds2x
+     - erq
+     - erq2
+     - lli
+     - lli2
+     - neb
+     - poi
+     - vli
+     - zig
+     - llm
+     - fri
+     - lim
+     - llm2
+     - lrm
      - ltt
      - ltt2
+     - per
+     - qua
+#     - sam
      - ttr
+     - ttt
      - wil
+
+
 
 DA_minsample: # Differential abundance (DA) prefiltering step. Integer. Minimal number of samples a feature must be present in to be retained. Otherwise it will be bundled with other features as "Others"
      - 2

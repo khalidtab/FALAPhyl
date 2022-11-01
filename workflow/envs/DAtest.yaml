@@ -24,3 +24,5 @@ dependencies:
     - r-optparse
     - r-eulerr
     - parallel
+    - r-minqa
+    - r-lme4

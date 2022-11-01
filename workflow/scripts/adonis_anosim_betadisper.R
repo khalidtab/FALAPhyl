@@ -74,15 +74,21 @@ myboxplot = boxplot(betadisper_test,
 legend("topright", legend = myboxplot$names, border="black", fill = as.character(arrangedColors),cex=0.5)
 dev.off()
 
+ProportionsExplainedPCoA1 = (betadisper_test$eig[1]/sum(betadisper_test$eig))
+ProportionsExplainedPCoA1 = ProportionsExplainedPCoA1 %>% round(.,4)*100
+ProportionsExplainedPCoA2 = (betadisper_test$eig[2]/sum(betadisper_test$eig))
+ProportionsExplainedPCoA2 = ProportionsExplainedPCoA2 %>% round(.,4)*100
+
 
 
 svg(filename = paste0(output_for_pcoa),width = mywidth,height=myheight,family="sans")
 p1 = plot(betadisper_test,hull=FALSE,label=FALSE,col=as.character(arrangedColors),
      ellipse=TRUE,lty="solid",lwd=5, 
      segments=TRUE,seg.col="grey",seg.lty=1,seg.lwd=0.3,
-     pch=rep(16,length(arrangedColors)), # type of point
-     xlab="PCoA1",ylab="PCoA2",
-     main=paste("PCoA with spatial median and beta-dispersion standard deviation ellipses"))
+     pch=rep(1,length(arrangedColors)), # type of point
+     xlab=paste0("PCoA1 - variance explained: ",ProportionsExplainedPCoA1,"%"),
+     ylab=paste0("PCoA2 - variance explained: ",ProportionsExplainedPCoA2,"%"),
+     main=paste("PCoA with lines connecting to the spatial median\n and beta-dispersion standard-deviation ellipses"))
 legend("topright", legend = myboxplot$names, border="black", fill = as.character(arrangedColors),cex=0.5)
 dev.off()
 
