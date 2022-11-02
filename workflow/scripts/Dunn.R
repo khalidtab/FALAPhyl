@@ -65,7 +65,7 @@ GiveMeDunn = function(myDis){
 }
 
 # Load and format mapping file
-mymap = read.table(opt$mapping,comment="@",header=TRUE)
+mymap = suppressMessages(read.csv(opt$mapping, skip=0, header=T, sep="\t"))
 colnames(mymap)[1] = "SampleID"
 catNum = which(colnames(mymap) == opt$category)
 mymap = cbind(mymap[,1],mymap[,catNum]) %>% as.data.frame(.)

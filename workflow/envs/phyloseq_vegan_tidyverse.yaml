@@ -1,4 +1,4 @@
-name: betadiv
+name: betapart
 channels:
     - bioconda
     - conda-forge
@@ -21,7 +21,7 @@ dependencies:
     - r-picante
     - r-doSNOW
     - r-devtools
-    - bioconductor-philr
+    - bioconductor-philr = 1.12.0
     - r-igraph = 1.2.5
     - r-reshape2
     - mscorefonts
