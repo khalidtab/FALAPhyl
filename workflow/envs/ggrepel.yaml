@@ -11,6 +11,5 @@ dependencies:
 - r-svglite
 - r-cowplot
 #- xvfbwrapper
-- r-gdtools = 0.2.4
 - r-cli
 - mscorefonts
