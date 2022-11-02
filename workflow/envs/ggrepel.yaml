@@ -1,7 +1,7 @@
 channels:
 - conda-forge
-- bioconda
 - r
+- bioconda
 dependencies:
 - r-optparse 
 - r-tidyverse
@@ -11,5 +11,6 @@ dependencies:
 - r-svglite
 - r-cowplot
 #- xvfbwrapper
-- r-gdtools = 1.6
+- r-gdtools = 0.2.4
 - r-cli
+- mscorefonts
