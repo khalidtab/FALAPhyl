@@ -6,7 +6,7 @@ suppressWarnings(suppressMessages(library(dunn.test)))
 suppressWarnings(suppressMessages(library(magrittr)))
 
 option_list = list(
-  make_option(c("-i", "--input"), type="character", default=NULL, help="Distance matrix", metavar="Dissimilarity matrix that is going to be deconstructed to pairwise dissimilarity"),
+  make_option(c("-i", "--input"), type="character", default=NULL, help="Distance matrix", metavar="output of the scores"),
   make_option(c("-o", "--output"), type="character", default=NULL, help="output folder for all pairwise files", metavar="Output folder name")
 );
 

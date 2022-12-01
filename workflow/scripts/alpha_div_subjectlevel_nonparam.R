@@ -47,7 +47,7 @@ for (x in 1:numOfComparisons){
   category2Table = subset(as.data.frame(merged),group == category2)
   currenTable = rbind(category1Table,category2Table)
   patientIDrepetitions = table(currenTable[paste(patientID)])
-  patientIDtwos = subset(as.data.frame(patientIDrepetitions),Freq == 2) %>% .$Var1 %>% as.matrix(.)
+  patientIDtwos = subset(as.data.frame(patientIDrepetitions),Freq == 2) %>% .[,1] %>% as.matrix(.)
   category1reps = rep(category1,length(patientIDtwos))
   category2reps = rep(category2,length(patientIDtwos))
   
