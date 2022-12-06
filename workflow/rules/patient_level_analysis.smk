@@ -57,11 +57,32 @@ rule patient_level_betapart:
       " mkdir {output} && "
       " Rscript --vanilla ./workflow/scripts/betapart_subjectlevel.R -i {input.jac} -r {input.repl} -n {input.norepl} -m data/{wildcards.sample}.txt -c {wildcards.group} -p {params.subjectID} -o {output} -d {wildcards.distance} > {log} 2>&1 "
 
-
+rule friedman: # Plots the beta diversity distances using the Non-Metric Dimensional Scaling (NMDS) algorithm
+   version: "1.0"
+   conda: "../../workflow/envs/dunn.yaml"
+   input:
+      rules.beta_div.output.tsv
+   output: 
+      report("data/distance/Dunns/{sample}/friedman_Dunns–{dist}–{group}.txt",
+      category="Beta diversity",
+      subcategory="{dist}",
+      labels={
+              "Description": "Friedman's nonparametric test and Dunn's multiple comparisons of the distances between the groups",
+              "Data type": "Text file",
+              "Distance type": "{dist}",
+              "Grouping category": "{group}"})
+   log:
+      "data/logs/Friendman_Dunn_{sample}–{dist}–{group}.log"
+   message: "Beta diversity - {wildcards.dist}: Calculating distances between groups based on Friedman's nonparametric test, then performing Dunn's multiple comaparison for variable {wildcards.group} in {wildcards.sample}"
+   params:
+      subjectID=expand("{subjectID}",subjectID=config["subjectID"])
+   shell:
+      "Rscript --vanilla ./workflow/scripts/friedman.R -i {input} -o {output} -m data/{wildcards.sample}.txt -c {wildcards.group} -s {params.subjectID} > {log} 2>&1 "
 
 rule subject_beta:
    input:
-      expand("data/plots/patientlvl_betapart_{sample}–{group}–{distance}/",  sample=config["mysample"],group=config["group"],distance=["bray","jaccard"])
+      expand("data/plots/patientlvl_betapart_{sample}–{group}–{distance}/",   sample=config["mysample"],group=config["group"],distance=["bray","jaccard"]),
+      expand("data/distance/Dunns/{sample}/friedman_Dunns–{dist}–{group}.txt",sample=config["mysample"],group=config["group"],dist=config["distances"])
 
 rule subject_alpha:
    input:

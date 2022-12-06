@@ -75,8 +75,8 @@ for (x in 1:numOfComparisons){
   
   myGraph = ggpubr::ggpaired(tablesMerged, cond1 = category1, cond2 = category2, fill = "condition", palette = "jco", line.size=0.01, 
                              title= (paste("Patient-level comparison of",alphaDivType,"\nBetween",category1,"&",category2)), 
-                             subtitle = paste("n =",numOfPatients,"\nWilcoxon signed rank sum test, P-value <",formatC(pvalue, format = "e", digits = 5)),
-                             ". Rank biserial effect size= ",formatC(effectSize$r_rank_biserial, format = "g", digits = 2))
+                             subtitle = paste("n =",numOfPatients,".Wilcoxon signed rank sum test, P-value <",formatC(pvalue, format = "e", digits = 5),
+                             "\nRank biserial effect size= ",formatC(effectSize$r_rank_biserial, format = "g", digits = 2)))
   ggsave(filename=paste0(output,"/",category1,"_",category2,".svg"),plot=myGraph)
 }
 
