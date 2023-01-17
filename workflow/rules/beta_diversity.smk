@@ -23,7 +23,7 @@ rule beta_div: # Calculate distances between samples based on the chosen beta di
    shell: 
       "Rscript --vanilla ./workflow/scripts/beta_diversity.R -i {input} -o {output} -d {wildcards.dist} "
 
-rule nmds: # Plots the beta diversity distances using the Non-Metric Dimensional Scaling (NMDS) algorithm
+rule nmds_: # Plots the beta diversity distances using the Non-Metric Dimensional Scaling (NMDS) algorithm
    version: "1.0"
    conda: "../../workflow/envs/ggrepel.yaml"
    input:
@@ -77,7 +77,7 @@ rule nmds: # Plots the beta diversity distances using the Non-Metric Dimensional
    shell:
       "Rscript --vanilla ./workflow/scripts/NMDS.R -i {input} -o {output.mysvg} -m data/{wildcards.sample}.txt -g {wildcards.group} -c {wildcards.group}{params.color} -x {params.width} -y {params.height} > {log} 2>&1 "
 
-rule pcoa: # Plots the beta diversity distances using the Principal Coordinates Analysis (PCoA) algorithm
+rule pcoa_: # Plots the beta diversity distances using the Principal Coordinates Analysis (PCoA) algorithm
    version: "1.0"
    conda:
       "../../workflow/envs/ggrepel.yaml"
@@ -133,7 +133,7 @@ rule pcoa: # Plots the beta diversity distances using the Principal Coordinates 
       "Rscript --vanilla ./workflow/scripts/PCoA.R -i {input} -m data/{wildcards.sample}.txt -g {wildcards.group} -c {wildcards.group}{params.color} -o {output.mysvg} -x {params.width} -y {params.height} > {log} 2>&1 "
 
 
-rule adonis: # Calculates whether the two groups have similar dispersions (variances) to their centroid
+rule adonis_: # Calculates whether the two groups have similar dispersions (variances) to their centroid
    version: "1.0"
    conda:
       "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
@@ -174,7 +174,7 @@ rule adonis: # Calculates whether the two groups have similar dispersions (varia
    shell:
       " Rscript --vanilla ./workflow/scripts/adonis_anosim_betadisper.R -i {input} -o {output.myresults} -m data/{wildcards.sample}.txt -g {wildcards.group} -c {params.color} -t {params.test} -x {params.width} -y {params.height} > {log} 2>&1 "
 
-use rule adonis as anosim with:
+use rule adonis_ as anosim_ with:
    output:
       myresults=report("data/distance/ANOSIM/{sample}/anosim–{dist}–{group}.txt",
       caption="../report/beta_anosim.rst",
@@ -206,7 +206,7 @@ use rule adonis as anosim with:
    message: "Beta diversity - {wildcards.dist}: Calculating ANOSIM for variable {wildcards.group} in {wildcards.sample}"
 
 
-rule permdisp: # Calculates whether the two groups have similar dispersions (variances) to their centroid
+rule permdisp_: # Calculates whether the two groups have similar dispersions (variances) to their centroid
    conda:
       "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
    input:
@@ -255,7 +255,7 @@ rule permdisp: # Calculates whether the two groups have similar dispersions (var
    shell:
       " Rscript --vanilla ./workflow/scripts/adonis_anosim_betadisper.R -i {input} -o {output.myresults} -m data/{wildcards.sample}.txt -p {output.myPCoA} -b {output.myBoxplot} -g {wildcards.group} -c {params.color} -t {params.test} -x {params.width} -y {params.height} > {log} 2>&1 "
 
-rule dunns: # Plots the beta diversity distances using the Non-Metric Dimensional Scaling (NMDS) algorithm
+rule dunns_: # Plots the beta diversity distances using the Non-Metric Dimensional Scaling (NMDS) algorithm
    version: "1.0"
    conda: "../../workflow/envs/dunn.yaml"
    input:
@@ -275,7 +275,29 @@ rule dunns: # Plots the beta diversity distances using the Non-Metric Dimensiona
    shell:
       "Rscript --vanilla ./workflow/scripts/Dunn.R -i {input} -o {output} -m data/{wildcards.sample}.txt -c {wildcards.group} > {log} 2>&1 "
 
+rule betadisper:
+   input:
+      expand("data/distance/PERMDISP/{sample}/betadisper–{dist}–{group}.txt", sample=config["mysample"], dist=config["distances"], group=config["group"])
 
+rule anosim:
+   input:
+      expand("data/distance/ANOSIM/{sample}/anosim–{dist}–{group}.txt",       sample=config["mysample"], dist=config["distances"], group=config["group"])
+
+rule adonis:
+   input:
+      expand("data/distance/ADONIS/{sample}/adonis–{dist}–{group}.txt",       sample=config["mysample"], dist=config["distances"], group=config["group"])
+
+rule nmds:
+   input:
+      expand("data/plots/betaDiv_{sample}/NMDS–{dist}–{group}.svg",           sample=config["mysample"], dist=config["distances"], group=config["group"])
+
+rule pcoa:
+   input:
+      expand("data/plots/betaDiv_{sample}/PCoA–{dist}–{group}.svg",           sample=config["mysample"], dist=config["distances"], group=config["group"])
+
+rule dunn:
+   input:
+      expand("data/distance/Dunns/{sample}/Dunns–{dist}–{group}.txt",           sample=config["mysample"], dist=config["distances"], group=config["group"]
 
 rule beta:
    input:
