@@ -297,7 +297,7 @@ rule pcoa:
 
 rule dunn:
    input:
-      expand("data/distance/Dunns/{sample}/Dunns–{dist}–{group}.txt",           sample=config["mysample"], dist=config["distances"], group=config["group"]
+      expand("data/distance/Dunns/{sample}/Dunns–{dist}–{group}.txt",           sample=config["mysample"], dist=config["distances"], group=config["group"])
 
 rule beta:
    input:
