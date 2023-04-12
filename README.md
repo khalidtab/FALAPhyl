@@ -14,19 +14,20 @@ If you are using the docker image, you will need to mount the OS's folder as a v
 
 The volume mounted above should include the following files and folders:
 
-> /biom/ 
-
-This is the folder with the biom files to be processed. Files must be in [filename].biom extension, where [filename] is the file name that is exactly the same as the other input files (mapping file)
-
-> /map/ 
-
-This is the folder with the mapping file to be processed. Mapping file must be in the [filname.].txt format, where [filename] is the file name that is exactly the same as the other input files (biom)
-
-> input.yaml
-
-The file with the input parameters. This can be downloaded from this github repo, and it is also packaged in the docker image in the parent directory. If you are using the file in the docker image, it must be copied to the volume, and modified before usage. Any parameter that is not wanted should be commented with a #
+1. [filename].biom, where [filename] is the file name that is exactly the same as the other input files (mapping file)
+2. Mapping file in the [filname.].txt format, where [filename] is the file name that is exactly the same as the other input files (biom). File is in the format typically used for Qiime2. That is, first column "#SampleID", contains sample IDs that match those in the biom file, then the other columns are the additional variables you're interested in analyzing.
+3. input.yaml: the file with the input parameters. This can be downloaded from this github repo, and it is also packaged in the docker image in the parent directory. If you are using the file in the docker image, it must be copied to the volume, and modified before usage. Any parameter that is not wanted should be commented with a #
 
 To run the pipeline. Run the following command
-> snakemake [filename].final --cores all --use-conda
+> snakemake all alpha beta breakdown network diff subject_alpha subject_beta subject_diff --cores all --use-conda
 
-[filename] must be the exact same name as the biom and the mapping files, with the .final at the end
+Here is the explanation of the options:
+1. all: self-explanatory. Will run all analyses.
+2. alpha: alpha diversity, and violin plots of the graphs
+3. beta: dissimilarity matrices, ADONIS, ANOSIM, Beta dispersion, PCoA and NMDS
+4. breakdown: Jaccard and Bray-Curtis broken down to their corresponding components (per the R package Betapart). ANOSIM on the two components. Probability density function of the components through permutation.
+5. network: nodes and edges based on SparCC. Zi-Pi graphs to determine which nodes are most interesting.
+6. diff: differential abundance using multiple methods, using the R package DAtest. Will do pairwise comparisons of selected variables. Will output differential abundance, power analysis, and the following graphs to help identify the best method: AUC, FDR, Power, and Scores.
+7. subject_alpha: For paired/repeated measures. Alpha diversity differences but restricted to differences within a subject.
+8. subject_beta: For paired/repeated measures. Same as the breakdown option above, but the comparison is restricted to differences within the subject.
+9. subject_diff: For paired/repeated measures. Same as the diff option above, but the comparisons is restricted to differences within the subject.
