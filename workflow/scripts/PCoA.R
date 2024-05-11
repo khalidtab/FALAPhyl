@@ -50,6 +50,7 @@ coordinates = cbind(rownames(coordinates),coordinates)
 colnames(coordinates) = c("SampleID","PCoA1","PCoA2")
 
 map = suppressMessages(read.csv(mapping_file, skip=0, header=T, sep="\t"))
+colnames(map)[1] = "X.SampleID"
 
 # Get NMDS coordinates
 

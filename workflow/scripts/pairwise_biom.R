@@ -46,7 +46,7 @@ load_phylo = function(myPhyloseqObject){
 # Make the phyloseq merged file
 
 
-biom = suppressMessages(readr::read_tsv(biomFile,skip=1)) %>% as.data.frame(.)
+biom = suppressMessages(readr::read_tsv(biomFile)) %>% as.data.frame(.)
 rownames(biom) = biom[,1]
 biom[,1] = NULL
 

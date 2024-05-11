@@ -35,6 +35,7 @@ myheight = as.numeric(opt$height)
 
 dist = suppressMessages(read.csv(file=dissimilarity, skip=0, header=T, row.names=1, sep="\t")) %>% as.dist(.)
 map = suppressMessages(read.csv(mapping_file, skip=0, header=T, sep="\t"))
+colnames(map)[1] = "X.SampleID"
 
 # Get NMDS coordinates
 NMDS = metaMDS(dist)

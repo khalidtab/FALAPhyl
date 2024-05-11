@@ -27,7 +27,7 @@ dissimilarity = opt$dissimilarity
 output = opt$output 
 
 # Format the input file
-mytsv = read.table(tsvfile,sep="\t",skip=1,comment.char = "@",header = TRUE,row.names = 1)
+mytsv = read.table(tsvfile,sep="\t",comment.char = "@",header = TRUE,row.names = 1)
 mytsv = mytsv %>% mutate_if(is.character,as.numeric)
 
 

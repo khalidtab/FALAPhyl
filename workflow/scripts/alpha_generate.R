@@ -22,7 +22,7 @@ alpha = opt$alpha
 output = opt$output
 
 
-biomFile = read.table(biom,comment.char = "@",skip=1,sep = "\t",header=TRUE)
+biomFile = read.table(biom,comment.char = "@",sep = "\t",header=TRUE)
 row.names(biomFile) = biomFile[,1]
 biomFile[,1] = NULL 
 biomFile = otu_table(biomFile,taxa_are_rows = TRUE)

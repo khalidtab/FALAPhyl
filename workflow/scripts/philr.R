@@ -25,7 +25,7 @@ if (is.null(opt$input)){
 
 # Load files
 
-biom = suppressMessages(read.delim(opt$input,skip=1,sep="\t")) %>% as.data.frame(.)
+biom = suppressMessages(read.delim(opt$input,sep="\t")) %>% as.data.frame(.)
 rownames(biom) = biom[,1]
 biom[,1] = NULL
 
