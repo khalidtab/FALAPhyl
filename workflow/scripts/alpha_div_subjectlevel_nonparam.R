@@ -27,6 +27,7 @@ output = opt$output
 patientID = opt$patientID 
 
 map = suppressMessages(read_tsv(map))
+colnames(map)[1] = "SampleID"
 alpha = suppressMessages(read_tsv(alpha))
 alphaDivType = colnames(alpha)[2]
 # Merge then keep only the pertinent columns
@@ -47,6 +48,12 @@ for (x in 1:numOfComparisons){
   category2Table = subset(as.data.frame(merged),group == category2)
   currenTable = rbind(category1Table,category2Table)
   patientIDrepetitions = table(currenTable[paste(patientID)])
+  if(length(unique(patientIDrepetitions)) > 1){
+    print(paste("Categories to be compared are",category1,category2))
+    print(patientIDrepetitions)
+    print("Your design is not balanced. You have some samples missing that preclude analysis of your subject-level alpha diversity comparison.")
+  }
+  
   patientIDtwos = subset(as.data.frame(patientIDrepetitions),Freq == 2) %>% .[,1] %>% as.matrix(.)
   category1reps = rep(category1,length(patientIDtwos))
   category2reps = rep(category2,length(patientIDtwos))

@@ -27,9 +27,9 @@ row.names(myTSV) = myTSV[,1]
 myTSV[,1] = NULL
 
 mapping_file = read_tsv(mapping_file)
-sampleIDs = mapping_file[,1] %>% as.data.frame(.) %>% unlist(.)
+sampleIDs = mapping_file[,1] %>% unlist(.) %>% as.character(.)
 
-myTSV = myTSV %>% .[,which(colnames(.) %in% sampleIDs)] %>% .[-which(rowSums(.) == 0),] # Keep samples that are in the mapping file, then keep features which the sum of the rows is not zero
+myTSV = myTSV %>% .[,which(colnames(.) %in% sampleIDs)] %>% filter(rowSums(.) != 0)  # Keep samples that are in the mapping file, then keep features which the sum of the rows is not zero
 myTSV = cbind(rownames(myTSV),myTSV) # Put the rows names back as a column
 colnames(myTSV)[1] = "#OTU ID" 
 

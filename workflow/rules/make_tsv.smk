@@ -43,7 +43,7 @@ checkpoint biom_pairwise1: # Create pairwise biom files for all the variables so
    input:
       "data/tsv/{sample}.tsv"
    output:
-      temporary(directory("tmp/diff/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/pairwise/"))
+      temporary(directory("data/tmp/diff/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/pairwise/"))
    message: "Filtering biom files of {wildcards.sample} as pairwise comparisons of the variables of {wildcards.group}"
    shell:
       " mkdir -p {output} | "
@@ -55,7 +55,7 @@ checkpoint biom_pairwise2: # Create pairwise biom files for all the variables so
    input:
       "data/tsv/{sample}.tsv"
    output:
-      temporary(directory("tmp/diff/pairwise–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–{theTest}/"))
+      temporary(directory("data/tmp/diff/pairwise–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–{theTest}/"))
    message: "Filtering biom files of {wildcards.sample} as pairwise comparisons of the variables of {wildcards.group}"
    shell:
       " mkdir -p {output} | "

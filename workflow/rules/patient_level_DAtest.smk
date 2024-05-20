@@ -3,8 +3,8 @@ rule testDA_pair with:
    conda:
       "../../workflow/envs/DAtest.yaml"
    input:
-      tsv="tmp/diff/pairwise–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–{theTest}/{annie}.tsv",
-      map="tmp/diff/pairwise–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–{theTest}/{annie}.txt"
+      tsv="data/tmp/diff/pairwise–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–{theTest}/{annie}.tsv",
+      map="data/tmp/diff/pairwise–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–{theTest}/{annie}.txt"
    output:
       testfile=report("data/diff_subject/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/diffPaired–{annie}–{theTest}.tsv",
       caption="../report/DAtest_subject_test.rst",
@@ -31,7 +31,7 @@ rule testDAPair_done:
    input:
       ids_testDApair
    output:
-      temporary(touch("tmp/testDAPair_{sample}–{group}–{theTest}–minAbd{minabund}minR{minread}minS{minsample}–done.txt"))
+      temporary(touch("data/tmp/testDAPair_{sample}–{group}–{theTest}–minAbd{minabund}minR{minread}minS{minsample}–done.txt"))
 
 
 
@@ -51,8 +51,8 @@ rule PowerDAPair:
    conda:
       "../../workflow/envs/DAtest.yaml"
    input:
-      tsv="tmp/diff/pairwise–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–{theTest}/{annie}.tsv",
-      map="tmp/diff/pairwise–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–{theTest}/{annie}.txt"
+      tsv="data/tmp/diff/pairwise–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–{theTest}/{annie}.tsv",
+      map="data/tmp/diff/pairwise–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–{theTest}/{annie}.txt"
    output:
       testfile=report("data/diff_subject/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/diffPowerPair–{annie}–{theTest}.tsv",
       caption="../report/DAtest_subject_test.rst",
@@ -78,7 +78,7 @@ rule testDAPowerPair_done:
    input:
       ids_testDAPowerPair
    output:
-      temporary(touch("tmp/testDAPair_Power_{sample}–{group}–{theTest}–minAbd{minabund}minR{minread}minS{minsample}–done.txt"))
+      temporary(touch("data/tmp/testDAPair_Power_{sample}–{group}–{theTest}–minAbd{minabund}minR{minread}minS{minsample}–done.txt"))
 
 
 
@@ -86,10 +86,10 @@ rule testDAPowerPair_done:
 
 rule cleanup_DAtestPair_pairwise:
    input:
-      "tmp/testDAPair_Power_{sample}–{group}–{theTest}–minAbd{minabund}minR{minread}minS{minsample}–done.txt",
-      "tmp/testDAPair_{sample}–{group}–{theTest}–minAbd{minabund}minR{minread}minS{minsample}–done.txt"
+      "data/tmp/testDAPair_Power_{sample}–{group}–{theTest}–minAbd{minabund}minR{minread}minS{minsample}–done.txt",
+      "data/tmp/testDAPair_{sample}–{group}–{theTest}–minAbd{minabund}minR{minread}minS{minsample}–done.txt"
    output:
-      temporary(touch("tmp/donePair_{sample}–{group}–{theTest}–{minabund}{minread}{minsample}.txt"))
+      temporary(touch("data/tmp/donePair_{sample}–{group}–{theTest}–{minabund}{minread}{minsample}.txt"))
    message: "Done with testing effect size power testing, with within subject constraints, for {wildcards.sample}–{wildcards.group}–{wildcards.theTest}–minAbd{wildcards.minabund}minR{wildcards.minread}minS{wildcards.minsample}"
 
 
@@ -112,10 +112,10 @@ rule EffSizePowerTestPair:
    conda:
       "../../workflow/envs/DAtest.yaml"
    input:
-      tsv="tmp/diff/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/pairwise/{annie}.tsv",
-      map="tmp/diff/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/pairwise/{annie}.txt"
+      tsv="data/tmp/diff/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/pairwise/{annie}.tsv",
+      map="data/tmp/diff/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/pairwise/{annie}.txt"
    output:
-      thefile=temporary("tmp/done–DATestPair–EffSizePowerTest–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/{annie}.txt"),
+      thefile=temporary("data/tmp/done–DATestPair–EffSizePowerTest–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/{annie}.txt"),
    params:
       DAtest=config["paired_DA_tests"],
       subject=config["subjectID"][0]
@@ -133,7 +133,7 @@ rule testDA_Power_plotPaired:
    conda:
       "../../workflow/envs/ggpubr.yaml"
    input:
-      thedonefile="tmp/done–DATestPair–EffSizePowerTest–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/{annie}.txt"
+      thedonefile="data/tmp/done–DATestPair–EffSizePowerTest–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/{annie}.txt"
    output:
       mytable ="data/diff_subject/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/{annie}–AUC_FDR_Power–Paired.txt",
       myAUC=report("data/plots/Paired–AUC–{sample}–{group}–{annie}–minAbd{minabund}minR{minread}minS{minsample}.svg",
@@ -194,7 +194,7 @@ rule EffSizePowerTestPair_done:
    input:
       ids_EffSizePowerTestPair
    output:
-      temporary(touch("tmp/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–TestDAPair_power_done.txt"))
+      temporary(touch("data/tmp/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–TestDAPair_power_done.txt"))
    message: "Done with power testing, graphing and Dunn's test, with within subject constraints. {wildcards.sample}–{wildcards.group}–minAbd{wildcards.minabund}minR{wildcards.minread}minS{wildcards.minsample}"
    shell:
       "echo done"
@@ -202,5 +202,5 @@ rule EffSizePowerTestPair_done:
 
 rule subject_diff:
    input:
-      expand("tmp/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–TestDAPair_power_done.txt", sample=config["mysample"],group=config["group"],theTest=config["paired_DA_tests"],minabund=config["DA_minabund"],minread=config["DA_minread"],minsample=config["DA_minsample"]),
-      expand("tmp/donePair_{sample}–{group}–{theTest}–{minabund}{minread}{minsample}.txt", sample=config["mysample"],group=config["group"],theTest=config["paired_DA_tests"],minabund=config["DA_minabund"],minread=config["DA_minread"],minsample=config["DA_minsample"])
+      expand("data/tmp/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–TestDAPair_power_done.txt", sample=config["mysample"],group=config["group"],theTest=config["paired_DA_tests"],minabund=config["DA_minabund"],minread=config["DA_minread"],minsample=config["DA_minsample"]),
+      expand("data/tmp/donePair_{sample}–{group}–{theTest}–{minabund}{minread}{minsample}.txt", sample=config["mysample"],group=config["group"],theTest=config["paired_DA_tests"],minabund=config["DA_minabund"],minread=config["DA_minread"],minsample=config["DA_minsample"])

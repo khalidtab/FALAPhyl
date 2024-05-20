@@ -3,8 +3,8 @@ rule testDA:
    conda:
       "../../workflow/envs/DAtest.yaml"
    input:
-      tsv="tmp/diff/pairwise–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–{theTest}/{annie}.tsv",
-      map="tmp/diff/pairwise–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–{theTest}/{annie}.txt"
+      tsv="data/tmp/diff/pairwise–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–{theTest}/{annie}.tsv",
+      map="data/tmp/diff/pairwise–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–{theTest}/{annie}.txt"
    output:
       testfile=report("data/diff/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/diff–{annie}–{theTest}.tsv",
       caption="../report/DAtest_subject_test.rst",
@@ -31,7 +31,7 @@ rule testDA_done:
    input:
       ids_testDA
    output:
-      temporary(touch("tmp/testDA_{sample}–{group}–{theTest}–minAbd{minabund}minR{minread}minS{minsample}–done.txt"))
+      temporary(touch("data/tmp/testDA_{sample}–{group}–{theTest}–minAbd{minabund}minR{minread}minS{minsample}–done.txt"))
 
 
 
@@ -51,8 +51,8 @@ rule PowerDA:
    conda:
       "../../workflow/envs/DAtest.yaml"
    input:
-      tsv="tmp/diff/pairwise–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–{theTest}/{annie}.tsv",
-      map="tmp/diff/pairwise–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–{theTest}/{annie}.txt"
+      tsv="data/tmp/diff/pairwise–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–{theTest}/{annie}.tsv",
+      map="data/tmp/diff/pairwise–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–{theTest}/{annie}.txt"
    output:
       testfile=report("data/diff/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/diffPower–{annie}–{theTest}.tsv",
       caption="../report/DAtest_subject_test.rst",
@@ -78,7 +78,7 @@ rule testDAPower_done:
    input:
       ids_testDAPower
    output:
-      temporary(touch("tmp/testDA_Power_{sample}–{group}–{theTest}–minAbd{minabund}minR{minread}minS{minsample}–done.txt"))
+      temporary(touch("data/tmp/testDA_Power_{sample}–{group}–{theTest}–minAbd{minabund}minR{minread}minS{minsample}–done.txt"))
 
 
 
@@ -86,10 +86,10 @@ rule testDAPower_done:
 
 rule cleanup_DAtest_pairwise:
    input:
-      "tmp/testDA_Power_{sample}–{group}–{theTest}–minAbd{minabund}minR{minread}minS{minsample}–done.txt",
-      "tmp/testDA_{sample}–{group}–{theTest}–minAbd{minabund}minR{minread}minS{minsample}–done.txt"
+      "data/tmp/testDA_Power_{sample}–{group}–{theTest}–minAbd{minabund}minR{minread}minS{minsample}–done.txt",
+      "data/tmp/testDA_{sample}–{group}–{theTest}–minAbd{minabund}minR{minread}minS{minsample}–done.txt"
    output:
-      temporary(touch("tmp/done_{sample}–{group}–{theTest}–{minabund}{minread}{minsample}.txt"))
+      temporary(touch("data/tmp/done_{sample}–{group}–{theTest}–{minabund}{minread}{minsample}.txt"))
    message: "Done with testing effect size power testing for {wildcards.sample}–{wildcards.group}–{wildcards.theTest}–minAbd{wildcards.minabund}minR{wildcards.minread}minS{wildcards.minsample}"
    shell:
       "echo done"
@@ -113,10 +113,10 @@ rule EffSizePowerTest:
    conda:
       "../../workflow/envs/DAtest.yaml"
    input:
-      tsv="tmp/diff/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/pairwise/{annie}.tsv",
-      map="tmp/diff/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/pairwise/{annie}.txt"
+      tsv="data/tmp/diff/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/pairwise/{annie}.tsv",
+      map="data/tmp/diff/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/pairwise/{annie}.txt"
    output:
-      thefile=temporary("tmp/done–DATest–EffSizePowerTest–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/{annie}.txt")
+      thefile=temporary("data/tmp/done–DATest–EffSizePowerTest–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/{annie}.txt")
    params:
       DAtest=config["DA_tests"]
    message: "Effect size power testing for {wildcards.sample} – {wildcards.annie}."
@@ -134,7 +134,7 @@ rule testDA_Power_plot:
    conda:
       "../../workflow/envs/ggpubr.yaml"
    input:
-      thedonefile="tmp/done–DATest–EffSizePowerTest–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/{annie}.txt"
+      thedonefile="data/tmp/done–DATest–EffSizePowerTest–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/{annie}.txt"
    output:
       mytable ="data/diff/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/{annie}–AUC_FDR_Power.txt",
       myAUC=report("data/plots/AUC–{sample}–{group}–{annie}–minAbd{minabund}minR{minread}minS{minsample}.svg",
@@ -195,12 +195,12 @@ rule EffSizePowerTest_done:
    input:
       ids_EffSizePowerTest
    output:
-      temporary(touch("tmp/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–TestDA_power_done.txt"))
+      temporary(touch("data/tmp/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–TestDA_power_done.txt"))
    message: "Done with power testing, graphing and Dunn's test {wildcards.sample}–{wildcards.group}–minAbd{wildcards.minabund}minR{wildcards.minread}minS{wildcards.minsample}"
    shell:
       "echo done"
 
 rule diff:
    input:
-      expand("tmp/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–TestDA_power_done.txt", sample=config["mysample"],group=config["group"],theTest=config["DA_tests"],minabund=config["DA_minabund"],minread=config["DA_minread"],minsample=config["DA_minsample"]),
-      expand("tmp/done_{sample}–{group}–{theTest}–{minabund}{minread}{minsample}.txt", sample=config["mysample"],group=config["group"],theTest=config["DA_tests"],minabund=config["DA_minabund"],minread=config["DA_minread"],minsample=config["DA_minsample"])
+      expand("data/tmp/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–TestDA_power_done.txt", sample=config["mysample"],group=config["group"],theTest=config["DA_tests"],minabund=config["DA_minabund"],minread=config["DA_minread"],minsample=config["DA_minsample"]),
+      expand("data/tmp/done_{sample}–{group}–{theTest}–{minabund}{minread}{minsample}.txt", sample=config["mysample"],group=config["group"],theTest=config["DA_tests"],minabund=config["DA_minabund"],minread=config["DA_minread"],minsample=config["DA_minsample"])
