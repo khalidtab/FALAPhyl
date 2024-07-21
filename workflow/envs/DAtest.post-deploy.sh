@@ -1,2 +1,2 @@
 conda activate $CONDA_PREFIX
-R -e 'if (!requireNamespace("devtools")) install.packages("devtools") ; devtools::install_github("Russel88/DAtest")'
+R -e 'if (!requireNamespace("devtools")) install.packages("devtools") ; devtools::install_github("Russel88/DAtest") ; devtools::install_github("himelmallick/Tweedieverse") ; devtools::install_version("statmod", version = "1.4.33", repos ="http://cran.us.r-project.org”). ; devtools::install_version("cplm", version = "0.7-8", repos = "http://cran.us.r-project.org")'
