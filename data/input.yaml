@@ -114,6 +114,7 @@ DA_tests:
      - znb
      - zpo
      - adx
+     - CPLM
 
 paired_DA_tests:
      - ds2

@@ -124,11 +124,11 @@ rule EffSizePowerTest:
       '''
       mkdir -p data/diff/{wildcards.sample}–{wildcards.group}–minAbd{wildcards.minabund}minR{wildcards.minread}minS{wildcards.minsample}/{wildcards.annie}/AUC_FDR_Power && echo {params.DAtest} | 
       tr " " "\n" | 
-      parallel -j 1 "if [ ! -e data/diff/{wildcards.sample}–{wildcards.group}–minAbd{wildcards.minabund}minR{wildcards.minread}minS{wildcards.minsample}/{wildcards.annie}/AUC_FDR_Power/EffSizePowerTest-{{}}.tsv ] ; then Rscript --vanilla workflow/scripts/testDA.R -i {input.tsv} -m {input.map} -c {wildcards.group} -s {wildcards.minsample} -r {wildcards.minread} -a {wildcards.minabund} -o data/diff/{wildcards.sample}–{wildcards.group}–minAbd{wildcards.minabund}minR{wildcards.minread}minS{wildcards.minsample}/{wildcards.annie}/AUC_FDR_Power/EffSizePowerTest-{{}}.tsv -t {{}} > data/logs/EffSizePowerTest–{wildcards.sample}–{wildcards.annie}–minAbd{wildcards.minabund}minR{wildcards.minread}minS{wildcards.minsample}–{{}}.txt  2>&1 && rm -rf /data/diff/pairwise–{wildcards.sample}–{wildcards.group}–minAbd{wildcards.minabund}minR{wildcards.minread}minS{wildcards.minsample}–{{}}/ ;fi" &&
+      parallel -j 1 "if [ ! -e data/diff/{wildcards.sample}–{wildcards.group}–minAbd{wildcards.minabund}minR{wildcards.minread}minS{wildcards.minsample}/{wildcards.annie}/AUC_FDR_Power/EffSizePowerTest-{{}}.tsv ] ; then Rscript --vanilla workflow/scripts/testDA.R -i {input.tsv} -m {input.map} -c {wildcards.group} -s {wildcards.minsample} -r {wildcards.minread} -a {wildcards.minabund} -m /tmp/ -l data/logs/EffSizePowerTest–{wildcards.sample}–{wildcards.annie}–minAbd{wildcards.minabund}minR{wildcards.minread}minS{wildcards.minsample}–{{}}.txt -o data/diff/{wildcards.sample}–{wildcards.group}–minAbd{wildcards.minabund}minR{wildcards.minread}minS{wildcards.minsample}/{wildcards.annie}/AUC_FDR_Power/EffSizePowerTest-{{}}.tsv -t {{}} > data/logs/EffSizePowerTest–{wildcards.sample}–{wildcards.annie}–minAbd{wildcards.minabund}minR{wildcards.minread}minS{wildcards.minsample}–{{}}.txt  2>&1 && rm -rf /data/diff/pairwise–{wildcards.sample}–{wildcards.group}–minAbd{wildcards.minabund}minR{wildcards.minread}minS{wildcards.minsample}–{{}}/ ;fi" &&
        touch {output.thefile}
       '''
 
-
+data/logs/EffSizePowerTest–{sample}–{annie}–minAbd{minabund}minR{minread}minS{minsample}
 
 rule testDA_Power_plot: 
    conda:
