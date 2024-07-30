@@ -137,7 +137,113 @@ if (mymethod == "fri"){
 } else if (mymethod == "zig"){
   final=DA.zig(df, paired=subject, predictor = vec)
   
-} 
+} } else if (mymethod %in% c("CPLM","ZICP","ZSCP","ZACP")){
+  
+  library("Tweedieverse")
+  
+  df <- apply(df, 2, function(x) x / sum(x))
+  
+  CPLM <- function(count_table, predictor, paired, covars) {
+    
+    write_log <- function(message) {
+      write(message, file = log_file, append = TRUE)
+    }
+    
+    # Create a unique output directory based on timestamp
+    timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
+    output_dir <- paste0(tmp_folder, timestamp)
+    dir.create(output_dir, recursive = TRUE)
+    results_file <- paste0(output_dir, "/all_results.tsv")
+    
+    write_log("Entering function")
+    
+    # Debug: Print inputs
+    write_log("count_table:")
+    write_log(paste(capture.output(head(count_table)), collapse = "\n"))
+    write_log(paste("Dimensions of count_table:", paste(dim(count_table), collapse = " x ")))
+    
+    write_log("predictor:")
+    write_log(paste(capture.output(head(predictor)), collapse = "\n"))
+    write_log(paste("Length of predictor:", length(predictor)))
+    
+    # Prepare the predictor data frame
+    predictor_df <- data.frame(sampleid = colnames(count_table), metadata = as.character(predictor))
+    rownames(predictor_df) <- predictor_df$sampleid
+    predictor_df$sampleid <- NULL
+    
+    write_log("predictor_df:")
+    write_log(paste(capture.output(head(predictor_df)), collapse = "\n"))
+    write_log(paste("Dimensions of predictor_df:", paste(dim(predictor_df), collapse = " x ")))
+    
+    # Run the Tweedieverse function
+    write_log("Running Tweedieverse...")
+    tryCatch({
+      Tweedieverse::Tweedieverse(
+        input_features = as.data.frame(count_table),
+        input_metadata = predictor_df,
+        output = output_dir,
+        base_model = mymethod,
+        abd_threshold = 0,
+        prev_threshold = 0.0,
+        var_threshold = 0,
+        entropy_threshold = 0,
+        random_effects = subjectID
+      )
+      write_log("Tweedieverse completed.")
+    }, error = function(e) {
+      write_log(paste("Error in Tweedieverse:", e$message))
+      return(NULL)
+    })
+    
+    # Check if the results file was created
+    if (!file.exists(results_file)) {
+      write_log("Results file does not exist")
+      stop("Results file does not exist")
+    }
+    write_log("Results file exists.")
+    
+    # Read the results
+    myTable <- read_tsv(results_file, show_col_types = FALSE)
+    myTable <- as.data.frame(myTable)
+    
+    # Debug: Check myTable
+    write_log("myTable:")
+    write_log(paste(capture.output(head(myTable)), collapse = "\n"))
+    write_log(paste("Dimensions of myTable:", paste(dim(myTable), collapse = " x ")))
+    
+    # Ensure myTable has the expected structure
+    if (nrow(myTable) == 0 || !all(c("feature", "pval") %in% colnames(myTable))) {
+      write_log("Results table has unexpected structure")
+      stop("Results table has unexpected structure")
+    }
+    
+    # Define a result data frame
+    result_df <- data.frame(
+      Feature = myTable$feature,
+      pval = myTable$pval,
+      pval.adj = p.adjust(myTable$pval, method = "fdr"),
+      Method = mymethod,
+      stringsAsFactors = FALSE
+    )
+    rownames(result_df) <- result_df$Feature
+    
+    write_log("Returning result_df from CPLM")
+    write_log(paste(capture.output(head(result_df)), collapse = "\n"))
+    
+    return(result_df)
+  }
+  
+  # Run testDA with cores set to 1
+  final <- DAtest::testDA(
+    data = df,
+    predictor = vec,
+    tests = c("zzz"),
+    args = list(zzz = list(FUN = CPLM)),
+    cores = 1)
+  
+  final$table = final$data
+  
+}
 
 write_tsv(final,opt$output)
 

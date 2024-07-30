@@ -223,9 +223,11 @@ if (mymethod == "abc"){
 } else if (mymethod == "lia") {
   final=testDA(df, predictor = vec,tests=c("kru","lia"))
   
-} else if (mymethod == "CPLM"){
+} else if (mymethod %in% c("CPLM","ZICP","ZSCP","ZACP")){
 
   library("Tweedieverse")
+  
+  df <- apply(df, 2, function(x) x / sum(x))
   
   CPLM <- function(count_table, predictor, paired, covars) {
     
@@ -239,7 +241,7 @@ if (mymethod == "abc"){
     dir.create(output_dir, recursive = TRUE)
     results_file <- paste0(output_dir, "/all_results.tsv")
     
-    write_log("Entering CPLM function")
+    write_log("Entering function")
     
     # Debug: Print inputs
     write_log("count_table:")
@@ -266,7 +268,7 @@ if (mymethod == "abc"){
         input_features = as.data.frame(count_table),
         input_metadata = predictor_df,
         output = output_dir,
-        base_model = "CPLM",
+        base_model = mymethod,
         abd_threshold = 0,
         prev_threshold = 0.0,
         var_threshold = 0,
