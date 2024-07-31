@@ -137,7 +137,7 @@ if (mymethod == "fri"){
 } else if (mymethod == "zig"){
   final=DA.zig(df, paired=subject, predictor = vec)
   
-} } else if (mymethod %in% c("CPLM","ZICP","ZSCP","ZACP")){
+} else if (mymethod %in% c("CPLM","ZICP","ZSCP","ZACP")){
   
   library("Tweedieverse")
   
@@ -227,7 +227,7 @@ if (mymethod == "fri"){
     )
     rownames(result_df) <- result_df$Feature
     
-    write_log("Returning result_df from CPLM")
+    write_log("Returning result_df")
     write_log(paste(capture.output(head(result_df)), collapse = "\n"))
     
     return(result_df)
@@ -239,7 +239,8 @@ if (mymethod == "fri"){
     predictor = vec,
     tests = c("zzz"),
     args = list(zzz = list(FUN = CPLM)),
-    cores = 1)
+    cores = 1,
+    paired = subject)
   
   final$table = final$data
   

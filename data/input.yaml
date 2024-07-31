@@ -84,6 +84,10 @@ betapart_permutations: # How many permutations to create?
 # tta,ttc = t-test (ALR,CLR)
 # ttt,ltt,ltt2,ttr = Welch(t.test,t.test log,t.test log #2,t.test Rank-normalization)
 # wil = Wilcoxon
+#     - CPLM: compound poisson linear model
+#     - ZICP: zero-inflated compound poisson linear model
+#     - ZSCP
+#     - ZACP: 
 DA_tests:
      - abc
      - bay
@@ -115,6 +119,9 @@ DA_tests:
      - zpo
      - adx
      - CPLM
+     - ZICP
+     - ZSCP
+     - ZACP
 
 paired_DA_tests:
      - ds2

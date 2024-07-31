@@ -227,7 +227,7 @@ if (mymethod == "abc"){
 
   library("Tweedieverse")
   
-  df <- apply(df, 2, function(x) x / sum(x))
+ # df <- apply(df, 2, function(x) x / sum(x))
   
   CPLM <- function(count_table, predictor, paired, covars) {
     
@@ -323,8 +323,7 @@ if (mymethod == "abc"){
     data = df,
     predictor = vec,
     tests = c("zzz"),
-    args = list(zzz = list(FUN = CPLM)),
-    cores = 1)
+    args = list(zzz = list(FUN = CPLM)), relative = TRUE)
   
 final$table = final$data
     

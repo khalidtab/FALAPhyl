@@ -66,7 +66,7 @@ rule PowerDAPair:
       "data/logs/PowerDAPair–{sample}–{group}–{annie}–{theTest}–minAbd{minabund}minR{minread}minS{minsample}.txt"
    message: "Differential abundance: Power analysis for the test {wildcards.theTest} using {wildcards.sample} – {wildcards.annie}, with within subject constraints."
    shell:
-      "Rscript --vanilla workflow/scripts/powerDA_subject.R -i {input.tsv} -m {input.map} -c {wildcards.group} -s {wildcards.minsample} -r {wildcards.minread} -a {wildcards.minabund} -t {wildcards.theTest} -o {output.testfile} -p {params.subject} > {log} 2>&1"
+      "Rscript --vanilla workflow/scripts/powerDA_subject.R -i {input.tsv} -m {input.map} -c {wildcards.group} -s {wildcards.minsample} -r {wildcards.minread} -a {wildcards.minabund} -t {wildcards.theTest} -o {output.testfile} -p {params.subject} -e /data/tmp > {log} 2>&1"
 
 def ids_testDAPowerPair(wildcards):
     biom_pairwise_checkpoint_output = checkpoints.biom_pairwise2.get(**wildcards).output[0]    

@@ -64,7 +64,7 @@ rule PowerDA:
       "data/logs/PowerDA–{sample}–{group}–{annie}–{theTest}–minAbd{minabund}minR{minread}minS{minsample}.txt"
    message: "Differential abundance: Power analysis for the test {wildcards.theTest} using {wildcards.sample} – {wildcards.annie}."
    shell:
-      "Rscript --vanilla workflow/scripts/powerDA.R -i {input.tsv} -m {input.map} -c {wildcards.group} -s {wildcards.minsample} -r {wildcards.minread} -a {wildcards.minabund} -t {wildcards.theTest} -o {output.testfile} > {log} 2>&1"
+      "Rscript --vanilla workflow/scripts/powerDA.R -i {input.tsv} -m {input.map} -c {wildcards.group} -s {wildcards.minsample} -r {wildcards.minread} -a {wildcards.minabund} -t {wildcards.theTest} -o {output.testfile} -l {log} > {log} 2>&1"
 
 
 
@@ -128,7 +128,7 @@ rule EffSizePowerTest:
        touch {output.thefile}
       '''
 
-data/logs/EffSizePowerTest–{sample}–{annie}–minAbd{minabund}minR{minread}minS{minsample}
+
 
 rule testDA_Power_plot: 
    conda:

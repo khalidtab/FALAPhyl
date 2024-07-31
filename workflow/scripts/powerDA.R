@@ -14,7 +14,9 @@ option_list = list(
   make_option(c("-s", "--minsample"), type="character", default=NULL, help="Prefiltering number. Minimal number of samples a feature needs to be present in. Otherwise it will be filtered out, and combined as Others", metavar="Min number of samples"),
   make_option(c("-r", "--minread"), type="character", default=NULL, help="Prefiltering number. Minimal number of reads a feature needs to be present in. Otherwise it will be filtered out, and combined as Others", metavar="Min number of reads"),
   make_option(c("-a", "--minabund"), type="character", default=NULL, help="Prefiltering number. Minimal mean relative abundance a feature needs to be present in. Otherwise it will be filtered out, and combined as Others", metavar="Min number of mean relative abundance"),
-  make_option(c("-o", "--output"), type="character", default=NULL, help="output file name", metavar="Output file name")
+  make_option(c("-l", "--log"), type="character", default=NULL, help="log file", metavar="log file"), 
+   make_option(c("-e", "--tmp"), type="character", default=NULL, help="tmp folder", metavar="tmp folder"), 
+ make_option(c("-o", "--output"), type="character", default=NULL, help="output file name", metavar="Output file name")
 );
 
 opt_parser = OptionParser(option_list=option_list);
@@ -32,7 +34,7 @@ df = as.data.frame(df)
 rownames(df) = dfRows[,1]
 df[,1] = NULL
 df[] = lapply(df, as.numeric)
-df = t(df)
+
 if ( as.numeric(opt$minsample)==0 && as.numeric(opt$minread)==0 && as.numeric(opt$minabund)==0){df = df}else{
   df = preDA(df, min.samples = as.numeric(opt$minsample), min.reads = as.numeric(opt$minread), min.abundance =  as.numeric(opt$minabund))
 }
@@ -47,6 +49,10 @@ working_map = cbind(as.character(map[,1]),
                     as.character(map[,catNum])) %>% as.data.frame(.)
 colnames(working_map) = c("SampleID","condition")
 vec = working_map$condition %>% as.factor(.)
+
+tmp_folder = opt$tmp
+
+log_file = opt$log
 
 mymethod = opt$test
 
@@ -220,6 +226,11 @@ if (mymethod == "abc"){
   
  } else if (mymethod == "lia") {
    final=powerDA(df, predictor = vec, test = "lia")
+   
+ } else if (mymethod %in% c("CPLM","ZICP","ZSCP","ZACP")){
+   
+   final = NA
+   final$text = "effect size power calculation is not available for the chosen test"
    
  }
 

@@ -9,12 +9,14 @@ suppressWarnings(suppressMessages(library("optparse")))
 option_list = list(
   make_option(c("-i", "--input"), type="character", default=NULL, help="Biom file", metavar="Features input file formatted as biom"),
   make_option(c("-m", "--mapping"), type="character", default=NULL, help="Mapping file", metavar="Input mapping file"),
-  make_option(c("-t", "--test"), type="character", default=NULL, help="DAtest method", metavar="Type of test that DAtest does"),
   make_option(c("-c", "--category"), type="character", default=NULL, help="Category", metavar="Name of category column to compare"),
   make_option(c("-s", "--minsample"), type="character", default=NULL, help="Prefiltering number. Minimal number of samples a feature needs to be present in. Otherwise it will be filtered out, and combined as Others", metavar="Min number of samples"),
   make_option(c("-r", "--minread"), type="character", default=NULL, help="Prefiltering number. Minimal number of reads a feature needs to be present in. Otherwise it will be filtered out, and combined as Others", metavar="Min number of reads"),
   make_option(c("-a", "--minabund"), type="character", default=NULL, help="Prefiltering number. Minimal mean relative abundance a feature needs to be present in. Otherwise it will be filtered out, and combined as Others", metavar="Min number of mean relative abundance"),
-  make_option(c("-o", "--output"), type="character", default=NULL, help="output file name", metavar="Output file name")
+  make_option(c("-t", "--thetest"), type="character", default=NULL, help="Test to be run", metavar="Test to be run"),
+  make_option(c("-o", "--output"), type="character", default=NULL, help="Output file name", metavar="Output file name"),
+  make_option(c("-p", "--tmp"), type="character", default=NULL, help="Path to temporary folder", metavar="Path to temporary folder"),
+  make_option(c("-l", "--log"), type="character", default=NULL, help="Log file name", metavar="Log file name")
 );
 
 opt_parser = OptionParser(option_list=option_list);
@@ -47,8 +49,12 @@ working_map = cbind(as.character(map[,1]),
 colnames(working_map) = c("SampleID","condition")
 vec = working_map$condition %>% as.factor(.)
 
+log_file = opt$log
+
+tmp_folder = opt$tmp
+
 # opt$test = "abc"
-mymethod = opt$test
+mymethod = opt$thetest
 
 if (mymethod == "abc"){
   final=DA.abc(df, predictor = vec)
@@ -182,14 +188,11 @@ if (mymethod == "abc"){
 } else if (mymethod %in% c("CPLM","ZICP","ZSCP","ZACP")){
   
   library("Tweedieverse")
-  
+  print(paste0("Running ",mymethod))
+  print("Creating relative abundaces of the samples.")
   df <- apply(df, 2, function(x) x / sum(x))
   
   CPLM <- function(count_table, predictor, paired, covars) {
-    
-    write_log <- function(message) {
-      write(message, file = log_file, append = TRUE)
-    }
     
     # Create a unique output directory based on timestamp
     timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
@@ -197,28 +200,28 @@ if (mymethod == "abc"){
     dir.create(output_dir, recursive = TRUE)
     results_file <- paste0(output_dir, "/all_results.tsv")
     
-    write_log("Entering function")
+    print("Entering function")
     
     # Debug: Print inputs
-    write_log("count_table:")
-    write_log(paste(capture.output(head(count_table)), collapse = "\n"))
-    write_log(paste("Dimensions of count_table:", paste(dim(count_table), collapse = " x ")))
+    print("count_table:")
+    print(paste(capture.output(head(count_table)), collapse = "\n"))
+    print(paste("Dimensions of count_table:", paste(dim(count_table), collapse = " x ")))
     
-    write_log("predictor:")
-    write_log(paste(capture.output(head(predictor)), collapse = "\n"))
-    write_log(paste("Length of predictor:", length(predictor)))
+    print("predictor:")
+    print(paste(capture.output(head(predictor)), collapse = "\n"))
+    print(paste("Length of predictor:", length(predictor)))
     
     # Prepare the predictor data frame
     predictor_df <- data.frame(sampleid = colnames(count_table), metadata = as.character(predictor))
     rownames(predictor_df) <- predictor_df$sampleid
     predictor_df$sampleid <- NULL
     
-    write_log("predictor_df:")
-    write_log(paste(capture.output(head(predictor_df)), collapse = "\n"))
-    write_log(paste("Dimensions of predictor_df:", paste(dim(predictor_df), collapse = " x ")))
+    print("predictor_df:")
+    print(paste(capture.output(head(predictor_df)), collapse = "\n"))
+    print(paste("Dimensions of predictor_df:", paste(dim(predictor_df), collapse = " x ")))
     
     # Run the Tweedieverse function
-    write_log("Running Tweedieverse...")
+    print("Running Tweedieverse...")
     tryCatch({
       Tweedieverse::Tweedieverse(
         input_features = as.data.frame(count_table),
@@ -230,9 +233,9 @@ if (mymethod == "abc"){
         var_threshold = 0,
         entropy_threshold = 0
       )
-      write_log("Tweedieverse completed.")
+      print("Tweedieverse completed.")
     }, error = function(e) {
-      write_log(paste("Error in Tweedieverse:", e$message))
+      print(paste("Error in Tweedieverse:", e$message))
       return(NULL)
     })
     
@@ -241,20 +244,20 @@ if (mymethod == "abc"){
       write_log("Results file does not exist")
       stop("Results file does not exist")
     }
-    write_log("Results file exists.")
+    print("Results file exists.")
     
     # Read the results
     myTable <- read_tsv(results_file, show_col_types = FALSE)
     myTable <- as.data.frame(myTable)
     
     # Debug: Check myTable
-    write_log("myTable:")
-    write_log(paste(capture.output(head(myTable)), collapse = "\n"))
-    write_log(paste("Dimensions of myTable:", paste(dim(myTable), collapse = " x ")))
+    print("myTable:")
+    print(paste(capture.output(head(myTable)), collapse = "\n"))
+    print(paste("Dimensions of myTable:", paste(dim(myTable), collapse = " x ")))
     
     # Ensure myTable has the expected structure
     if (nrow(myTable) == 0 || !all(c("feature", "pval") %in% colnames(myTable))) {
-      write_log("Results table has unexpected structure")
+      print("Results table has unexpected structure")
       stop("Results table has unexpected structure")
     }
     
@@ -268,8 +271,8 @@ if (mymethod == "abc"){
     )
     rownames(result_df) <- result_df$Feature
     
-    write_log("Returning result_df")
-    write_log(paste(capture.output(head(result_df)), collapse = "\n"))
+    print("Returning result_df")
+    print(paste(capture.output(head(result_df)), collapse = "\n"))
     
     return(result_df)
   }
@@ -279,7 +282,6 @@ if (mymethod == "abc"){
     data = df,
     predictor = vec,
     FUN = CPLM,
-    cores = 1,
     p.adj = "fdr")
   
   final$table = final$data
