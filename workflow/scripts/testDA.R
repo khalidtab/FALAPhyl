@@ -15,7 +15,7 @@ option_list = list(
   make_option(c("-a", "--minabund"), type="character", default=NULL, help="Prefiltering number. Minimal mean relative abundance a feature needs to be present in. Otherwise it will be filtered out, and combined as Others", metavar="Min number of mean relative abundance"),
   make_option(c("-t", "--thetest"), type="character", default=NULL, help="Test to be run", metavar="Test to be run"),
   make_option(c("-o", "--output"), type="character", default=NULL, help="Output file name", metavar="Output file name"),
-  make_option(c("-m", "--tmp"), type="character", default=NULL, help="Path to temporary folder", metavar="Path to temporary folder"),
+  make_option(c("-p", "--tmp"), type="character", default=NULL, help="Path to temporary folder", metavar="Path to temporary folder"),
   make_option(c("-l", "--log"), type="character", default=NULL, help="Log file name", metavar="Log file name")
 );
 
@@ -37,7 +37,7 @@ df = as.data.frame(df)
 rownames(df) = dfRows[,1]
 df[,1] = NULL
 df[] = lapply(df, as.numeric)
-
+df = t(df) %>% as.data.frame(.)
 
 # Load mapping file
 map = opt$mapping
@@ -227,13 +227,9 @@ if (mymethod == "abc"){
 
   library("Tweedieverse")
   
- # df <- apply(df, 2, function(x) x / sum(x))
+ df <- apply(df, 2, function(x) x / sum(x))
   
   CPLM <- function(count_table, predictor, paired, covars) {
-    
-    write_log <- function(message) {
-      write(message, file = log_file, append = TRUE)
-    }
     
     # Create a unique output directory based on timestamp
     timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
@@ -241,28 +237,28 @@ if (mymethod == "abc"){
     dir.create(output_dir, recursive = TRUE)
     results_file <- paste0(output_dir, "/all_results.tsv")
     
-    write_log("Entering function")
+    print("Entering function")
     
     # Debug: Print inputs
-    write_log("count_table:")
-    write_log(paste(capture.output(head(count_table)), collapse = "\n"))
-    write_log(paste("Dimensions of count_table:", paste(dim(count_table), collapse = " x ")))
+    print("count_table:")
+    print(paste(capture.output(head(count_table)), collapse = "\n"))
+    print(paste("Dimensions of count_table:", paste(dim(count_table), collapse = " x ")))
     
-    write_log("predictor:")
-    write_log(paste(capture.output(head(predictor)), collapse = "\n"))
-    write_log(paste("Length of predictor:", length(predictor)))
+    print("predictor:")
+    print(paste(capture.output(head(predictor)), collapse = "\n"))
+    print(paste("Length of predictor:", length(predictor)))
     
     # Prepare the predictor data frame
     predictor_df <- data.frame(sampleid = colnames(count_table), metadata = as.character(predictor))
     rownames(predictor_df) <- predictor_df$sampleid
     predictor_df$sampleid <- NULL
     
-    write_log("predictor_df:")
-    write_log(paste(capture.output(head(predictor_df)), collapse = "\n"))
-    write_log(paste("Dimensions of predictor_df:", paste(dim(predictor_df), collapse = " x ")))
+    print("predictor_df:")
+    print(paste(capture.output(head(predictor_df)), collapse = "\n"))
+    print(paste("Dimensions of predictor_df:", paste(dim(predictor_df), collapse = " x ")))
     
     # Run the Tweedieverse function
-    write_log("Running Tweedieverse...")
+    print("Running Tweedieverse...")
     tryCatch({
       Tweedieverse::Tweedieverse(
         input_features = as.data.frame(count_table),
@@ -272,33 +268,36 @@ if (mymethod == "abc"){
         abd_threshold = 0,
         prev_threshold = 0.0,
         var_threshold = 0,
-        entropy_threshold = 0
+        entropy_threshold = 0,
       )
-      write_log("Tweedieverse completed.")
+      print("Tweedieverse completed.")
     }, error = function(e) {
-      write_log(paste("Error in Tweedieverse:", e$message))
+      print(paste("Error in Tweedieverse:", e$message))
       return(NULL)
     })
     
     # Check if the results file was created
     if (!file.exists(results_file)) {
-      write_log("Results file does not exist")
+      print("Results file does not exist")
       stop("Results file does not exist")
     }
-    write_log("Results file exists.")
+    print("Results file exists.")
     
     # Read the results
     myTable <- read_tsv(results_file, show_col_types = FALSE)
     myTable <- as.data.frame(myTable)
     
+    # Delete folder
+    unlink(output_dir, recursive = TRUE)
+    
     # Debug: Check myTable
-    write_log("myTable:")
-    write_log(paste(capture.output(head(myTable)), collapse = "\n"))
-    write_log(paste("Dimensions of myTable:", paste(dim(myTable), collapse = " x ")))
+    print("myTable:")
+    print(paste(capture.output(head(myTable)), collapse = "\n"))
+    print(paste("Dimensions of myTable:", paste(dim(myTable), collapse = " x ")))
     
     # Ensure myTable has the expected structure
     if (nrow(myTable) == 0 || !all(c("feature", "pval") %in% colnames(myTable))) {
-      write_log("Results table has unexpected structure")
+      print("Results table has unexpected structure")
       stop("Results table has unexpected structure")
     }
     
@@ -312,21 +311,77 @@ if (mymethod == "abc"){
     )
     rownames(result_df) <- result_df$Feature
     
-    write_log("Returning result_df from CPLM")
-    write_log(paste(capture.output(head(result_df)), collapse = "\n"))
+    print("Returning result_df")
+    print(paste(capture.output(head(result_df)), collapse = "\n"))
     
     return(result_df)
   }
   
   # Run testDA with cores set to 1
-  final <- DAtest::testDA(
+  final_results <- DAtest::testDA(
     data = df,
     predictor = vec,
     tests = c("zzz"),
-    args = list(zzz = list(FUN = CPLM)), relative = TRUE)
+    args = list(zzz = list(FUN = CPLM)), relative = FALSE, cores = 1)
+
+  library(ROCR)
   
-final$table = final$data
+  # Assuming 'data' is the input data frame
+  data <- as.data.frame(final_results$results)
+  
+  # Identify the columns for adjusted p-values and spiked status
+  pval_cols <- grep("zzz.pval.adj", colnames(data), value = TRUE)
+  spiked_cols <- grep("zzz.Spiked", colnames(data), value = TRUE)
+  raw_pval_cols <- gsub("zzz.pval.adj", "zzz.pval", pval_cols)
+  
+  # Define the significance threshold
+  significance_threshold <- 0.05
+  
+  # Function to calculate metrics for each run
+  calculate_metrics <- function(i) {
+    # Extract p-values and spiked status for the current run
+    pvals <- data[[pval_cols[i]]]
+    raw_pvals <- data[[raw_pval_cols[i]]]
+    spiked <- ifelse(data[[spiked_cols[i]]] == "Yes", 1, 0)
     
+    # Calculate AUC
+    pred <- prediction(-pvals, spiked)
+    perf <- performance(pred, "auc")
+    auc_value <- as.numeric(perf@y.values)
+    
+    # Calculate FPR
+    non_spiked <- spiked == 0
+    significant_non_spiked <- sum(raw_pvals[non_spiked] < significance_threshold)
+    total_non_spiked <- sum(non_spiked)
+    fpr <- significant_non_spiked / total_non_spiked
+    
+    # Calculate FDR
+    significant_features <- pvals < significance_threshold
+    false_discoveries <- sum(significant_features & non_spiked)
+    total_significant <- sum(significant_features)
+    fdr <- if (total_significant == 0) 0 else false_discoveries / total_significant
+    
+    # Calculate Power
+    spiked_features <- spiked == 1
+    significant_spiked <- sum(pvals[spiked_features] < significance_threshold)
+    total_spiked <- sum(spiked_features)
+    power <- significant_spiked / total_spiked
+    
+    # Return results as a list
+    return(c(AUC = auc_value, FPR = fpr, FDR = fdr, Power = power))
+  }
+  
+  # Use lapply to calculate metrics for all runs and convert the result to a data frame
+  metrics <- do.call(rbind, lapply(seq_along(pval_cols), calculate_metrics))
+  
+  # Create the final summary data frame
+  final_summary <- data.frame(
+    Method = mymethod,  # Replace with your actual method name if different
+    metrics,
+    Run = seq_len(nrow(metrics)))
+  
+  final = NULL
+  final$table = final_summary
 }
 
 

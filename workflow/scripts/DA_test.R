@@ -34,7 +34,8 @@ df = as.data.frame(df)
 rownames(df) = dfRows[,1]
 df[,1] = NULL
 df[] = lapply(df, as.numeric)
-df = t(df)
+df = t(df) %>% as.data.frame(.)
+
 if ( as.numeric(opt$minsample)==0 && as.numeric(opt$minread)==0 && as.numeric(opt$minabund)==0){df = df}else{
   df = preDA(df, min.samples = as.numeric(opt$minsample), min.reads = as.numeric(opt$minread), min.abundance =  as.numeric(opt$minabund))
 }
@@ -188,6 +189,7 @@ if (mymethod == "abc"){
 } else if (mymethod %in% c("CPLM","ZICP","ZSCP","ZACP")){
   
   library("Tweedieverse")
+  library("cplm")
   print(paste0("Running ",mymethod))
   print("Creating relative abundaces of the samples.")
   df <- apply(df, 2, function(x) x / sum(x))
