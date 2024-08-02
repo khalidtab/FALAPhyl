@@ -16,7 +16,8 @@ option_list = list(
   make_option(c("-t", "--thetest"), type="character", default=NULL, help="Test to be run", metavar="Test to be run"),
   make_option(c("-o", "--output"), type="character", default=NULL, help="Output file name", metavar="Output file name"),
   make_option(c("-p", "--tmp"), type="character", default=NULL, help="Path to temporary folder", metavar="Path to temporary folder"),
-  make_option(c("-l", "--log"), type="character", default=NULL, help="Log file name", metavar="Log file name")
+  make_option(c("-l", "--log"), type="character", default=NULL, help="Log file name", metavar="Log file name"),
+  make_option(c("-e", "--effectsize"), type="character", default=NULL, help="effect size", metavar="effect size")
 );
 
 opt_parser = OptionParser(option_list=option_list);
@@ -56,172 +57,174 @@ tmp_folder = opt$tmp
 
 mymethod = opt$thetest
 
+effectSize = as.numeric(opt$effectsize)
+
 if (mymethod == "abc"){
-  final=testDA(df, predictor = vec,tests=c("kru","abc"))
+  final=testDA(df, predictor = vec,tests=c("kru","abc"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "adx") {
-  final=testDA(df, predictor = vec,tests=c("kru","adx"))
+  final=testDA(df, predictor = vec,tests=c("kru","adx"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "aov") {
-  final=testDA(df, predictor = vec,tests=c("kru","aov"))
+  final=testDA(df, predictor = vec,tests=c("kru","aov"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "lao") {
-  final=testDA(df, predictor = vec,tests=c("kru","lao"))
+  final=testDA(df, predictor = vec,tests=c("kru","lao"), effectSize = effectSize, cores = 1)
   
   
 }  else if (mymethod == "lao2") {
-  final=testDA(df, predictor = vec,tests=c("kru","lao2"))
+  final=testDA(df, predictor = vec,tests=c("kru","lao2"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "bay") {
-  final=testDA(df, predictor = vec,tests=c("kru","bay"))
+  final=testDA(df, predictor = vec,tests=c("kru","bay"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "pea") {
-  final=testDA(df, predictor = vec,tests=c("kru","pea"))
+  final=testDA(df, predictor = vec,tests=c("kru","pea"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "spe") {
-  final=testDA(df, predictor = vec,tests=c("kru","spe"))
+  final=testDA(df, predictor = vec,tests=c("kru","spe"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "ds2x") {
-  final=testDA(df, predictor = vec,tests=c("kru","ds2x"))
+  final=testDA(df, predictor = vec,tests=c("kru","ds2x"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "ds2") {
-  final=testDA(df, predictor = vec,tests=c("kru","ds2"))
+  final=testDA(df, predictor = vec,tests=c("kru","ds2"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "ere") {
-  final=testDA(df, predictor = vec,tests=c("kru","ere"))
+  final=testDA(df, predictor = vec,tests=c("kru","ere"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "ere2") {
-  final=testDA(df, predictor = vec,tests=c("kru","ere2"))
+  final=testDA(df, predictor = vec,tests=c("kru","ere2"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "erq") {
-  final=testDA(df, predictor = vec,tests=c("kru","erq"))
+  final=testDA(df, predictor = vec,tests=c("kru","erq"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "erq2") {
-  final=testDA(df, predictor = vec,tests=c("kru","erq2"))
+  final=testDA(df, predictor = vec,tests=c("kru","erq2"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "fri") {
-  final=testDA(df, predictor = vec,tests=c("kru","fri"))
+  final=testDA(df, predictor = vec,tests=c("kru","fri"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "neb") {
-  final=testDA(df, predictor = vec,tests=c("kru","neb"))
+  final=testDA(df, predictor = vec,tests=c("kru","neb"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "poi") {
-  final=testDA(df, predictor = vec,tests=c("kru","poi"))
+  final=testDA(df, predictor = vec,tests=c("kru","poi"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "qpo") {
-  final=testDA(df, predictor = vec,tests=c("kru","qpo"))
+  final=testDA(df, predictor = vec,tests=c("kru","qpo"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "znb") {
-  final=testDA(df, predictor = vec,tests=c("kru","znb"))
+  final=testDA(df, predictor = vec,tests=c("kru","znb"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "zpo") {
-  final=testDA(df, predictor = vec,tests=c("kru","zpo"))
+  final=testDA(df, predictor = vec,tests=c("kru","zpo"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "lim") {
-  final=testDA(df, predictor = vec,tests=c("kru","lim"))
+  final=testDA(df, predictor = vec,tests=c("kru","lim"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "lli") {
-  final=testDA(df, predictor = vec,tests=c("kru","lli"))
+  final=testDA(df, predictor = vec,tests=c("kru","lli"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "lli2") {
-  final=testDA(df, predictor = vec,tests=c("kru","lli2"))
+  final=testDA(df, predictor = vec,tests=c("kru","lli2"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "vli") {
-  final=testDA(df, predictor = vec,tests=c("kru","vli"))
+  final=testDA(df, predictor = vec,tests=c("kru","vli"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "lrm") {
-  final=testDA(df, predictor = vec,tests=c("kru","lrm"))
+  final=testDA(df, predictor = vec,tests=c("kru","lrm"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "llm") {
-  final=testDA(df, predictor = vec,tests=c("kru","llm"))
+  final=testDA(df, predictor = vec,tests=c("kru","llm"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "llm2") {
-  final=testDA(df, predictor = vec,tests=c("kru","llm2"))
+  final=testDA(df, predictor = vec,tests=c("kru","llm2"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "msf") {
-  final=testDA(df, predictor = vec,tests=c("kru","msf"))
+  final=testDA(df, predictor = vec,tests=c("kru","msf"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "zig") {
-  final=testDA(df, predictor = vec,tests=c("kru","zig"))
+  final=testDA(df, predictor = vec,tests=c("kru","zig"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "mva") {
-  final=testDA(df, predictor = vec,tests=c("kru","mva"))
+  final=testDA(df, predictor = vec,tests=c("kru","mva"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "per") {
-  final=testDA(df, predictor = vec,tests=c("kru","per"))
+  final=testDA(df, predictor = vec,tests=c("kru","per"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "qua") {
-  final=testDA(df, predictor = vec,tests=c("kru","qua"))
+  final=testDA(df, predictor = vec,tests=c("kru","qua"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "sam") {
-  final=testDA(df, predictor = vec,tests=c("kru","sam"))
+  final=testDA(df, predictor = vec,tests=c("kru","sam"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "ttt") {
-  final=testDA(df, predictor = vec,tests=c("kru","ttt"))
+  final=testDA(df, predictor = vec,tests=c("kru","ttt"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "ltt") {
-  final=testDA(df, predictor = vec,tests=c("kru","ltt"))
+  final=testDA(df, predictor = vec,tests=c("kru","ltt"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "ltt2") {
-  final=testDA(df, predictor = vec,tests=c("kru","ltt2"))
+  final=testDA(df, predictor = vec,tests=c("kru","ltt2"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "ttr") {
-  final=testDA(df, predictor = vec,tests=c("kru","ttr"))
+  final=testDA(df, predictor = vec,tests=c("kru","ttr"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "wil") {
-  final=testDA(df, predictor = vec,tests=c("kru","wil"))
+  final=testDA(df, predictor = vec,tests=c("kru","wil"), effectSize = effectSize, cores = 1)
   
   
 }  else if (mymethod == "ttc") {
-  final=testDA(df, predictor = vec,tests=c("kru","ttc"))
+  final=testDA(df, predictor = vec,tests=c("kru","ttc"), effectSize = effectSize, cores = 1)
   
   
 }  else if (mymethod == "lic") {
-  final=testDA(df, predictor = vec,tests=c("kru","lic"))
+  final=testDA(df, predictor = vec,tests=c("kru","lic"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "tta") {
-  final=testDA(df, predictor = vec,tests=c("kru","tta"))
+  final=testDA(df, predictor = vec,tests=c("kru","tta"), effectSize = effectSize, cores = 1)
   
   
 } else if (mymethod == "lia") {
-  final=testDA(df, predictor = vec,tests=c("kru","lia"))
+  final=testDA(df, predictor = vec,tests=c("kru","lia"), effectSize = effectSize, cores = 1)
   
 } else if (mymethod %in% c("CPLM","ZICP","ZSCP","ZACP")){
 
@@ -322,7 +325,7 @@ if (mymethod == "abc"){
     data = df,
     predictor = vec,
     tests = c("zzz"),
-    args = list(zzz = list(FUN = CPLM)), relative = FALSE, cores = 1)
+    args = list(zzz = list(FUN = CPLM)), relative = FALSE, cores = 1, effectSize = effectSize)
 
   library(ROCR)
   

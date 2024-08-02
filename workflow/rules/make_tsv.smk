@@ -37,19 +37,34 @@ rule create_filtered_biom:
       'biom convert -i {input} -o {output} --to-json --table-type="OTU table"  > {log} '
 
 
-checkpoint biom_pairwise1: # Create pairwise biom files for all the variables so that the differential abundance tests would work
+checkpoint biom_pairwise1: # for DA effect size calculation
    conda:
       "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
    input:
       "data/tsv/{sample}.tsv"
    output:
-      temporary(directory("data/tmp/diff/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/pairwise/"))
+      temporary(directory(expand("data/tmp/diff/{{sample}}–{{group}}–minAbd{{minabund}}minR{{minread}}minS{{minsample}}/{theTest}–pairwise/",theTest=config["DA_tests"])))
+   params: theTest=config['DA_tests']
    message: "Filtering biom files of {wildcards.sample} as pairwise comparisons of the variables of {wildcards.group}"
    shell:
-      " mkdir -p {output} | "
-      " Rscript --vanilla workflow/scripts/pairwise_biom.R -i {input} -m data/{wildcards.sample}.txt -g {wildcards.group} -o {output} "
+      '''
+      mkdir -p {output} data/tmp/difftmp/{wildcards.sample}–{wildcards.group}–minAbd{wildcards.minabund}minR{wildcards.minread}minS{wildcards.minsample}
+      Rscript --vanilla workflow/scripts/pairwise_biom.R -i {input} -m data/{wildcards.sample}.txt -g {wildcards.group} -o data/tmp/difftmp/{wildcards.sample}–{wildcards.group}–minAbd{wildcards.minabund}minR{wildcards.minread}minS{wildcards.minsample}
+      # Set IFS to newline to handle file paths with special characters or spaces
+      IFS=$' '
+      # List of unquoted items (simulating unquoted terminal output)
+      items=({params.theTest})
+      
+      # Loop through each item in the list
+      for item in ${{items[@]}}; do
+          cp -r data/tmp/difftmp/{wildcards.sample}–{wildcards.group}–minAbd{wildcards.minabund}minR{wildcards.minread}minS{wildcards.minsample}/* data/tmp/diff/{wildcards.sample}–{wildcards.group}–minAbd{wildcards.minabund}minR{wildcards.minread}minS{wildcards.minsample}/$item–pairwise/
+      done
+      rm -r data/tmp/difftmp/
+      # Reset IFS to default (optional)
+      unset IFS
+      '''
 
-checkpoint biom_pairwise2: # Create pairwise biom files for all the variables so that the differential abundance tests would work
+checkpoint biom_pairwise2: # DAtest
    conda:
       "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
    input:
