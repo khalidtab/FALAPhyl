@@ -236,7 +236,7 @@ if (mymethod == "abc"){
     
     # Create a unique output directory based on timestamp
     timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
-    output_dir <- paste0(tmp_folder, timestamp)
+    output_dir <- paste0(tmp_folder, timestamp, "_CPLM")
     dir.create(output_dir, recursive = TRUE)
     results_file <- paste0(output_dir, "/all_results.tsv")
     
@@ -289,9 +289,6 @@ if (mymethod == "abc"){
     # Read the results
     myTable <- read_tsv(results_file, show_col_types = FALSE)
     myTable <- as.data.frame(myTable)
-    
-    # Delete folder
-    unlink(output_dir, recursive = TRUE)
     
     # Debug: Check myTable
     print("myTable:")

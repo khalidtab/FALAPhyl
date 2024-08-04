@@ -120,7 +120,7 @@ rule testDA_Power_test:
               "Data type": "Text file"})
    log: 
       "data/logs/DAscoresDunn–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}.txt"
-   message: "Differential abundance: Dunn's multiple comparisons) power analysis using {wildcards.sample} – {wildcards.pairwiseCats}."
+   message: "Differential abundance: Dunn's multiple comparisons) power analysis using {wildcards.sample}."
    shell:
       "Rscript --vanilla workflow/scripts/DA_dunn.R -i {input.mytable} -o {output.dunnfile} > {log} 2>&1 "
 

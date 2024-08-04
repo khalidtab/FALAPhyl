@@ -1,6 +1,6 @@
 # file names without the extension
 mysample:
-     - v35_oral
+     - july21
 
 
 # The group column name in your mapping file. If multiple were listed, they will used as if they are univariates.
@@ -84,19 +84,17 @@ betapart_permutations: # How many permutations to create?
 # tta,ttc = t-test (ALR,CLR)
 # ttt,ltt,ltt2,ttr = Welch(t.test,t.test log,t.test log #2,t.test Rank-normalization)
 # wil = Wilcoxon
-#     - CPLM: compound poisson linear model
-#     - ZICP: zero-inflated compound poisson linear model
-#     - ZSCP
-#     - ZACP: 
+# From Tweedieverse - CPLM: Compound poisson linear model
+
 DA_tests:
      - abc
-     - bay
-     - ds2
-     - ds2x
-     - ere
-     - ere2
-     - erq
-     - erq2
+#     - bay
+#     - ds2
+#     - ds2x
+#     - ere
+#     - ere2
+#     - erq
+#     - erq2
      - lia
      - lic
      - lli
@@ -104,10 +102,10 @@ DA_tests:
      - ltt
      - ltt2
      - msf
-     - neb
-     - per
-     - poi
-     - qpo
+#     - neb
+#     - per
+#     - poi
+#     - qpo
 #     - sam
      - tta
      - ttc
@@ -115,38 +113,48 @@ DA_tests:
      - ttt
      - vli
      - wil
-     - znb
-     - zpo
-     - adx
+#     - znb
+#     - zpo
+#     - adx
      - CPLM
-     - ZICP
-     - ZSCP
-     - ZACP
+
 
 paired_DA_tests:
-     - ds2
-     - ds2x
-     - erq
-     - erq2
-     - lli
-     - lli2
-     - neb
-     - poi
-     - vli
-     - zig
-     - llm
-     - fri
-     - lim
-     - llm2
-     - lrm
-     - ltt
-     - ltt2
-     - per
-     - qua
-#     - sam
-     - ttr
-     - ttt
-     - wil
+#     - ds2
+#     - ds2x
+#     - erq
+#     - erq2
+#     - lli
+#     - lli2
+#     - neb
+#     - poi
+#     - vli
+#     - zig
+#     - llm
+#     - fri
+#     - lim
+#     - llm2
+#     - lrm
+#     - ltt
+#     - ltt2
+#     - per
+#     - qua
+##     - sam
+#     - ttr
+#     - ttt
+#     - wil
+     - CPLM
+
+
+DA_repeats:
+     - 20
+
+DA_effectSize: # each one will be repeated DA_repeats times
+     - 2
+     - 4
+     - 8
+     - 16
+     - 32
 
 
 

@@ -23,35 +23,47 @@ if (is.null(opt$input)){
   stop("At least one argument must be supplied (input file)", call.=FALSE)
 }
 
-myFiles = list.files(path=opt$input,pattern="EffSizePowerTest-")
+print(opt$input)
 
-readFiles = data.frame(matrix(ncol = 6, nrow = 0))
+myFiles = list.dirs(path=opt$input) %>% 
+          grep("effectSize",x=.,value = TRUE) %>% 
+          sapply(., function(x) list.files(x, full.names = TRUE))
 
-for (myFile in myFiles){
-  myReadFile = suppressMessages(read_tsv(paste0(opt$input,"/",myFile)))
-  readFiles = rbind(myReadFile,readFiles)
+typesOfTests = gsub(pattern = ".*–[0-9]*", replacement = "",x=myFiles) %>% 
+               gsub(pattern = "/.*", replacement = "",x=.) %>%
+               gsub(pattern = "[0-9]–", replacement = "",x=.) %>%
+               unique(.)
+ 
+
+theTestTables = function(theTest){
+  grep(theTest,myFiles,value = TRUE) %>%
+               lapply(., function(x) read_tsv(x,show_col_types = FALSE)) %>%
+               bind_rows(.) %>%
+               as.data.frame(.)
 }
 
-myReadFile = readFiles %>%
+theTestFiles = lapply(typesOfTests, function(x) theTestTables(x)) %>% bind_rows(.)
+
+theTestFiles = theTestFiles %>%
   mutate(score = (AUC - 0.5) * Power - FDR)
 
-write_tsv(myReadFile,opt$output)
+write_tsv(theTestFiles,opt$output)
 
-myAUC = ggerrorplot(myReadFile, x = "Method", y = "AUC", 
+myAUC = ggerrorplot(theTestFiles, x = "Method", y = "AUC", 
             desc_stat = "mean", color = "Method" 
             , size=1,add = "jitter") + theme(axis.text.x = element_text(angle=90)) + labs(x="Method", y = "AUC") +
   geom_hline(yintercept=0.5,color="red") + rremove("legend")
 
-myPower = ggerrorplot(myReadFile, x = "Method", y = "Power", 
+myPower = ggerrorplot(theTestFiles, x = "Method", y = "Power", 
                     desc_stat = "mean", color = "Method" 
                     , size=1,add = "jitter") + theme(axis.text.x = element_text(angle=90)) + labs(x="Method", y = "Power")+ rremove("legend")
 
-myFDR = ggerrorplot(myReadFile, x = "Method", y = "FDR", 
+myFDR = ggerrorplot(theTestFiles, x = "Method", y = "FDR", 
                       desc_stat = "mean", color = "Method" 
                       , size=1,add = "jitter") + theme(axis.text.x = element_text(angle=90)) + labs(x="Method", y = "False Discovery Rate", caption="Higher AUC means spiked features have been identified,\nand AUC=0.5 means spiked features are randomly spread with non-spiked.\nTherefore, we want an AUC as high as possible.\nThat is, spiked features should have low p-values (ie they have been identified).\nPower is the proportion of spiked features that are significant after multiple p-value corrections\nIt is therefore the proportion of features you would expect to detect in a regular analysis.\nThe higher the power, the better.\nFDR indicates the proportion of significant features (after multiple correction)\nthat were not spiked and therefore shouldn't be significant.\nThis should be as low as possible.")+ rremove("legend")
 
 
-myScores = ggerrorplot(myReadFile, x = "Method", y = "score", 
+myScores = ggerrorplot(theTestFiles, x = "Method", y = "score", 
                        desc_stat = "mean", color = "Method" 
                        , size=1,add = "jitter") + theme(axis.text.x = element_text(angle=90)) + labs(x="Method", y = "Score", title= 
                                                                                                        "Score", caption="Score is calculated for each method as follows: (Area Under the ROC Curve - 0.5) * Power - False Discovery Rate.\nThe higher the Score, the better the method is estimated to be.")+ rremove("legend")
