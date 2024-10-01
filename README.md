@@ -3,7 +3,7 @@
   <img src="FALAPhyl.png" alt="Banner" style="max-width: 100%; height: auto;">
 </div>
 
-# FALAPhyl: *F*orays into *A*utomating *L*aboraious *A*nalyses of *Phyl*ogeny
+# FALAPhyl: *F*orays into *A*utomating *L*aborious *A*nalyses of *Phyl*ogeny
 
 This is a pipeline that fully automates some bioinformatic analysis using well-recognised packages such as PhyloSeq, ggplot and others. It is built on top of snakemake.
 
