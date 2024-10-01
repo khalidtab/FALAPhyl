@@ -1,10 +1,8 @@
-[![GitHub Super-Linter](https://github.com/khalidtab/FALAPhyl/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
-
 <div style="text-align: center;">
   <img src="FALAPhyl.png" alt="Banner" style="max-width: 100%; height: auto;">
 </div>
+[![GitHub Super-Linter](https://github.com/khalidtab/FALAPhyl/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
 
-# 🧆 FALAPhyl: *F*orays into *A*utomating *L*aborious *A*nalysis of *Phyl*ogeny 
 This is a pipeline that fully automates some bioinformatic analysis using well-recognised packages such as PhyloSeq, ggplot and others. It is built on top of snakemake.
 
 The rationale for this is to perform exploratory analysis of your feature data, and produce publication quality plots for beta diversity (Principal Coordinates Analysis - PCoA, Non-metric Multidimensional Scaling - NMDS), alpha diversity, the network connectivity Zi-Pi plot (Zi within-module connectivity, Pi among-module connectivity).
