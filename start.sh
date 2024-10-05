@@ -6,10 +6,11 @@ echo -e "\033[0;32mWelcome to FALAPhyl!\033[0m"
 echo -e "\033[0;32m====================\033[0m"
 echo ""
 echo ""
-echo "Copying the template files in your directly if they don't exist (environments.txt, falaphyl.yaml)'"
+echo "Copying the template files in your directly if they don't exist (FALAPhyl_environments.txt, falaphyl.yaml, FALAPhyl_metadata.txt)'"
 # Step 1: Copy files as needed (if applicable)
-cp -p environments.txt data/
+cp -p environments.txt data/FALAPhyl_environments.txt
 cp -p falaphyl.yaml data/
+cp -p metadata.txt data/FALAPhyl_metadata.txt
 
 echo ""
 echo ""
