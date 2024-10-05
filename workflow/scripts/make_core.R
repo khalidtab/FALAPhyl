@@ -45,7 +45,7 @@ myCurrentOTU = myCurrentOTU %>% filter(if_any(everything(), ~ !is.na(.))) # Rows
 retainedOTUs = myCurrentOTU[which(rowMeans(!is.na(myCurrentOTU)) >= threshold), ] # Convert matrix to TRUE and FALSE. True is represented by 1 and false by 0. Get the mean of the row. If that row is more than the threshold then it is retained
 
 if(dim(retainedOTUs)[1] == 0){ # ie, no retained OTUs because of the threshold
-  print(paste0("The level of core you have specified resulted in no retained features for",currentCat,". Adjust your level of core and rerun snakemake on a lower core level 'threshold' by adjusting the input.yaml file."))
+  print(paste0("The level of core you have specified resulted in no retained features for",currentCat,". Adjust your level of core and rerun snakemake on a lower core level 'threshold' by adjusting the falaphyl.yaml file."))
 }
 
 excludedOTUs = subset(myCurrentOTU, !row.names(myCurrentOTU) %in% row.names(retainedOTUs)) # Give me myOTUs were row names of myOTUs is NOT (!) in row names of retainedOTUS

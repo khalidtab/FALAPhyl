@@ -1,6 +1,6 @@
 report: "report/workflow.rst"
 
-configfile: "data/input.yaml"
+configfile: "data/falaphyl.yaml"
 include: "rules/alpha_diversity.smk"
 include: "rules/beta_diversity.smk"
 include: "rules/betapart.smk"

@@ -20,7 +20,7 @@ The volume mounted above should include the following files and folders:
 
 1. [filename].biom, where [filename] is the file name that is exactly the same as the other input files (mapping file)
 2. Mapping file in the [filname.].txt format, where [filename] is the file name that is exactly the same as the other input files (biom). File is in the format typically used for Qiime2. That is, first column "#SampleID", contains sample IDs that match those in the biom file, then the other columns are the additional variables you're interested in analyzing.
-3. input.yaml: the file with the input parameters. This can be downloaded from this github repo, and it is also packaged in the docker image in the parent directory. If you are using the file in the docker image, it must be copied to the volume, and modified before usage. Any parameter that is not wanted should be commented with a #
+3. falaphyl.yaml: the file with the input parameters. This can be downloaded from this github repo, and it is also packaged in the docker image in the parent directory. If you are using the file in the docker image, it must be copied to the volume, and modified before usage. Any parameter that is not wanted should be commented with a #
 
 To run the pipeline. Run the following command
 > snakemake all alpha beta breakdown network diff subject_alpha subject_beta subject_diff --cores all --use-conda
