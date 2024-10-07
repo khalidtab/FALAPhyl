@@ -9,7 +9,7 @@ echo ""
 echo "Copying the template files in your directly if they don't exist (FALAPhyl_environments.txt, falaphyl.yaml, FALAPhyl_metadata.txt)'"
 # Step 1: Copy files as needed (if applicable)
 cp -pn environments.txt data/FALAPhyl_environments.txt
-cp -pn falaphyl.yaml data/
+cp -pn falaphyl.yaml data/falaphyl.yaml
 cp -pn metadata.txt data/FALAPhyl_metadata.txt
 
 echo ""
