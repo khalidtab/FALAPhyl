@@ -11,6 +11,8 @@ rule beta_div: # Calculate distances between samples based on the chosen beta di
       mem_mb=get_mem_mb
    params: 
       dist="{dist}"
+   log:
+      "data/logs/betaDiv–{sample}–{dist}.txt"
    output:
       tsv=report("data/distance/beta_div/{sample}–{dist}.tsv",
       caption="../report/beta_matrix.rst", 
@@ -21,7 +23,7 @@ rule beta_div: # Calculate distances between samples based on the chosen beta di
               "Distance type": "{dist}"})
    message: "Beta diversity: Calculating beta dissimilarity {wildcards.dist} for {wildcards.sample}"
    shell: 
-      "Rscript --vanilla ./workflow/scripts/beta_diversity.R -i {input} -o {output} -d {wildcards.dist} "
+      "Rscript --vanilla ./workflow/scripts/beta_diversity.R -i {input} -o {output} -d {wildcards.dist} > {log}"
 
 rule nmds_: # Plots the beta diversity distances using the Non-Metric Dimensional Scaling (NMDS) algorithm
    version: "1.0"

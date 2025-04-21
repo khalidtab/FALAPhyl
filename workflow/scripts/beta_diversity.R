@@ -32,15 +32,16 @@ mytsv = mytsv %>% mutate_if(is.character,as.numeric)
 
 
 if (dissimilarity == "PhILR"){
-# Generate tree
+# Generate a random tree with 'n' tips
+  mytree = rtree(length(rownames(mytsv)), tip.label = rownames(mytsv)) %>% as.phylo(.)
+  print("Random tree generated")
   mytsv =  otu_table(mytsv, taxa_are_rows = TRUE)
-  mytree = suppressWarnings(dist(mytsv,method="euclidean")) %>% hclust(.,method="ward.D") %>% as.phylo(.) 
 
 phylo = suppressMessages(merge_phyloseq(mytsv,mytree))
 
 # Test tree
-isRooted = suppressWarnings(ape::is.rooted(phy_tree(phylo)))
-isBinary = suppressWarnings(ape::is.binary(phy_tree(phylo)))
+isRooted = ape::is.rooted(phy_tree(phylo))
+isBinary = ape::is.binary(phy_tree(phylo))
 if(!isRooted){stop("Tree needs to be rooted.",call.=FALSE)} #if not rooted
 if(!isBinary){phy_tree(phylo) = multi2di(phylo@phy_tree)} #if not binary tree
 
@@ -55,8 +56,9 @@ phylot = merge_phyloseq(data.no0,phylo@phy_tree,phylo@sam_data,phylo@tax_table) 
 
 myMatrix = phylot@otu_table@.Data %>% t(.)
 tree = phy_tree(phylot)
-
-gp.philr = philr::philr(myMatrix, tree, part.weights='uniform', ilr.weights='uniform') %>% suppressMessages(.)
+print("Ready to run philr")
+gp.philr = philr::philr(myMatrix, tree, part.weights='uniform', ilr.weights='uniform')
+print("philr done. Making it into a matrix…")
 gp.dist = dist(gp.philr, method="euclidean") # Make it into phyloseq compatible object
 }else{
   

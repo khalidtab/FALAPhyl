@@ -6,7 +6,7 @@ suppressWarnings(suppressMessages(library(dunn.test)))
 suppressWarnings(suppressMessages(library(magrittr)))
 
 option_list = list(
-  make_option(c("-i", "--input"), type="character", default=NULL, help="Distance matrix", metavar="output of the scores"),
+  make_option(c("-i", "--input"), type="character", default=NULL, help="AUC/FDR/Power text", metavar="AUC/FDR/Power text"),
   make_option(c("-o", "--output"), type="character", default=NULL, help="output folder for all pairwise files", metavar="Output folder name")
 );
 
@@ -19,6 +19,14 @@ if (is.null(opt$input)){
 }
 
 myFile = read_tsv(opt$input)
-myResults = dunn.test(myFile$score,myFile$Method,method="bh") %>% as.data.frame(.)
+
+if (length(unique(myFile$Method)) == 2) {
+  myResults = wilcox.test(score ~ Method, data = myFile)
+} else if (length(unique(myFile$Method)) > 2) {
+  myResults = dunn.test(myFile$score, myFile$Method, method = "bh")
+} else {
+  message("Only one group found. No test needed.")
+  myResults = as.data.frame("one group")
+}
 
 write_tsv(myResults,opt$output)
