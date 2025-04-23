@@ -45,8 +45,7 @@ map = read.csv(map,sep="\t") %>% as.data.frame(.)
 
 category = opt$category
 catNum = which(colnames(map) == category)
-working_map = cbind(as.character(map[,1]),
-                    as.character(map[,catNum])) %>% as.data.frame(.)
+working_map = cbind(as.character(map[,1]), as.character(map[,catNum])) %>% as.data.frame(.)
 colnames(working_map) = c("SampleID","condition")
 vec = working_map$condition %>% as.factor(.)
 
@@ -54,7 +53,6 @@ log_file = opt$log
 
 tmp_folder = opt$tmp
 
-# opt$test = "abc"
 mymethod = opt$thetest
 
 if (mymethod == "abc"){
@@ -191,7 +189,7 @@ if (mymethod == "abc"){
   library("Tweedieverse")
   library("cplm")
   print(paste0("Running ",mymethod))
-  print("Creating relative abundaces of the samples.")
+  print("Creating relative abundances of the samples.")
   df <- apply(df, 2, function(x) x / sum(x))
   
   CPLM <- function(count_table, predictor, paired, covars) {
@@ -208,11 +206,11 @@ if (mymethod == "abc"){
     print("count_table:")
     print(paste(capture.output(head(count_table)), collapse = "\n"))
     print(paste("Dimensions of count_table:", paste(dim(count_table), collapse = " x ")))
-    
+
     print("predictor:")
     print(paste(capture.output(head(predictor)), collapse = "\n"))
     print(paste("Length of predictor:", length(predictor)))
-    
+
     # Prepare the predictor data frame
     predictor_df <- data.frame(sampleid = colnames(count_table), metadata = as.character(predictor))
     rownames(predictor_df) <- predictor_df$sampleid
@@ -256,7 +254,7 @@ if (mymethod == "abc"){
     print("myTable:")
     print(paste(capture.output(head(myTable)), collapse = "\n"))
     print(paste("Dimensions of myTable:", paste(dim(myTable), collapse = " x ")))
-    
+
     # Ensure myTable has the expected structure
     if (nrow(myTable) == 0 || !all(c("feature", "pval") %in% colnames(myTable))) {
       print("Results table has unexpected structure")
@@ -286,6 +284,8 @@ if (mymethod == "abc"){
     FUN = CPLM,
     p.adj = "fdr")
   
+
+
   final$table = final$data
   
 }

@@ -15,7 +15,7 @@ cp -pn FALAPhyl_metadata.txt data/
 echo ""
 echo ""
 echo "Example command(s):"
-echo -e "\033[0;36msnakemake alpha beta breakdown diff network subject_beta subject_alpha subject_diff --use-conda --cores all --keep-going --retries 5 --rerun-incomplete --scheduler greedy \033[0m"
+echo -e "\033[0;36msnakemake alpha beta breakdown diff network paired_beta paired_alpha paired_diff --use-conda --cores all --keep-going --retries 5 --rerun-incomplete --scheduler greedy \033[0m"
 echo "Please copy and paste the above command(s) or type your own command below."
 echo ""
 echo ""

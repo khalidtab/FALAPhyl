@@ -118,7 +118,7 @@ AUC <- ggplot(theTestFiles, aes(x = Method_numeric, y = AUC)) +
   geom_point(data = global_meansAUC,
              aes(x = Method_nudged, y = GlobalMean),
              inherit.aes = FALSE,
-             shape = 24, fill = "black", color = "white", size = 3) +
+             shape = 24, fill = "black", color = "white", size = 7) +
   
   # Reference line at AUC = 0.5
   geom_hline(yintercept = 0.5, linetype = "dashed", color = "red") +
@@ -199,7 +199,7 @@ plotPower = function(){
     geom_point(data = global_meansPower,
                aes(x = Method_nudged, y = GlobalMean),
                inherit.aes = FALSE,
-               shape = 24, fill = "black", color = "white", size = 3) +
+               shape = 24, fill = "black", color = "white", size = 7) +
     
     # Facet by comparison
     facet_wrap(~ comparison, ncol = 1, scales = "free_y") +
@@ -277,7 +277,7 @@ plotFDR = function(){
     geom_point(data = global_meansFDR,
                aes(x = Method_nudged, y = GlobalMean),
                inherit.aes = FALSE,
-               shape = 24, fill = "black", color = "white", size = 3) +
+               shape = 24, fill = "black", color = "white", size = 7) +
     
     # Facet per comparison
     facet_wrap(~ comparison, ncol = 1, scales = "free_y") +
@@ -297,7 +297,7 @@ plotFDR = function(){
         "• Black dots: individual FDR values (transparency = effect size)",
         "• Maroon circles: per-effect-size means (jittered + nudged)",
         "• Black triangles: global mean across comparisons (nudged)",
-        "• FDR is the proportion of significant features that were NOT spiked (after multiple comparison adjustment) that were not spiked and therefore shouldn't be significant",
+        "• FDR is the proportion of significant features that were NOT spiked (after multiple comparison adjustment) and therefore shouldn't be significant",
         "• Lower is better — high FDR indicates false positives",
         sep = "\n"
       )
@@ -355,7 +355,7 @@ plotScore = function(){
     geom_point(data = global_meansScore,
                aes(x = Method_nudged, y = GlobalMean),
                inherit.aes = FALSE,
-               shape = 24, fill = "black", color = "white", size = 3) +
+               shape = 24, fill = "black", color = "white", size = 7) +
     
     # Facet by comparison
     facet_wrap(~ comparison, ncol = 1, scales = "free_y") +

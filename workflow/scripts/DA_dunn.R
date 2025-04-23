@@ -20,13 +20,42 @@ if (is.null(opt$input)){
 
 myFile = read_tsv(opt$input)
 
-if (length(unique(myFile$Method)) == 2) {
-  myResults = wilcox.test(score ~ Method, data = myFile)
-} else if (length(unique(myFile$Method)) > 2) {
-  myResults = dunn.test(myFile$score, myFile$Method, method = "bh")
-} else {
-  message("Only one group found. No test needed.")
-  myResults = as.data.frame("one group")
+all_comparisons <- unique(myFile$comparison)
+results_list <- list()
+
+for (comp in all_comparisons) {
+  sub_data <- myFile %>% filter(comparison == comp)
+  n_groups <- length(unique(sub_data$test_type))
+  
+  if (n_groups < 2) {
+    message(paste("Skipping:", comp, "— only one group"))
+    results_list[[comp]] <- data.frame(Comparison = comp, Message = "Only one group")
+    
+  } else if (n_groups == 2) {
+    # Wilcoxon test
+    test_result <- wilcox.test(score ~ test_type, data = sub_data)
+    results_list[[comp]] <- data.frame(
+      Comparison = comp,
+      Method = "Wilcoxon",
+      p_value = test_result$p.value
+    )
+    
+  } else {
+    # Dunn test
+    dt <- dunn.test(sub_data$score, sub_data$test_type, method = "bh", kw = FALSE)
+    df <- data.frame(
+      Comparison = comp,
+      ComparisonGroup = dt$comparisons,
+      Z = dt$Z,
+      P = dt$P,
+      P.adjusted = dt$P.adjusted
+    )
+    results_list[[comp]] <- df
+  }
 }
 
-write_tsv(myResults,opt$output)
+# Combine all into a single data frame
+all_results <- bind_rows(results_list)
+
+output <- capture.output(print(all_results))
+writeLines(output, opt$output)

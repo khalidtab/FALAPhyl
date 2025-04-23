@@ -1,5 +1,4 @@
 rule alpha_div_calc: # Provides per sample alpha calculation
-   version: "1.0"
    conda:
       "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
    input:
@@ -20,7 +19,6 @@ rule alpha_div_calc: # Provides per sample alpha calculation
 
 
 rule alpha_div_plot: # Calculates alpha diversity in each group, and outputs a PDF plot, and calculates the alpha diversity statistical analysis using nonparametric methods
-   version: "1.0"
    conda:
       "../../workflow/envs/ggpubr.yaml"
    input:
@@ -48,7 +46,6 @@ rule alpha_div_plot: # Calculates alpha diversity in each group, and outputs a P
 
 
 rule alpha_div_stats: # Provides per sample alpha calculation
-   version: "1.0"
    conda:
       "../../workflow/envs/ggrepel.yaml"
    input:
@@ -70,7 +67,6 @@ rule alpha_div_stats: # Provides per sample alpha calculation
 
 
 rule alpha_div: # Final step in alpha diversity calculations, to clean up temporary files
-   version: "1.0"
    input:
       svg="data/plots/alpha_div_{sample}/{group}–{alpha}.svg",
       stats="data/alpha_div/stats_{sample}–{group}–{alpha}.txt"

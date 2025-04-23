@@ -1,5 +1,4 @@
 rule biom_to_tsv: # Since qiime requires a specific biom format (either V100/json or V210/hdf5), we can take the generic biom file, and force it to be a json, then import it to qiime as an artifact
-   version: "1.0"
    conda:
         "../../workflow/envs/biom.yaml"
    input:
@@ -23,7 +22,6 @@ rule filter_biom: # Remove samples that are not in the mapping file
       "Rscript --vanilla ./workflow/scripts/filter_biom.R -i {input} -o {output} -m data/{wildcards.sample}.txt "
 
 rule create_filtered_biom: 
-   version: "2.0"
    conda:
       "../../workflow/envs/biom.yaml"
    input:
@@ -37,40 +35,91 @@ rule create_filtered_biom:
       'biom convert -i {input} -o {output} --to-json --table-type="OTU table"  > {log} '
 
 
-checkpoint biom_pairwise1: # for DA effect size calculation
+checkpoint makeBiomForEffectSize: # EffectSize
    conda:
       "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
    input:
       "data/tsv/{sample}.tsv"
    output:
-      temporary(directory(expand("data/tmp/diff/{{sample}}–{{group}}–minAbd{{minabund}}minR{{minread}}minS{{minsample}}/{theTest}–pairwise/",theTest=config["DA_tests"])))
+      temporary(directory(expand("data/tmp/diff/EffectSize–{{sample}}–{{group}}–minAbd{{minabund}}minR{{minread}}minS{{minsample}}–{theTest}/",theTest=config["DA_tests"])))
    params: theTest=config['DA_tests']
-   message: "Filtering biom files of {wildcards.sample} as pairwise comparisons of the variables of {wildcards.group}"
+   message: "Filtering biom files of {wildcards.sample} as pairwise comparisons of the variables of {wildcards.group}, and creating temporary files for each test to avoid any file access clashes"
    shell:
       '''
       mkdir -p {output} data/tmp/difftmp/{wildcards.sample}–{wildcards.group}–minAbd{wildcards.minabund}minR{wildcards.minread}minS{wildcards.minsample}
       Rscript --vanilla workflow/scripts/pairwise_biom.R -i {input} -m data/{wildcards.sample}.txt -g {wildcards.group} -o data/tmp/difftmp/{wildcards.sample}–{wildcards.group}–minAbd{wildcards.minabund}minR{wildcards.minread}minS{wildcards.minsample}
-      # Set IFS to newline to handle file paths with special characters or spaces
-      IFS=$' '
-      # List of unquoted items (simulating unquoted terminal output)
+      IFS=$"\n"  # Newline-separated list, in case test names contain spaces
+      
       items=({params.theTest})
       
-      # Loop through each item in the list
-      for item in ${{items[@]}}; do
-          cp -r data/tmp/difftmp/{wildcards.sample}–{wildcards.group}–minAbd{wildcards.minabund}minR{wildcards.minread}minS{wildcards.minsample}/* data/tmp/diff/{wildcards.sample}–{wildcards.group}–minAbd{wildcards.minabund}minR{wildcards.minread}minS{wildcards.minsample}/$item–pairwise/
+      # Loop through each DA test method
+      for item in "${{items[@]}}"; do
+      # Create target directory for the test
+      target_dir="data/tmp/diff/EffectSize–{wildcards.sample}–{wildcards.group}–minAbd{wildcards.minabund}minR{wildcards.minread}minS{wildcards.minsample}–$item"
+      mkdir -p "$target_dir"
+      
+      # Loop through each file in the temp diff directory
+      for filepath in data/tmp/difftmp/{wildcards.sample}–{wildcards.group}–minAbd{wildcards.minabund}minR{wildcards.minread}minS{wildcards.minsample}/*; do
+      filename_with_ext=$(basename "$filepath")
+      extension="${{filename_with_ext##*.}}"      # File extension
+      filename="${{filename_with_ext%.*}}"        # Filename without extension
+      
+      # Construct new name and copy
+      cp "$filepath" "$target_dir/${{filename}}.${{extension}}"
       done
+      done
+      
+      # Cleanup
       rm -r data/tmp/difftmp/
-      # Reset IFS to default (optional)
       unset IFS
       '''
 
-checkpoint biom_pairwise2: # DAtest
+checkpoint makeBiomForEffectSizePaired: # EffectSize
    conda:
       "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
    input:
       "data/tsv/{sample}.tsv"
    output:
-      temporary(directory("data/tmp/diff/pairwise–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–{theTest}/"))
+      temporary(directory(expand("data/tmp/diffPaired/EffectSize–{{sample}}–{{group}}–minAbd{{minabund}}minR{{minread}}minS{{minsample}}–{theTest}/",theTest=config["paired_DA_tests"])))
+   params: theTest=config['paired_DA_tests']
+   message: "Filtering biom files of {wildcards.sample} as pairwise comparisons of the variables of {wildcards.group}, and creating temporary files for each test to avoid any file access clashes"
+   shell:
+      '''
+      mkdir -p {output} data/tmp/diffPairedtmp/{wildcards.sample}–{wildcards.group}–minAbd{wildcards.minabund}minR{wildcards.minread}minS{wildcards.minsample}
+      Rscript --vanilla workflow/scripts/pairwise_biom.R -i {input} -m data/{wildcards.sample}.txt -g {wildcards.group} -o data/tmp/diffPairedtmp/{wildcards.sample}–{wildcards.group}–minAbd{wildcards.minabund}minR{wildcards.minread}minS{wildcards.minsample}
+      IFS=$"\n"  # Newline-separated list, in case test names contain spaces
+      
+      items=({params.theTest})
+      
+      # Loop through each DA test method
+      for item in "${{items[@]}}"; do
+      # Create target directory for the test
+      target_dir="data/tmp/diffPaired/EffectSize–{wildcards.sample}–{wildcards.group}–minAbd{wildcards.minabund}minR{wildcards.minread}minS{wildcards.minsample}–$item"
+      mkdir -p "$target_dir"
+      
+      # Loop through each file in the temp diff directory
+      for filepath in data/tmp/diffPairedtmp/{wildcards.sample}–{wildcards.group}–minAbd{wildcards.minabund}minR{wildcards.minread}minS{wildcards.minsample}/*; do
+      filename_with_ext=$(basename "$filepath")
+      extension="${{filename_with_ext##*.}}"      # File extension
+      filename="${{filename_with_ext%.*}}"        # Filename without extension
+      
+      # Construct new name and copy
+      cp "$filepath" "$target_dir/${{filename}}.${{extension}}"
+      done
+      done
+      
+      # Cleanup
+      rm -r data/tmp/diffPairedtmp/
+      unset IFS
+      '''
+
+checkpoint makeBiomForDAtest: # DAtest
+   conda:
+      "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
+   input:
+      "data/tsv/{sample}.tsv"
+   output:
+      temporary(directory("data/tmp/diff/DAtest–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–{theTest}/"))
    message: "Filtering biom files of {wildcards.sample} as pairwise comparisons of the variables of {wildcards.group}"
    shell:
       " mkdir -p {output} | "

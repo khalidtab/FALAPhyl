@@ -9,13 +9,16 @@ suppressWarnings(suppressMessages(library("optparse")))
 option_list = list(
   make_option(c("-i", "--input"), type="character", default=NULL, help="Biom file", metavar="Features input file formatted as biom"),
   make_option(c("-m", "--mapping"), type="character", default=NULL, help="Mapping file", metavar="Input mapping file"),
-  make_option(c("-t", "--test"), type="character", default=NULL, help="DAtest method", metavar="Type of test that DAtest does"),
   make_option(c("-c", "--category"), type="character", default=NULL, help="Category", metavar="Name of category column to compare"),
   make_option(c("-s", "--minsample"), type="character", default=NULL, help="Prefiltering number. Minimal number of samples a feature needs to be present in. Otherwise it will be filtered out, and combined as Others", metavar="Min number of samples"),
   make_option(c("-r", "--minread"), type="character", default=NULL, help="Prefiltering number. Minimal number of reads a feature needs to be present in. Otherwise it will be filtered out, and combined as Others", metavar="Min number of reads"),
   make_option(c("-a", "--minabund"), type="character", default=NULL, help="Prefiltering number. Minimal mean relative abundance a feature needs to be present in. Otherwise it will be filtered out, and combined as Others", metavar="Min number of mean relative abundance"),
-  make_option(c("-p", "--pair"), type="character", default=NULL, help="Column name of the subject ID in the mapping file", metavar="Column name of the subject ID in the mapping file"),  
-  make_option(c("-o", "--output"), type="character", default=NULL, help="output file name", metavar="Output file name")
+  make_option(c("-t", "--thetest"), type="character", default=NULL, help="Test to be run", metavar="Test to be run"),
+  make_option(c("-o", "--output"), type="character", default=NULL, help="Output file name", metavar="Output file name"),
+  make_option(c("-p", "--tmp"), type="character", default=NULL, help="Path to temporary folder", metavar="Path to temporary folder"),
+  make_option(c("-l", "--log"), type="character", default=NULL, help="Log file name", metavar="Log file name"),
+  make_option(c("-u", "--pair"), type="character", default=NULL, help="Column name of the subject ID in the mapping file", metavar="Column name of the subject ID in the mapping file") 
+
 );
 
 opt_parser = OptionParser(option_list=option_list);
@@ -26,6 +29,7 @@ if (is.null(opt$input)){
   stop("At least one argument must be supplied (input file).n", call.=FALSE)
 }
 
+
 df = opt$input
 df = read_tsv(df)
 dfRows = as.data.frame(df[,1])
@@ -33,7 +37,8 @@ df = as.data.frame(df)
 rownames(df) = dfRows[,1]
 df[,1] = NULL
 df[] = lapply(df, as.numeric)
-df = t(df)
+df = t(df) %>% as.data.frame(.)
+
 if ( as.numeric(opt$minsample)==0 && as.numeric(opt$minread)==0 && as.numeric(opt$minabund)==0){df = df}else{
   df = preDA(df, min.samples = as.numeric(opt$minsample), min.reads = as.numeric(opt$minread), min.abundance =  as.numeric(opt$minabund))
 }
@@ -46,14 +51,16 @@ subjectID = opt$pair
 
 catNum = which(colnames(map) == category)
 subjectNum = which(colnames(map) == subjectID)
-working_map = cbind(as.character(map[,1]),
-                    as.character(map[,catNum]),
-                    as.character(map[,subjectNum])) %>% as.data.frame(.)
+working_map = cbind(as.character(map[,1]), as.character(map[,catNum]), as.character(map[,subjectNum])) %>% as.data.frame(.)
 colnames(working_map) = c("SampleID","condition","subject")
 vec = working_map$condition %>% as.factor(.)
 subject = working_map$subject %>% as.factor(.)
 
-mymethod = opt$test
+log_file = opt$log
+
+tmp_folder = opt$tmp
+
+mymethod = opt$thetest
 
 
 if (mymethod == "fri"){
@@ -139,15 +146,54 @@ if (mymethod == "fri"){
   
 } else if (mymethod %in% c("CPLM","ZICP","ZSCP","ZACP")){
   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   library("Tweedieverse")
-  
+  library("cplm")
+  print(paste0("Running ",mymethod))
+  print("Creating relative abundances of the samples.")
   df <- apply(df, 2, function(x) x / sum(x))
   
   CPLM <- function(count_table, predictor, paired, covars) {
-    
-    write_log <- function(message) {
-      write(message, file = log_file, append = TRUE)
-    }
     
     # Create a unique output directory based on timestamp
     timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
@@ -155,28 +201,28 @@ if (mymethod == "fri"){
     dir.create(output_dir, recursive = TRUE)
     results_file <- paste0(output_dir, "/all_results.tsv")
     
-    write_log("Entering function")
+    print("Entering function")
     
     # Debug: Print inputs
-    write_log("count_table:")
-    write_log(paste(capture.output(head(count_table)), collapse = "\n"))
-    write_log(paste("Dimensions of count_table:", paste(dim(count_table), collapse = " x ")))
-    
-    write_log("predictor:")
-    write_log(paste(capture.output(head(predictor)), collapse = "\n"))
-    write_log(paste("Length of predictor:", length(predictor)))
-    
+    print("count_table:")
+    print(paste(capture.output(head(count_table)), collapse = "\n"))
+    print(paste("Dimensions of count_table:", paste(dim(count_table), collapse = " x ")))
+
+    print("predictor:")
+    print(paste(capture.output(head(predictor)), collapse = "\n"))
+    print(paste("Length of predictor:", length(predictor)))
+
     # Prepare the predictor data frame
     predictor_df <- data.frame(sampleid = colnames(count_table), metadata = as.character(predictor))
     rownames(predictor_df) <- predictor_df$sampleid
     predictor_df$sampleid <- NULL
     
-    write_log("predictor_df:")
-    write_log(paste(capture.output(head(predictor_df)), collapse = "\n"))
-    write_log(paste("Dimensions of predictor_df:", paste(dim(predictor_df), collapse = " x ")))
-    
+    print("predictor_df:")
+    print(paste(capture.output(head(predictor_df)), collapse = "\n"))
+    print(paste("Dimensions of predictor_df:", paste(dim(predictor_df), collapse = " x ")))
+
     # Run the Tweedieverse function
-    write_log("Running Tweedieverse...")
+    print("Running Tweedieverse...")
     tryCatch({
       Tweedieverse::Tweedieverse(
         input_features = as.data.frame(count_table),
@@ -189,9 +235,9 @@ if (mymethod == "fri"){
         entropy_threshold = 0,
         random_effects = subjectID
       )
-      write_log("Tweedieverse completed.")
+      print("Tweedieverse completed.")
     }, error = function(e) {
-      write_log(paste("Error in Tweedieverse:", e$message))
+      print(paste("Error in Tweedieverse:", e$message))
       return(NULL)
     })
     
@@ -200,20 +246,20 @@ if (mymethod == "fri"){
       write_log("Results file does not exist")
       stop("Results file does not exist")
     }
-    write_log("Results file exists.")
+    print("Results file exists.")
     
     # Read the results
     myTable <- read_tsv(results_file, show_col_types = FALSE)
     myTable <- as.data.frame(myTable)
     
     # Debug: Check myTable
-    write_log("myTable:")
-    write_log(paste(capture.output(head(myTable)), collapse = "\n"))
-    write_log(paste("Dimensions of myTable:", paste(dim(myTable), collapse = " x ")))
-    
+    print("myTable:")
+    print(paste(capture.output(head(myTable)), collapse = "\n"))
+    print(paste("Dimensions of myTable:", paste(dim(myTable), collapse = " x ")))
+
     # Ensure myTable has the expected structure
     if (nrow(myTable) == 0 || !all(c("feature", "pval") %in% colnames(myTable))) {
-      write_log("Results table has unexpected structure")
+      print("Results table has unexpected structure")
       stop("Results table has unexpected structure")
     }
     
@@ -227,20 +273,19 @@ if (mymethod == "fri"){
     )
     rownames(result_df) <- result_df$Feature
     
-    write_log("Returning result_df")
-    write_log(paste(capture.output(head(result_df)), collapse = "\n"))
+    print("Returning result_df")
+    print(paste(capture.output(head(result_df)), collapse = "\n"))
     
     return(result_df)
   }
   
   # Run testDA with cores set to 1
-  final <- DAtest::testDA(
+  final <- DAtest::DA.zzz(
     data = df,
     predictor = vec,
-    tests = c("zzz"),
-    args = list(zzz = list(FUN = CPLM)),
-    cores = 1,
-    paired = subject)
+    FUN = CPLM,
+    paired = subject,
+    p.adj = "fdr")
   
   final$table = final$data
   

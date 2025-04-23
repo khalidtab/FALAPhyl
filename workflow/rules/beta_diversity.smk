@@ -2,7 +2,6 @@ def get_mem_mb(wildcards, attempt):
     return attempt * 1000
 
 rule beta_div: # Calculate distances between samples based on the chosen beta diversity choices in the input file
-   version: "2.0"
    conda:
       "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
    input:
@@ -26,7 +25,6 @@ rule beta_div: # Calculate distances between samples based on the chosen beta di
       "Rscript --vanilla ./workflow/scripts/beta_diversity.R -i {input} -o {output} -d {wildcards.dist} > {log}"
 
 rule nmds_: # Plots the beta diversity distances using the Non-Metric Dimensional Scaling (NMDS) algorithm
-   version: "1.0"
    conda: "../../workflow/envs/ggrepel.yaml"
    input:
       rules.beta_div.output.tsv
@@ -80,7 +78,6 @@ rule nmds_: # Plots the beta diversity distances using the Non-Metric Dimensiona
       "Rscript --vanilla ./workflow/scripts/NMDS.R -i {input} -o {output.mysvg} -m data/{wildcards.sample}.txt -g {wildcards.group} -c {wildcards.group}{params.color} -x {params.width} -y {params.height} > {log} 2>&1 "
 
 rule pcoa_: # Plots the beta diversity distances using the Principal Coordinates Analysis (PCoA) algorithm
-   version: "1.0"
    conda:
       "../../workflow/envs/ggrepel.yaml"
    input:
@@ -136,7 +133,6 @@ rule pcoa_: # Plots the beta diversity distances using the Principal Coordinates
 
 
 rule adonis_: # Calculates whether the two groups have similar dispersions (variances) to their centroid
-   version: "1.0"
    conda:
       "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
    input:
@@ -258,12 +254,11 @@ rule permdisp_: # Calculates whether the two groups have similar dispersions (va
       " Rscript --vanilla ./workflow/scripts/adonis_anosim_betadisper.R -i {input} -o {output.myresults} -m data/{wildcards.sample}.txt -p {output.myPCoA} -b {output.myBoxplot} -g {wildcards.group} -c {params.color} -t {params.test} -x {params.width} -y {params.height} > {log} 2>&1 "
 
 rule dunns_: # Plots the beta diversity distances using the Non-Metric Dimensional Scaling (NMDS) algorithm
-   version: "1.0"
    conda: "../../workflow/envs/dunn.yaml"
    input:
       rules.beta_div.output.tsv
    output: 
-      report("data/distance/Dunns/{sample}/Dunns–{dist}–{group}.txt",
+      report("data/distance/PerGroupDistCompare/{sample}/Dunns–{dist}–{group}.txt",
       category="Beta diversity",
       subcategory="{dist}",
       labels={
@@ -299,7 +294,7 @@ rule pcoa:
 
 rule dunn:
    input:
-      expand("data/distance/Dunns/{sample}/Dunns–{dist}–{group}.txt",           sample=config["mysample"], dist=config["distances"], group=config["group"])
+      expand("data/distance/PerGroupDistCompare/{sample}/Dunns–{dist}–{group}.txt",           sample=config["mysample"], dist=config["distances"], group=config["group"])
 
 rule beta:
    input:
@@ -308,5 +303,5 @@ rule beta:
       expand("data/distance/ADONIS/{sample}/adonis–{dist}–{group}.txt",       sample=config["mysample"], dist=config["distances"], group=config["group"]),
       expand("data/plots/betaDiv_{sample}/NMDS–{dist}–{group}.svg",           sample=config["mysample"], dist=config["distances"], group=config["group"]),
       expand("data/plots/betaDiv_{sample}/PCoA–{dist}–{group}.svg",           sample=config["mysample"], dist=config["distances"], group=config["group"]),
-      expand("data/distance/Dunns/{sample}/Dunns–{dist}–{group}.txt",           sample=config["mysample"], dist=config["distances"], group=config["group"])
+      expand("data/distance/PerGroupDistCompare/{sample}/Dunns–{dist}–{group}.txt",           sample=config["mysample"], dist=config["distances"], group=config["group"])
       

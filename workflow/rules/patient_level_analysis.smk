@@ -2,7 +2,6 @@ def get_mem_mb(wildcards, attempt):
     return attempt * 1000
 
 rule patient_level_alpha_comparison:
-   version: "1.0"
    conda: "../../workflow/envs/ggpubr.yaml"
    input:
       rules.alpha_div_calc.output
@@ -29,7 +28,6 @@ rule patient_level_alpha_comparison:
       
       
 rule patient_level_betapart: 
-   version: "1.0"
    conda: "../../workflow/envs/ggpubr.yaml"
    input:
       repl=rules.betapart_matrix.output.repl,
@@ -58,12 +56,11 @@ rule patient_level_betapart:
       " Rscript --vanilla ./workflow/scripts/betapart_subjectlevel.R -i {input.jac} -r {input.repl} -n {input.norepl} -m data/{wildcards.sample}.txt -c {wildcards.group} -p {params.subjectID} -o {output} -d {wildcards.distance} > {log} 2>&1 "
 
 rule friedman: # Plots the beta diversity distances using the Non-Metric Dimensional Scaling (NMDS) algorithm
-   version: "1.0"
    conda: "../../workflow/envs/dunn.yaml"
    input:
       rules.beta_div.output.tsv
    output: 
-      report("data/distance/Dunns/{sample}/friedman_Dunns–{dist}–{group}.txt",
+      report("data/distance/PerGroupDistCompare/{sample}/friedman–{dist}–{group}.txt",
       category="Beta diversity",
       subcategory="{dist}",
       labels={
@@ -79,11 +76,11 @@ rule friedman: # Plots the beta diversity distances using the Non-Metric Dimensi
    shell:
       "Rscript --vanilla ./workflow/scripts/friedman.R -i {input} -o {output} -m data/{wildcards.sample}.txt -c {wildcards.group} -s {params.subjectID} > {log} 2>&1 "
 
-rule subject_beta:
+rule paired_beta:
    input:
       expand("data/plots/patientlvl_betapart_{sample}–{group}–{distance}/",   sample=config["mysample"],group=config["group"],distance=["bray","jaccard"]),
-      expand("data/distance/Dunns/{sample}/friedman_Dunns–{dist}–{group}.txt",sample=config["mysample"],group=config["group"],dist=config["distances"])
+      expand("data/distance/PerGroupDistCompare/{sample}/friedman–{dist}–{group}.txt",sample=config["mysample"],group=config["group"],dist=config["distances"])
 
-rule subject_alpha:
+rule paired_alpha:
    input:
       expand("data/plots/patientlvl_alphaDiv_{sample}–{group}–{alpha}/",  sample=config["mysample"],group=config["group"],alpha=config["alpha"])

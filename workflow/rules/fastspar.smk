@@ -2,7 +2,6 @@ scattergather:
     bootstraps=config["sparcc_bootstrap"][0]
 
 checkpoint makeCore: # SparCC works better when the feature table has less zeros. Therefore, this script will filter the feature tables to the desired level of "coreness" based on the input file values
-   version: "1.0"
    conda:
       "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
    input:
@@ -18,7 +17,6 @@ checkpoint makeCore: # SparCC works better when the feature table has less zeros
       "Rscript --vanilla ./workflow/scripts/make_core.R -i {input.biom} -m {input.map} -c {wildcards.group} -t {params.threshold} -o {output}/ "
 
 rule fastspar: # SparCC (through the fastpar algorithm) will be done on the core feature table. This is an intermediate step that will solve the output file name based on the definition below, and as such solves the input based on the output
-   version: "1.0"
    conda:
       "../../workflow/envs/fastspar.yaml"
    input:
@@ -33,7 +31,6 @@ rule fastspar: # SparCC (through the fastpar algorithm) will be done on the core
       "rm {output}.cov.tsv"
 
 rule bootstrap: # To calculate P-values, bootstraps need to be done from the core feature table. This script accomplishes this.
-   version: "1.0"
    conda:
       "../../workflow/envs/fastspar.yaml"
    input:
@@ -55,7 +52,6 @@ rule bootstrap: # To calculate P-values, bootstraps need to be done from the cor
 
 
 rule pvalues: # Calculates p-values by using the correlations from the core feature table, and the boostraps
-   version: "1.0"
    conda:
       "../../workflow/envs/fastspar.yaml"
    input:
@@ -76,7 +72,6 @@ rule pvalues: # Calculates p-values by using the correlations from the core feat
 
 
 rule nodes_and_edges: #This script returns nodes and edges that pass the desired level of correlation and pvalue. It also calculates modularity, and the Zi-Pi calculations
-   version: "1.0"
    conda:
       "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
    input:
@@ -107,7 +102,6 @@ rule nodes_and_edges: #This script returns nodes and edges that pass the desired
       "Rscript --vanilla ./workflow/scripts/nodes_edges.R -i {input.corr} -p {input.pvalues} -n {output.nodes} -e {output.edges} -a {params.threshold} -b {params.pvalue} >/dev/null"
 
 rule zipi: # This script plots the Zi-Pi plots from the nodes_and_edges output
-   version: "1.0"
    conda:
       "../../workflow/envs/ggrepel.yaml"
    input:
@@ -139,7 +133,6 @@ def zipi_output_aggregation(wildcards):
 
 
 rule network_cleanup: # Cleans up the temporary files from the network calculations
-   version: "1.0"
    input:
       zipi_output_aggregation
    output:

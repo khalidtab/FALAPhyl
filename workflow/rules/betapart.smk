@@ -89,7 +89,6 @@ rule betapart_pairwise_done: # Create pairwise distance breakdown between each t
 ## 2. ANOSIM
 
 rule repl_anosim_betapart:
-   version: "1.0"
    conda:
       "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
    input:
@@ -152,7 +151,6 @@ use rule repl_anosim_betapart as norepl_anosim_betapart with:
 ### Split biom file for the upcoming betapart steps
 
 checkpoint group_and_category: # Will export multiple biom files tagged by their group name (retrieved from parameter) and the category within that group ("group+category.txt"). The tagging is done within the R script
-   version: "1.0"
    conda:
       "../../workflow/envs/phyloseq_vegan_tidyverse.yaml"
    input:
