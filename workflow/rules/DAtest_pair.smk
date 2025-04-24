@@ -6,7 +6,7 @@ rule testDApair with:
       map="data/tmp/diff/DAtest–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–{theTest}/{pairwiseCats}.txt"
    output:
       testfile=report("data/diffpaired/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/diffPaired–{pairwiseCats}–{theTest}.tsv",
-      caption="../report/DAtest_subject_test.rst",
+      caption="../report/DAtestpaired_types.rst",
       category="Differential abundance – Patient-level analysis – {sample} – {group} – {pairwiseCats}",
       labels={
               "Description": "{theTest} – Differential abundance for paired samples",
@@ -67,25 +67,25 @@ rule DA_EffectSizePaired_plot:
    output: 
       mytable ="data/diffpaired/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/AUC_FDR_Power.txt",
       myAUC=report("data/plots/AUCpaired–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}.svg",
-      caption="../report/DAtest_subject_test.rst",
+      caption="../report/DAtestpaired_types.rst",
       category="Differential abundance paired – {sample} – {group}",
       labels={
               "Description": "Area under the curve for differential abundance paired tests",
               "Data type": "svg file"}),
       myPower=report("data/plots/Powerpaired–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}.svg",
-      caption="../report/DAtest_subject_test.rst",
+      caption="../report/DAtestpaired_types.rst",
       category="Differential abundance paired – {sample} – {group}",
       labels={
               "Description": "Power for differential abundance paired tests",
               "Data type": "svg file"}),
       myFDR=report("data/plots/FDRpaired–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}.svg",
-      caption="../report/DAtest_subject_test.rst",
+      caption="../report/DAtestpaired_types.rst",
       category="Differential abundance paired – {sample} – {group}",
       labels={
               "Description": "False discovery rate for differential abundance paired tests",
               "Data type": "svg file"}),
       myScore=report("data/plots/Scorepaired–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}.svg",
-      caption="../report/DAtest_subject_test.rst",
+      caption="../report/DAtestpaired_types.rst",
       category="Differential abundance paired – {sample} – {group}",
       labels={
               "Description": "Composite test scores for differential abundance paired tests",
@@ -106,7 +106,7 @@ rule EffectSizePaired_StatTest:
       mytable ="data/diffpaired/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/AUC_FDR_Power.txt"
    output:
       dunnfile=report("data/diffpaired/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/nonparam_test_for_scores.txt",
-      caption="../report/DAtest_subject_test.rst",
+      caption="../report/DAtestpaired_types.rst",
       category="Differential abundance paired – {sample} – {group}",
       labels={
               "Description": "Dunn's nonparametric test for the scores",
