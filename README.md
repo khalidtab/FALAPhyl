@@ -1,7 +1,4 @@
-[![GitHub Super-Linter](https://github.com/khalidtab/FALAPhyl/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
-<div style="text-align: center;">
-  <img src="FALAPhyl.png" alt="Banner" style="max-width: 100%; height: auto;">
-</div>
+[![Super-Linter](https://github.com/<OWNER>/<REPOSITORY>/actions/workflows/<WORKFLOW_FILE_NAME>/badge.svg)](https://github.com/marketplace/actions/super-linter)
 
 # FALAPhyl: *F*orays into *A*utomating *L*aborious *A*nalyses of *Phyl*ogeny
 
