@@ -1,4 +1,4 @@
-
+![image](FALAPhyl.png)
 
 # FALAPhyl: *F*orays into *A*utomating *L*aborious *A*nalyses of *Phyl*ogeny
 
