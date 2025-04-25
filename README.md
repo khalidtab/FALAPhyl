@@ -28,7 +28,7 @@ Before executing the code, ensure the following:
 
 To run the pipeline. Run the following command
 
-> snakemake alpha beta breakdown network diff subject_alpha subject_beta subject_diff --cores all --use-conda --keep-going --retries 5 --scheduler greedy --rerun-incomplete
+> snakemake alpha beta breakdown network diff paired_alpha paired_beta paired_diff --cores all --use-conda --keep-going --retries 5 --scheduler greedy --rerun-incomplete
 
 ## Command explanations
 
@@ -37,6 +37,6 @@ To run the pipeline. Run the following command
 3. `breakdown`: Jaccard and Bray-Curtis broken down to their corresponding components (per the R package Betapart). ANOSIM on the two components. Probability density function of the components through permutation.
 4. `network`: nodes and edges based on SparCC. Zi-Pi graphs to determine which nodes are most interesting.
 5. `diff`: differential abundance using multiple methods, using the R package DAtest. Will do pairwise comparisons of selected variables. Will output differential abundance, power analysis, and the following graphs to help identify the best method: AUC, FDR, Power, and Scores.
-6. `subject_alpha`: For paired/repeated measures. Alpha diversity differences but restricted to differences within a subject.
-7. `subject_beta`: For paired/repeated measures. Same as the breakdown option above, but the comparison is restricted to differences within the subject.
-8. `subject_diff`: For paired/repeated measures. Same as the diff option above, but the comparisons is restricted to differences within the subject.
+6. `paired_alpha`: For paired/repeated measures. Alpha diversity differences but restricted to differences within a subject.
+7. `paired_beta`: For paired/repeated measures. Same as the breakdown option above, but the comparison is restricted to differences within the subject.
+8. `paired_diff`: For paired/repeated measures. Same as the diff option above, but the comparisons is restricted to differences within the subject.
