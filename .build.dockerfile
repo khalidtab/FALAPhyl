@@ -7,6 +7,7 @@ RUN git clone https://github.com/khalidtab/FALAPhyl && \
     cp FALAPhyl/workflow/snakefile ./snakefile && cp FALAPhyl/LICENSE ./LICENSE && \
     cp FALAPhyl/README.md ./README.md && \
     cp FALAPhyl/FALAPhyl_metadata.txt ./FALAPhyl_metadata.txt && \
+    cp FALAPhyl/FALAPhyl.png ./FALAPhyl.png && \
     rm -r FALAPhyl && \
     snakemake snakefile.final --use-conda --cores all --conda-create-envs-only --snakefile  ./build.snakefile 2>&1 | tee -a FALAPhyl_environments.txt && \
     rm ./build.snakefile && conda clean -a -y && rm ./snakefile

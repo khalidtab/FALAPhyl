@@ -21,19 +21,28 @@ rule filter_biom: # Remove samples that are not in the mapping file
    shell: 
       "Rscript --vanilla ./workflow/scripts/filter_biom.R -i {input} -o {output} -m data/{wildcards.sample}.txt "
 
-rule create_filtered_biom: 
+rule include_biom_and_meta:
    conda:
       "../../workflow/envs/biom.yaml"
    input:
       "data/tsv/{sample}.tsv"
    output:
-      "data/biom/{sample}_temp.biom"
+      report("data/biom/{sample}_temp.biom",
+             category="Biom file",
+             subcategory="Input files – {sample}",
+             labels={"Data type": "Count table in BIOM-format"}
+      ),
+      report("data/tmp/{sample}.txt",
+             category="Mapping file",
+             subcategory="Input files – {sample}",
+             labels={"Data type": "Mapping file"}
+      )
    log:
       "data/logs/filterBiom–{sample}.txt"
-   message: "Creating filtered biom file for {wildcards.sample}"
-   shell: 
-      'biom convert -i {input} -o {output} --to-json --table-type="OTU table"  > {log} '
-
+   message:
+      "Creating filtered biom file for {wildcards.sample}"
+   shell:
+      'biom convert -i {input} -o data/biom/{wildcards.sample}_temp.biom --to-json --table-type="OTU table" > {log} && cp data/{wildcards.sample}.txt data/tmp/{wildcards.sample}.txt'
 
 checkpoint makeBiomForEffectSize: # EffectSize
    conda:
