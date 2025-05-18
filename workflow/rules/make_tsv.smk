@@ -25,24 +25,19 @@ rule include_biom_and_meta:
    conda:
       "../../workflow/envs/biom.yaml"
    input:
-      "data/tsv/{sample}.tsv"
+      expand("data/tsv/{sample}.tsv",sample=config["mysample"])
    output:
-      report("data/biom/{sample}_temp.biom",
+      report(expand("data/biom/{sample}_temp.biom",sample=config["mysample"]),
              category="Biom file",
-             subcategory="Input files – {sample}",
-             labels={"Data type": "Count table in BIOM-format"}
-      ),
-      report("data/tmp/{sample}.txt",
+             subcategory="Input files",
+             labels={"Data type": "Count table in BIOM-format"}),
+      report(expand("data/tmp/{sample}.txt",sample=config["mysample"]),
              category="Mapping file",
-             subcategory="Input files – {sample}",
-             labels={"Data type": "Mapping file"}
-      )
-   log:
-      "data/logs/filterBiom–{sample}.txt"
-   message:
-      "Creating filtered biom file for {wildcards.sample}"
+             subcategory="Input files",
+             labels={"Data type": "Mapping file"})
+   params: mySample=config["mysample"]
    shell:
-      'biom convert -i {input} -o data/biom/{wildcards.sample}_temp.biom --to-json --table-type="OTU table" > {log} && cp data/{wildcards.sample}.txt data/tmp/{wildcards.sample}.txt'
+      'biom convert -i {input} -o {output} --to-json --table-type="OTU table" && cp data/{params.mySample}.txt data/tmp/{params.mySample}.txt'
 
 checkpoint makeBiomForEffectSize: # EffectSize
    conda:
