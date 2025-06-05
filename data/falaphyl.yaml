@@ -145,11 +145,7 @@ paired_DA_tests:
 #     - wil
      - CPLM
 
-
-DA_repeats:
-     - 20
-
-DA_effectSize: # each one will be repeated DA_repeats times
+DA_effectSize: # each one will be repeated 20 times
      - 2
      - 4
      - 8
