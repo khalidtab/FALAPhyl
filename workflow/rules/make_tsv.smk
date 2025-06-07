@@ -27,17 +27,17 @@ rule include_biom_and_meta:
    input:
       expand("data/tsv/{sample}.tsv",sample=config["mysample"])
    output:
-      report(expand("data/biom/{sample}_temp.biom",sample=config["mysample"]),
+      biom=report(expand("data/biom/{sample}_temp.biom",sample=config["mysample"]),
              category="Biom file",
              subcategory="Input files",
              labels={"Data type": "Count table in BIOM-format"}),
-      report(expand("data/tmp/{sample}.txt",sample=config["mysample"]),
+      metadata=report(expand("data/tmp/{sample}.txt",sample=config["mysample"]),
              category="Mapping file",
              subcategory="Input files",
              labels={"Data type": "Mapping file"})
    params: mySample=config["mysample"]
    shell:
-      'biom convert -i {input} -o {output} --to-json --table-type="OTU table" && cp data/{params.mySample}.txt data/tmp/{params.mySample}.txt'
+      'biom convert -i {input} -o {output.biom} --to-json --table-type="OTU table" && cp data/{params.mySample}.txt data/tmp/{params.mySample}.txt'
 
 checkpoint makeBiomForEffectSize: # EffectSize
    conda:
