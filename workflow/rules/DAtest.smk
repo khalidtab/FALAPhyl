@@ -6,7 +6,7 @@ rule testDA:
       map="data/tmp/diff/DAtest–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–{theTest}/{pairwiseCats}.txt"
    output:
       testfile=report("data/diff/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/diff–{pairwiseCats}–{theTest}.tsv",
-      caption="../report/DAtest_types.rst",
+      caption="../report/DAtest_subject_test.rst",
       category="Differential abundance – {sample} – {group} – {pairwiseCats}",
       labels={
               "Description": "{theTest} – Differential abundance for samples",
@@ -67,25 +67,25 @@ rule DA_EffectSize_plot:
    output: 
       mytable ="data/diff/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/AUC_FDR_Power.txt",
       myAUC=report("data/plots/AUC–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}.svg",
-      caption="../report/DAtest_types.rst",
+      caption="../report/DAtest_subject_test.rst",
       category="Differential abundance – {sample} – {group}",
       labels={
               "Description": "Area under the curve for differential abundance tests",
               "Data type": "svg file"}),
       myPower=report("data/plots/Power–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}.svg",
-      caption="../report/DAtest_types.rst",
+      caption="../report/DAtest_subject_test.rst",
       category="Differential abundance – {sample} – {group}",
       labels={
               "Description": "Power for differential abundance tests",
               "Data type": "svg file"}),
       myFDR=report("data/plots/FDR–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}.svg",
-      caption="../report/DAtest_types.rst",
+      caption="../report/DAtest_subject_test.rst",
       category="Differential abundance – {sample} – {group}",
       labels={
               "Description": "False discovery rate for differential abundance tests",
               "Data type": "svg file"}),
       myScore=report("data/plots/Score–{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}.svg",
-      caption="../report/DAtest_types.rst",
+      caption="../report/DAtest_subject_test.rst",
       category="Differential abundance – {sample} – {group}",
       labels={
               "Description": "Composite test scores for differential abundance",
@@ -106,7 +106,7 @@ rule EffectSize_StatTest:
       mytable ="data/diff/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/AUC_FDR_Power.txt"
    output:
       dunnfile=report("data/diff/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}/nonparam_test_for_scores.txt",
-      caption="../report/DAtest_types.rst",
+      caption="../report/DAtest_subject_test.rst",
       category="Differential abundance – {sample} – {group}",
       labels={
               "Description": "Dunn's nonparametric test for the scores",

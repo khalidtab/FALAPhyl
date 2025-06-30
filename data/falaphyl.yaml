@@ -120,29 +120,21 @@ DA_tests:
 
 
 paired_DA_tests:
-#     - ds2
-#     - ds2x
-#     - erq
-#     - erq2
-#     - lli
-#     - lli2
-#     - neb
-#     - poi
-#     - vli
-#     - zig
-#     - llm
-#     - fri
-#     - lim
-#     - llm2
-#     - lrm
-#     - ltt
-#     - ltt2
-#     - per
-#     - qua
-##     - sam
-#     - ttr
-#     - ttt
-#     - wil
+     - ds2
+     - ds2x
+     - erq
+     - erq2
+     - lli
+     - lli2
+     - neb
+     - poi
+     - vli
+     - ltt
+     - ltt2
+     - per
+     - ttr
+     - ttt
+     - wil
      - CPLM
 
 DA_effectSize: # each one will be repeated 20 times

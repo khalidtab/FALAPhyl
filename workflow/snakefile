@@ -25,7 +25,4 @@ rule all:
       expand("data/tmp/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–TestDA_power_done.txt", sample=config["mysample"],group=config["group"],theTest=config["DA_tests"],minabund=config["DA_minabund"],minread=config["DA_minread"],minsample=config["DA_minsample"]),
       expand("data/tmp/done_{sample}–{group}–{theTest}–{minabund}{minread}{minsample}.txt", sample=config["mysample"],group=config["group"],theTest=config["DA_tests"],minabund=config["DA_minabund"],minread=config["DA_minread"],minsample=config["DA_minsample"]),
       expand("data/tmp/{sample}–{group}–minAbd{minabund}minR{minread}minS{minsample}–TestDAPair_power_done.txt", sample=config["mysample"],group=config["group"],theTest=config["DA_tests"],minabund=config["DA_minabund"],minread=config["DA_minread"],minsample=config["DA_minsample"]),
-      expand("data/tmp/testDAPair_{sample}–{group}–{theTest}–minAbd{minabund}minR{minread}minS{minsample}–done.txt", sample=config["mysample"],group=config["group"],theTest=config["paired_DA_tests"],minabund=config["DA_minabund"],minread=config["DA_minread"],minsample=config["DA_minsample"]),
-      expand("data/biom/{sample}_temp.biom",sample=config["mysample"]),
-      expand("data/tmp/{sample}.txt",sample=config["mysample"])
-
+      expand("data/tmp/testDAPair_{sample}–{group}–{theTest}–minAbd{minabund}minR{minread}minS{minsample}–done.txt", sample=config["mysample"],group=config["group"],theTest=config["DA_tests"],minabund=config["DA_minabund"],minread=config["DA_minread"],minsample=config["DA_minsample"])
