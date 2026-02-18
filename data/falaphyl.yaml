@@ -70,21 +70,78 @@ betapart_permutations: # How many permutations to create?
      - 100
 
 
-# The differential abundance types of tests you want to perform. 
-# adx = ALDEx2
-# abc = ANCOM-BC
-# bay = baySeq
-# ds2x,ds2 = (DESeq2,DESeq2 man. geoMeans)
-# ere,ere2,erq,erq2 = EdgeR (Exact test,Exact test2,Quasi likelihood,Quasi likelihood2)
-# neb,poi,qpo,znb,zpo = GLM (Negative binomial,Poisson,Quasi-poisson,ZI Negative Binomial,ZI Poisson)
-# lia,lic,lli,lli2,vli = LIMMA( ALR,CLR,log,log #2,voom)
-# msf = MetagenomeSeq featuremodel
-# per = Permutation test
-# sam = SAMseq
-# tta,ttc = t-test (ALR,CLR)
-# ttt,ltt,ltt2,ttr = Welch(t.test,t.test log,t.test log #2,t.test Rank-normalization)
-# wil = Wilcoxon
-# From Tweedieverse - CPLM: Compound poisson linear model
+# =============================================================================
+# Differential Abundance (DA) Testing
+# =============================================================================
+# FALAPhyl uses the DAtest framework (Russel et al. 2018) to evaluate which
+# statistical method performs best on YOUR specific dataset via spike-in
+# simulations. This is fundamentally different from tools like LEfSe, ALDEx2,
+# ANCOM-BC, or MaAsLin2, which each apply a single statistical approach:
+#
+#   - LEfSe/ALDEx2/ANCOM-BC/MaAsLin2: Apply ONE chosen method to find DA taxa
+#   - DAtest (via FALAPhyl): Empirically tests WHICH method works best for
+#     your data by introducing known differences (spike-ins) and measuring
+#     each method's ability to recover them (AUC, FDR, Power)
+#
+# FALAPhyl parallelizes the evaluation: each method x effectSize x comparison
+# runs as a separate Snakemake job, then results are compiled and compared
+# using a non-parametric test (Dunn's or Wilcoxon).
+#
+# Available DA methods (code = full name [R package]):
+#
+# --- T-tests & Wilcoxon ---
+#   ttt  = Welch's t-test                                     [stats]
+#   ttc  = t-test, equal variance                              [stats]
+#   ltt  = t-test on log-transformed data                      [stats]
+#   ltt2 = t-test on log-transformed data (pseudocount 0.001)  [stats]
+#   ttr  = t-test with rank normalization                      [stats]
+#   tta  = t-test on ALR-transformed data                      [stats]
+#   wil  = Wilcoxon rank-sum test                              [stats]
+#
+# --- LIMMA variants ---
+#   lia  = LIMMA on ALR-transformed data                       [limma]
+#   lic  = LIMMA on CLR-transformed data                       [limma]
+#   lli  = LIMMA on log-transformed data                       [limma]
+#   lli2 = LIMMA on log-transformed data (pseudocount 0.001)   [limma]
+#   vli  = LIMMA with voom transformation                      [limma]
+#
+# --- RNA-seq methods adapted for microbiome ---
+#   ds2  = DESeq2 with manual geometric means                  [DESeq2]
+#   ds2x = DESeq2 with default size factors                    [DESeq2]
+#   ere  = edgeR exact test                                    [edgeR]
+#   ere2 = edgeR exact test (TMM + prior.count)                [edgeR]
+#   erq  = edgeR quasi-likelihood F-test                       [edgeR]
+#   erq2 = edgeR quasi-likelihood (robust)                     [edgeR]
+#   bay  = baySeq                                              [baySeq]
+#
+# --- GLM-based methods ---
+#   neb  = Negative binomial GLM                               [MASS]
+#   poi  = Poisson GLM                                         [stats]
+#   qpo  = Quasi-Poisson GLM                                   [stats]
+#   znb  = Zero-inflated Negative Binomial                     [pscl]
+#   zpo  = Zero-inflated Poisson                               [pscl]
+#   lrm  = Logistic regression                                 [stats]
+#   llm  = Log-linear model                                    [stats]
+#   llm2 = Log-linear model (pseudocount 0.001)                [stats]
+#
+# --- Other methods ---
+#   abc  = ANCOM-BC (Analysis of Compositions of Microbiomes)  [ANCOMBC]
+#   adx  = ALDEx2 (ANOVA-Like Differential Expression)         [ALDEx2]
+#   msf  = MetagenomeSeq feature model (fitZIG)                [metagenomeSeq]
+#   per  = Permutation test                                    [stats]
+#   sam  = SAMseq (Significance Analysis of Microarrays)       [samr]
+#   kru  = Kruskal-Wallis test (used as baseline)              [stats]
+#
+# --- Tweedieverse models (added by FALAPhyl) ---
+#   CPLM = Compound Poisson Linear Model                       [Tweedieverse]
+#   ZICP = Zero-Inflated Compound Poisson                      [Tweedieverse]
+#   ZSCP = Zero-Squeezed Compound Poisson                      [Tweedieverse]
+#   ZACP = Zero-Adjusted Compound Poisson                      [Tweedieverse]
+#
+# Uncomment methods below to include them in the evaluation.
+# More methods = more comprehensive evaluation, but longer runtime.
+# Each method is tested at each effect size (DA_effectSize) and for
+# each pairwise comparison of the grouping variable.
 
 DA_tests:
      - abc
@@ -137,7 +194,14 @@ paired_DA_tests:
      - wil
      - CPLM
 
-DA_effectSize: # each one will be repeated 20 times
+# Spike-in effect sizes for DA method evaluation.
+# For each effect size, DAtest multiplies counts of k randomly selected
+# features by this factor in one group, then checks if the method detects
+# them. Each effect size is repeated 20 times per run.
+# Larger values = easier to detect; a good method should work even at
+# small effect sizes (e.g., 2x). Each method x effectSize combination
+# runs as a separate Snakemake job for parallelism.
+DA_effectSize:
      - 2
      - 4
      - 8

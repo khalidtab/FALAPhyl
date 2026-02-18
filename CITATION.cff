@@ -1,0 +1,62 @@
+cff-version: 1.2.0
+message: "If you use FALAPhyl, please cite it as below."
+title: "FALAPhyl: Fast Amplicon-Level Analysis of Phylogeny"
+type: software
+license: GPL-3.0
+url: "https://github.com/khalidtab/FALAPhyl"
+repository-code: "https://github.com/khalidtab/FALAPhyl"
+authors:
+  - family-names: Faridoun
+    given-names: Afnan
+    affiliation: "Department of General Dental Practice, College of Dentistry, Kuwait University"
+  - family-names: Carvalho
+    given-names: Ramon
+    affiliation: "School of Dentistry, Faculty of Medicine and Dentistry, University of Alberta"
+  - family-names: Smith
+    given-names: Jacob
+    affiliation: "Dalhousie University"
+  - family-names: Gibb
+    given-names: Andrew
+    affiliation: "School of Dentistry, Faculty of Medicine and Dentistry, University of Alberta"
+  - family-names: Jain
+    given-names: Lavanya
+    affiliation: "University of Alberta"
+  - family-names: Zhang
+    given-names: Annie
+    affiliation: "University of Alberta"
+  - family-names: Sran
+    given-names: Ajay
+    affiliation: "University of Alberta"
+  - family-names: Redmond
+    given-names: Johanna
+    affiliation: "University of Alberta"
+  - family-names: Malik
+    given-names: Mohammad Zubbair
+    affiliation: "Department of Translational Research, Dasman Diabetes Institute"
+  - family-names: Gibson
+    given-names: Monica
+    affiliation: "Department of Periodontology, School of Dentistry, Indiana University"
+  - family-names: Haider
+    given-names: Anum
+    affiliation: "School of Dentistry, Faculty of Medicine and Dentistry, University of Alberta"
+  - family-names: Rekhi
+    given-names: Umar
+    affiliation: "School of Dentistry, Faculty of Medicine and Dentistry, University of Alberta"
+  - family-names: Bhagirath
+    given-names: Anjali
+    affiliation: "Dalhousie University"
+  - family-names: Rock
+    given-names: Leigha D.
+    affiliation: "Dalhousie University"
+  - family-names: Altabtbaei
+    given-names: Khaled
+    affiliation: "School of Dentistry, Faculty of Medicine and Dentistry, University of Alberta"
+keywords:
+  - 16S rRNA
+  - microbiome
+  - alpha diversity
+  - beta diversity
+  - differential abundance
+  - DAtest
+  - Snakemake
+  - bioinformatics pipeline

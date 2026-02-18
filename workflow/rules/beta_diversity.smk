@@ -292,9 +292,33 @@ rule pcoa:
    input:
       expand("data/plots/betaDiv_{sample}/PCoA–{dist}–{group}.svg",           sample=config["mysample"], dist=config["distances"], group=config["group"])
 
+rule dunns_heatmap_:
+   conda: "../../workflow/envs/ggpubr.yaml"
+   input:
+      expand("data/distance/PerGroupDistCompare/{{sample}}/Dunns–{dist}–{{group}}.txt",
+             dist=config["distances"])
+   output:
+      report("data/plots/betaDiv_{sample}/Dunns_heatmap–{group}.svg",
+      caption="../report/beta_matrix.rst",
+      category="Beta diversity",
+      subcategory="Dunn's test",
+      labels={
+              "Description": "Heatmap of Dunn's Z-scores across distance metrics",
+              "Data type": "Plot - SVG",
+              "Grouping category": "{group}"})
+   params:
+      width=config["width"][0],
+      height=config["height"][0]
+   log:
+      "data/logs/Dunn_heatmap_{sample}–{group}.log"
+   message: "Beta diversity: Plotting Dunn's Z-score heatmap for variable {wildcards.group} in {wildcards.sample}"
+   shell:
+      "Rscript --vanilla ./workflow/scripts/plot_dunns_heatmap.R -i data/distance/PerGroupDistCompare/{wildcards.sample}/ -g {wildcards.group} -o {output} -x {params.width} -y {params.height} > {log} 2>&1 "
+
 rule dunn:
    input:
-      expand("data/distance/PerGroupDistCompare/{sample}/Dunns–{dist}–{group}.txt",           sample=config["mysample"], dist=config["distances"], group=config["group"])
+      expand("data/distance/PerGroupDistCompare/{sample}/Dunns–{dist}–{group}.txt",           sample=config["mysample"], dist=config["distances"], group=config["group"]),
+      expand("data/plots/betaDiv_{sample}/Dunns_heatmap–{group}.svg",                         sample=config["mysample"], group=config["group"])
 
 rule beta:
    input:
@@ -303,5 +327,6 @@ rule beta:
       expand("data/distance/ADONIS/{sample}/adonis–{dist}–{group}.txt",       sample=config["mysample"], dist=config["distances"], group=config["group"]),
       expand("data/plots/betaDiv_{sample}/NMDS–{dist}–{group}.svg",           sample=config["mysample"], dist=config["distances"], group=config["group"]),
       expand("data/plots/betaDiv_{sample}/PCoA–{dist}–{group}.svg",           sample=config["mysample"], dist=config["distances"], group=config["group"]),
-      expand("data/distance/PerGroupDistCompare/{sample}/Dunns–{dist}–{group}.txt",           sample=config["mysample"], dist=config["distances"], group=config["group"])
+      expand("data/distance/PerGroupDistCompare/{sample}/Dunns–{dist}–{group}.txt",           sample=config["mysample"], dist=config["distances"], group=config["group"]),
+      expand("data/plots/betaDiv_{sample}/Dunns_heatmap–{group}.svg",         sample=config["mysample"], group=config["group"])
       
